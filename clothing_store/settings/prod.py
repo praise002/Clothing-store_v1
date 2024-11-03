@@ -1,0 +1,21 @@
+from .base import *
+
+DEBUG = False
+
+ADMINS = [
+    ('Praise Idowu', 'ifeoluwapraise002@gmail.com'),
+]
+
+# ALLOWED_HOSTS = ['.vercel.app', '.now.sh'] 
+ALLOWED_HOSTS = ['*'] 
+
+DATABASES = {
+    'default': {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": config("POSTGRES_DB"),
+        "USER": config("POSTGRES_USER"),
+        "PASSWORD": config("POSTGRES_PASSWORD"),
+        "HOST": "db",
+        "PORT": config("POSTGRES_PORT"),
+    }
+}
