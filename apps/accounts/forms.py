@@ -133,8 +133,20 @@ class UserEditForm(forms.ModelForm):
         validators=[validate_name],
         max_length=50,
         widget=forms.TextInput(attrs={"class": "input input--text"})
-    )
+    ) #TODO: FIX CLASSES NAME
     
     class Meta:
         model = User
         fields = ["first_name", "last_name"]
+        
+class OtpForm(forms.Form):
+    otp = forms.IntegerField(
+        min_value=100000, 
+        max_value=999999,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',  #TODO: ALSO IN HTML FORMS
+            'placeholder': 'Enter OTP'
+        }),
+        label="OTP Code"
+    )

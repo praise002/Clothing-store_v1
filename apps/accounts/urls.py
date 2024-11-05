@@ -49,7 +49,7 @@ urlpatterns = [
      path('reset-password/<uidb64>/<token>/',
           views.CustomPasswordResetConfirmView.as_view(
                success_url = reverse_lazy("accounts:password_reset_complete"),
-          ),
+          ), #TODO: SWITCH TO OTP
           name='password_reset_confirm'),
      path('reset-password/complete/',
           views.CustomPasswordResetCompleteView.as_view(),
