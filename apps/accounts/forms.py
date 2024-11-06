@@ -2,7 +2,9 @@ from django import forms
 from django.contrib.auth.forms import (
     UserCreationForm,
     PasswordResetForm,
-    SetPasswordForm)
+    SetPasswordForm,
+    PasswordChangeForm
+)
 from django.utils.translation import gettext_lazy as _
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth import password_validation
@@ -12,6 +14,7 @@ from .models import User
 from .otp_utils import EmailThread
 from .validators import validate_name
 
+
 class RegistrationForm(UserCreationForm):
     error_messages = {
         "password_mismatch": _("Password Mismatch."),
@@ -19,65 +22,69 @@ class RegistrationForm(UserCreationForm):
     first_name = forms.CharField(
         validators=[validate_name],
         max_length=50,
-        widget=forms.TextInput(attrs={"placeholder": "e.g. Amina", "class": "input input--text"})
+        widget=forms.TextInput(attrs={"placeholder": "e.g. Amina"}),
     )
     last_name = forms.CharField(
         validators=[validate_name],
         max_length=50,
-        widget=forms.TextInput(attrs={"placeholder": "e.g. Smith", "class": "input input--text"})
+        widget=forms.TextInput(attrs={"placeholder": "e.g. Smith"}),
     )
     email = forms.EmailField(
         error_messages={"unique": _("Email already registered")},
         label="Email Address",
-        widget=forms.EmailInput(attrs={"placeholder": "e.g. user@domain.com", "class": "input input--email"}),
+        widget=forms.EmailInput(attrs={"placeholder": "e.g. user@domain.com"}),
     )
     password1 = forms.CharField(
         label="Password",
-        widget=forms.PasswordInput(attrs={"placeholder": "••••••••", "class": "input input--password"}),
+        widget=forms.PasswordInput(attrs={"placeholder": "••••••••"}),
     )
     password2 = forms.CharField(
         label="Confirm Password",
-        widget=forms.PasswordInput(attrs={"placeholder": "••••••••", "class": "input input--password"}),
+        widget=forms.PasswordInput(attrs={"placeholder": "••••••••"}),
     )
 
     usable_password = None
-    
+
     class Meta:
         model = User
         fields = [
-            "first_name", 
-            "last_name", 
-            "email", 
-            "password1", 
+            "first_name",
+            "last_name",
+            "email",
+            "password1",
             "password2",
-            ]
-    
+        ]
+
     def _post_clean(self):
         super(RegistrationForm, self)._post_clean()
         password1 = self.cleaned_data["password1"]
         if len(password1) < 8:
             self.add_error("password1", "Password too short")
 
+
 class LoginForm(forms.Form):
     email = forms.EmailField(
         widget=forms.EmailInput(
             attrs={
                 "placeholder": _("Enter your email address..."),
-                "class": "input input--text"
             }
-        ),)
+        ),
+    )
 
     password = forms.CharField(
-        widget=forms.PasswordInput(attrs={"placeholder": "••••••••", "class": "input input--password"}),
+        widget=forms.PasswordInput(attrs={"placeholder": "••••••••"}),
     )
-    
+
+
 class CustomPasswordResetForm(PasswordResetForm):
     email = forms.EmailField(
         label=_("Email"),
         max_length=254,
-        widget=forms.EmailInput(attrs={"placeholder": "e.g. user@domain.com", "autocomplete": "email", "class": "input input--email"}),
+        widget=forms.EmailInput(
+            attrs={"placeholder": "e.g. user@domain.com", "autocomplete": "email"}
+        ),
     )
-    
+
     def send_mail(
         self,
         subject_template_name,
@@ -109,8 +116,35 @@ class CustomPasswordResetForm(PasswordResetForm):
 class CustomSetPasswordForm(SetPasswordForm):
     new_password1 = forms.CharField(
         label=_("New password"),
+        widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
+        strip=False,
+        help_text=password_validation.password_validators_help_text_html(),
+    )
+    new_password2 = forms.CharField(
+        label=_("Confirm"),
+        strip=False,
+        widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
+    )
+
+
+class CustomChangePasswordForm(PasswordChangeForm):
+    old_password = forms.CharField(
+        label=_("Old password"),
+        strip=False,
         widget=forms.PasswordInput(
-            attrs={"autocomplete": "new-password", "class": "input input--password"}
+            attrs={
+                "autocomplete": "current-password",
+                "class": "form-control",
+            }
+        ),
+    )
+    new_password1 = forms.CharField(
+        label=_("New password"),
+        widget=forms.PasswordInput(
+            attrs={
+                "autocomplete": "new-password",
+                "class": "form-control",
+            }
         ),
         strip=False,
         help_text=password_validation.password_validators_help_text_html(),
@@ -119,34 +153,38 @@ class CustomSetPasswordForm(SetPasswordForm):
         label=_("Confirm"),
         strip=False,
         widget=forms.PasswordInput(
-            attrs={"autocomplete": "new-password", "class": "input input--password"}
+            attrs={
+                "autocomplete": "new-password",
+                "class": "form-control",
+            }
         ),
     )
-    
+
+
 class UserEditForm(forms.ModelForm):
     first_name = forms.CharField(
         validators=[validate_name],
         max_length=50,
-        widget=forms.TextInput(attrs={"class": "input input--text"})
+        # widget=forms.TextInput(attrs={"class": "input input--text"})
     )
     last_name = forms.CharField(
         validators=[validate_name],
         max_length=50,
-        widget=forms.TextInput(attrs={"class": "input input--text"})
-    ) #TODO: FIX CLASSES NAME
-    
+        # widget=forms.TextInput(attrs={"class": "input input--text"})
+    )  # TODO: FIX CLASSES NAME
+
     class Meta:
         model = User
         fields = ["first_name", "last_name"]
-        
+
+
 class OtpForm(forms.Form):
     otp = forms.IntegerField(
-        min_value=100000, 
+        min_value=100000,
         max_value=999999,
         required=True,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',  #TODO: ALSO IN HTML FORMS
-            'placeholder': 'Enter OTP'
-        }),
-        label="OTP Code"
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "Enter OTP"}
+        ),
+        label="OTP Code",
     )

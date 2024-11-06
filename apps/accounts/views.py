@@ -8,9 +8,10 @@ from django.contrib.auth.views import (
     PasswordResetConfirmView,
     PasswordResetCompleteView,
     PasswordResetDoneView,
+    PasswordChangeView
 )
 
-from .forms import RegistrationForm
+from .forms import CustomChangePasswordForm, OtpForm, RegistrationForm
 from .mixins import LoginRequiredMixin, LogoutRequiredMixin
 from .models import User, Otp
 from .otp_utils import OTPService
@@ -38,7 +39,7 @@ class RegisterView(LogoutRequiredMixin, View):
             return render(
                 request, "accounts/otp_form.html", {"form": form}
             )  # REDIRECT TO OTP VIEW
-            #TODO: WRITE CHECK YOUR EMAIL FOR A VERIFICATION LINK IN THE BEFORE THE FORM
+            # TODO: WRITE CHECK YOUR EMAIL FOR A VERIFICATION LINK IN THE BEFORE THE FORM
 
         return render(request, "accounts/signup.html", {"form": form})
 
@@ -92,60 +93,59 @@ class LoginView(LogoutRequiredMixin, View):
         return render(request, "accounts/login.html", context)
 
 
-class VerifyEmail(LogoutRequiredMixin, View): #TODO: OTPFORM
+class VerifyEmail(LogoutRequiredMixin, View):
     def post(self, request, *args, **kwargs):
-        # Get the email from the session
-        email = request.session.get("verification_email")
-        otp_code = request.POST.get("otp")  # Get OTP code from the POST data
+        form = OtpForm(request.POST)
 
-        # Check if the email exists in the session
-        if not email:
-            sweetify.error(request, "Not allowed.")
-            return redirect(reverse("accounts:login"))
+        if form.is_valid():
+            otp_code = form.cleaned_data["otp"]
 
-        try:
-            # Get the user by email
-            user_obj = User.objects.get(email=email)
+            # Get the email from the session
+            email = request.session.get("verification_email")
 
-        except User.DoesNotExist:
-            sweetify.error(request, "Invalid user.")
-            return redirect(reverse("accounts:login"))
-
-        # Fetch the OTP record for the user
-        try:
-            otp_record = Otp.objects.get(user=user_obj)
-            # Check if the OTP is valid and not expired
-            if otp_record.otp == otp_code and otp_record.is_valid:
-                user_obj.is_email_verified = True
-                user_obj.save()
-                sweetify.toast(request, "Verification successful!")
-
-                # Clean up the OTP record after successful verification
-                # otp_record.delete()
-
-                # Clear OTP after verification
-                Otp.objects.filter(user=user_obj).delete()
-
-                # Send welcome email
-                OTPService.welcome(request, user_obj)
-
-                # Clear the email from the session
-                request.session["verification_email"] = None
-
-                return redirect(reverse("accounts:login"))
-            else:
-                sweetify.error(request, "Invalid or expired OTP.")
+            # Check if the email exists in the session
+            if not email:
+                sweetify.error(request, "Not allowed.")
                 return redirect(reverse("accounts:login"))
 
-        except Otp.DoesNotExist:
-            sweetify.error(request, "No OTP found for this user.")
-            return redirect(reverse("accounts:login"))
+            try:
+                # Get the user by email
+                user_obj = User.objects.get(email=email)
+
+            except User.DoesNotExist:
+                sweetify.error(request, "Invalid user.")
+                return redirect(reverse("accounts:login"))
+
+            # Fetch the OTP record for the user
+            try:
+                otp_record = Otp.objects.get(user=user_obj)
+
+                # Check if the OTP is valid and not expired
+                if otp_record.otp == otp_code and otp_record.is_valid:
+                    user_obj.is_email_verified = True
+                    user_obj.save()
+                    sweetify.toast(request, "Verification successful!")
+
+                    # Clear OTP after verification
+                    Otp.objects.filter(user=user_obj).delete()
+
+                    # Send welcome email
+                    OTPService.welcome(request, user_obj)
+
+                    # Clear the email from the session
+                    request.session["verification_email"] = None
+
+                    return redirect(reverse("accounts:login"))
+                else:
+                    sweetify.error(request, "Invalid or expired OTP.")
+            except Otp.DoesNotExist:
+                sweetify.error(request, "No OTP found for this user.")
+
+        return redirect(reverse("accounts:login"))
 
     def get(self, request, *args, **kwargs):
-        # render a form for OTP input
-        return render(
-            request, "accounts/otp_form.html", {"user_id": kwargs["user_id"]}
-        )
+        form = OtpForm()
+        return render(request, "accounts/otp_form.html", {"form": form})
 
 
 class ResendVerificationEmail(LogoutRequiredMixin, View):
@@ -185,7 +185,9 @@ class CustomPasswordResetDoneView(LogoutRequiredMixin, PasswordResetDoneView):
 class CustomPasswordResetCompleteView(LogoutRequiredMixin, PasswordResetCompleteView):
     template_name = "accounts/password_reset_complete.html"
 
-
+class CustomPasswordChangeView(PasswordChangeView):
+    form_class = CustomChangePasswordForm
+    
 class LogoutView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         logout(request)
