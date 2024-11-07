@@ -52,6 +52,37 @@ class OTPService:
         email_message = EmailMessage(subject=subject, body=message, to=[user.email])
         email_message.content_subtype = "html"
         EmailThread(email_message).start()
+        
+    @staticmethod
+    def send_password_reset_otp(request, user):
+        domain = f"{request.scheme}://{request.get_host()}"  # http www.example.com
+        otp = OTPService.store_otp(user, OTPService.generate_otp())
+        subject = "Your Password Reset OTP"
+        email = user.email
+        context = {
+            "domain": domain,
+            "name": user.full_name,
+            "email": email,
+            "otp": otp,
+        }
+        message = render_to_string("password_reset_otp.html", context)
+        email_message = EmailMessage(subject=subject, body=message, to=[email])
+        email_message.content_subtype = "html"
+        EmailThread(email_message).start()
+
+    @staticmethod
+    def password_reset_success(request, user):
+        domain = f"{request.scheme}://{request.get_host()}"
+        subject = "Password Reset Successful"
+        context = {
+            "domain": domain,
+            "name": user.full_name,
+        }
+        message = render_to_string("password_reset_success.html", context)
+        email_message = EmailMessage(subject=subject, body=message, to=[user.email])
+        email_message.content_subtype = "html"
+        EmailThread(email_message).start()
+
 
 
 

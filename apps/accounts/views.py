@@ -1,22 +1,29 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
 from django.views import View
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.urls import reverse_lazy
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.views import (
     PasswordResetView,
     PasswordResetConfirmView,
     PasswordResetCompleteView,
     PasswordResetDoneView,
-    PasswordChangeView
+    PasswordChangeView,
 )
 
-from .forms import CustomChangePasswordForm, OtpForm, RegistrationForm
+from .forms import (
+    CustomChangePasswordForm,
+    OtpForm,
+    RegistrationForm,
+    OTPRequestForm,
+    OTPVerificationForm,
+)
 from .mixins import LoginRequiredMixin, LogoutRequiredMixin
 from .models import User, Otp
 from .otp_utils import OTPService
 from .forms import (
-    CustomPasswordResetForm,
     CustomSetPasswordForm,
     LoginForm,
     RegistrationForm,
@@ -168,26 +175,94 @@ class ResendVerificationEmail(LogoutRequiredMixin, View):
         return render(request, "accounts/email_verification_sent.html")
 
 
-class CustomPasswordResetView(LogoutRequiredMixin, PasswordResetView):
-    form_class = CustomPasswordResetForm
+class OTPRequestView(View):
+    def get(self, request):
+        form = OTPRequestForm()
+        return render(request, "accounts/otp_request.html", {"form": form})
+
+    def post(self, request):
+        form = OTPRequestForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data["email"]
+            user = get_object_or_404(User, email=email)
+
+            # Send OTP using utility function
+            if OTPService.send_password_reset_otp(request, user):
+                # Store email in session after OTP is successfully sent
+                request.session["reset_email"] = email
+
+                sweetify.success(request, "An OTP has been sent to your email.")
+                return redirect(reverse_lazy("accounts:reset_password_verify_otp"))
+            else:
+                sweetify.error(request, "Failed to send OTP. Please try again.")
+
+        # Re-render form with errors if form is invalid
+        return render(request, "accounts/otp_request.html", {"form": form})
+
+
+class OTPVerificationView(LogoutRequiredMixin, View):
+    form_class = OTPVerificationForm
+    template_name = "accounts/otp_verify.html"
+
+    def get(self, request):
+        form = self.form_class()
+        return render(request, self.template_name, {"form": form})
+
+    def post(self, request):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            otp = form.cleaned_data["otp"]
+            otp_instance = get_object_or_404(Otp, otp=otp, user=request.user)
+
+            # Check if the OTP matches and is not expired
+            if otp_instance.is_valid():
+                return redirect(reverse_lazy("accounts:reset_password_form"))
+            else:
+                sweetify.error(request, "Invalid OTP or OTP has expired.")
+
+        # Re-render form with errors if OTP is invalid or any other error occurs
+        return render(request, self.template_name, {"form": form})
+
+
+class PasswordResetView(View):
     template_name = "accounts/password_reset_form.html"
 
+    def get(self, request, *args, **kwargs):
+        form = CustomSetPasswordForm()
+        return render(request, self.template_name, {"form": form})
 
-class CustomPasswordResetConfirmView(LogoutRequiredMixin, PasswordResetConfirmView):
-    form_class = CustomSetPasswordForm
-    template_name = "accounts/password_reset_confirm.html"
+    def post(self, request, *args, **kwargs):
+        form = CustomSetPasswordForm(request.POST)
 
+        if form.is_valid():
+            # Retrieve the email from session
+            email = request.session.get("reset_email")
+            user = get_object_or_404(User, email=email)
 
-class CustomPasswordResetDoneView(LogoutRequiredMixin, PasswordResetDoneView):
-    template_name = "accounts/password_reset_done.html"
+            # Set new password
+            new_password = form.cleaned_data["new_password1"]
+            user.set_password(new_password)
+            user.save()
+
+            # Update session to keep user logged in
+            update_session_auth_hash(request, user)
+
+            # Clear session data
+            request.session.pop("reset_email", None)
+
+            return redirect(reverse_lazy("accounts:password_reset_complete"))
+
+        return render(request, self.template_name, {"form": form})
 
 
 class CustomPasswordResetCompleteView(LogoutRequiredMixin, PasswordResetCompleteView):
     template_name = "accounts/password_reset_complete.html"
 
+
 class CustomPasswordChangeView(PasswordChangeView):
     form_class = CustomChangePasswordForm
-    
+
+
 class LogoutView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         logout(request)
@@ -201,3 +276,6 @@ class LogoutAllDevices(LoginRequiredMixin, View):
         return redirect(
             "accounts:login"
         )  # Redirect to the home page or any other desired page
+
+
+# TODO: CHECK ALL THE SWEETIFY.INFO & SUCCESS

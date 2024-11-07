@@ -3,7 +3,7 @@ from django.contrib.auth.forms import (
     UserCreationForm,
     PasswordResetForm,
     SetPasswordForm,
-    PasswordChangeForm
+    PasswordChangeForm,
 )
 from django.utils.translation import gettext_lazy as _
 from django.core.mail import EmailMultiAlternatives
@@ -76,56 +76,41 @@ class LoginForm(forms.Form):
     )
 
 
-class CustomPasswordResetForm(PasswordResetForm):
+class OTPRequestForm(forms.Form):
     email = forms.EmailField(
-        label=_("Email"),
+        label="Enter your registered email",
         max_length=254,
         widget=forms.EmailInput(
             attrs={"placeholder": "e.g. user@domain.com", "autocomplete": "email"}
         ),
     )
 
-    def send_mail(
-        self,
-        subject_template_name,
-        email_template_name,
-        context,
-        from_email,
-        to_email,
-        html_email_template_name=None,
-    ):
-        """
-        Send a django.core.mail.EmailMultiAlternatives to `to_email`.
-        """
-        subject = render_to_string(subject_template_name, context)
-        # Email subject *must not* contain newlines
-        subject = "".join(subject.splitlines())
-        body = render_to_string(email_template_name, context)
-        user = User.objects.filter(email=to_email).first()
-        if user:
-            context["name"] = user.full_name
-        email_message = EmailMultiAlternatives(subject, body, from_email, [to_email])
-        if html_email_template_name is not None:
-            context["name"]
-            html_email = render_to_string(html_email_template_name, context)
-            email_message.attach_alternative(html_email, "text/html")
 
-        EmailThread(email_message).start()
-
+class OTPVerificationForm(forms.Form):
+    otp = forms.IntegerField(label="Enter OTP")
 
 class CustomSetPasswordForm(SetPasswordForm):
     new_password1 = forms.CharField(
         label=_("New password"),
-        widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
+        widget=forms.PasswordInput(
+            attrs={
+                "autocomplete": "new-password",
+                "class": "form-control",
+            }
+        ),
         strip=False,
         help_text=password_validation.password_validators_help_text_html(),
     )
     new_password2 = forms.CharField(
         label=_("Confirm"),
         strip=False,
-        widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
+        widget=forms.PasswordInput(
+            attrs={
+                "autocomplete": "new-password",
+                "class": "form-control",
+            }
+        ),
     )
-
 
 class CustomChangePasswordForm(PasswordChangeForm):
     old_password = forms.CharField(
