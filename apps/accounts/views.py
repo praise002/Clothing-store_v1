@@ -6,10 +6,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.urls import reverse_lazy
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.views import (
-    PasswordResetView,
-    PasswordResetConfirmView,
     PasswordResetCompleteView,
-    PasswordResetDoneView,
     PasswordChangeView,
 )
 
@@ -43,10 +40,7 @@ class RegisterView(LogoutRequiredMixin, View):
             user = form.save()
             OTPService.send_otp_email(request, user)
             request.session["verification_email"] = user.email
-            return render(
-                request, "accounts/otp_form.html", {"form": form}
-            )  # REDIRECT TO OTP VIEW
-            # TODO: WRITE CHECK YOUR EMAIL FOR A VERIFICATION LINK IN THE BEFORE THE FORM
+            return redirect('accounts:verify_email')
 
         return render(request, "accounts/signup.html", {"form": form})
 
@@ -83,7 +77,7 @@ class LoginView(LogoutRequiredMixin, View):
                 )
                 OTPService.send_otp_email(request, user)
                 return render(
-                    request, "accounts/email_verification_sent.html", {"form": form}
+                    request, "accounts/otp_form_verification.html", {"form": form}
                 )
 
             # passes all above test, login user
@@ -152,7 +146,7 @@ class VerifyEmail(LogoutRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         form = OtpForm()
-        return render(request, "accounts/otp_form.html", {"form": form})
+        return render(request, "accounts/otp_form_verification.html", {"form": form})
 
 
 class ResendVerificationEmail(LogoutRequiredMixin, View):
@@ -172,13 +166,15 @@ class ResendVerificationEmail(LogoutRequiredMixin, View):
 
         OTPService.send_otp_email(request, user)
         sweetify.toast(self.request, "Email Sent")
-        return render(request, "accounts/email_verification_sent.html")
+        return render(request, "accounts/otp_form_verification.html")
 
 
 class OTPRequestView(View):
+    template_name = "accounts/password_reset_form.html"
+    
     def get(self, request):
         form = OTPRequestForm()
-        return render(request, "accounts/otp_request.html", {"form": form})
+        return render(request, self.template_name, {"form": form})
 
     def post(self, request):
         form = OTPRequestForm(request.POST)
@@ -197,12 +193,12 @@ class OTPRequestView(View):
                 sweetify.error(request, "Failed to send OTP. Please try again.")
 
         # Re-render form with errors if form is invalid
-        return render(request, "accounts/otp_request.html", {"form": form})
+        return render(request, self.template_name, {"form": form})
 
 
 class OTPVerificationView(LogoutRequiredMixin, View):
     form_class = OTPVerificationForm
-    template_name = "accounts/otp_verify.html"
+    template_name = "accounts/password_reset_otp_form.html"
 
     def get(self, request):
         form = self.form_class()
@@ -225,14 +221,15 @@ class OTPVerificationView(LogoutRequiredMixin, View):
 
 
 class PasswordResetView(View):
-    template_name = "accounts/password_reset_form.html"
+    template_name = "accounts/password_reset_confirm.html"
+    form_class = CustomSetPasswordForm
 
     def get(self, request, *args, **kwargs):
-        form = CustomSetPasswordForm()
+        form = self.form_class()
         return render(request, self.template_name, {"form": form})
 
     def post(self, request, *args, **kwargs):
-        form = CustomSetPasswordForm(request.POST)
+        form = self.form_class(request.POST)
 
         if form.is_valid():
             # Retrieve the email from session

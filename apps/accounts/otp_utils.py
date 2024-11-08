@@ -65,7 +65,7 @@ class OTPService:
             "email": email,
             "otp": otp,
         }
-        message = render_to_string("password_reset_otp.html", context)
+        message = render_to_string("password_reset_html_email.html", context)
         email_message = EmailMessage(subject=subject, body=message, to=[email])
         email_message.content_subtype = "html"
         EmailThread(email_message).start()
