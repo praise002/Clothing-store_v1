@@ -1,10 +1,9 @@
 from django import forms
 from django.contrib.auth.forms import (
     UserCreationForm,
-    PasswordResetForm,
-    SetPasswordForm,
     PasswordChangeForm,
 )
+from django.contrib.auth.password_validation import validate_password
 from django.utils.translation import gettext_lazy as _
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth import password_validation
@@ -36,11 +35,11 @@ class RegistrationForm(UserCreationForm):
     )
     password1 = forms.CharField(
         label="Password",
-        widget=forms.PasswordInput(attrs={"placeholder": "••••••••"}),
+        widget=forms.PasswordInput(attrs={"placeholder": "••••••••", "autocomplete": "new-password",}),
     )
     password2 = forms.CharField(
         label="Confirm Password",
-        widget=forms.PasswordInput(attrs={"placeholder": "••••••••"}),
+        widget=forms.PasswordInput(attrs={"placeholder": "••••••••", "autocomplete": "new-password",}),
     )
 
     usable_password = None
@@ -60,6 +59,17 @@ class RegistrationForm(UserCreationForm):
         password1 = self.cleaned_data["password1"]
         if len(password1) < 8:
             self.add_error("password1", "Password too short")
+
+class OtpForm(forms.Form):
+    otp = forms.IntegerField(
+        min_value=100000,
+        max_value=999999,
+        required=True,
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "Enter OTP"}
+        ),
+        label="OTP Code",
+    )
 
 
 class LoginForm(forms.Form):
@@ -81,15 +91,23 @@ class OTPRequestForm(forms.Form):
         label="Enter your registered email",
         max_length=254,
         widget=forms.EmailInput(
-            attrs={"placeholder": "e.g. user@domain.com", "autocomplete": "email"}
+            attrs={"class": "form-control", "placeholder": "e.g. user@domain.com", }
         ),
     )
 
 
 class OTPVerificationForm(forms.Form):
-    otp = forms.IntegerField(label="Enter OTP")
+    otp = forms.IntegerField(
+        min_value=100000,
+        max_value=999999,
+        required=True,
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "Enter OTP"}
+        ),
+        label="OTP Code",
+    )
 
-class CustomSetPasswordForm(SetPasswordForm):
+class CustomSetPasswordForm(forms.ModelForm):
     new_password1 = forms.CharField(
         label=_("New password"),
         widget=forms.PasswordInput(
@@ -111,6 +129,32 @@ class CustomSetPasswordForm(SetPasswordForm):
             }
         ),
     )
+    
+    class Meta:
+        model = User
+        fields = []  # We don't need other fields here, only password reset
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password1 = cleaned_data.get("new_password1")
+        password2 = cleaned_data.get("new_password2")
+
+        if password1 and password2:
+            if password1 != password2:
+                self.add_error("new_password2", "The two password fields must match.")
+            else:
+                # Validate the password
+                validate_password(password1, self.instance)
+
+        return cleaned_data
+
+    def save(self, commit=True):
+        password = self.cleaned_data["new_password1"]
+        user = self.instance
+        user.set_password(password)  # Set the password using hashing
+        if commit:
+            user.save()
+        return user
 
 class CustomChangePasswordForm(PasswordChangeForm):
     old_password = forms.CharField(
@@ -163,13 +207,3 @@ class UserEditForm(forms.ModelForm):
         fields = ["first_name", "last_name"]
 
 
-class OtpForm(forms.Form):
-    otp = forms.IntegerField(
-        min_value=100000,
-        max_value=999999,
-        required=True,
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "Enter OTP"}
-        ),
-        label="OTP Code",
-    )
