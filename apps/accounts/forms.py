@@ -86,25 +86,13 @@ class LoginForm(forms.Form):
     )
 
 
-class OTPRequestForm(forms.Form):
+class PasswordResetRequestForm(forms.Form):
     email = forms.EmailField(
         label="Enter your registered email",
         max_length=254,
         widget=forms.EmailInput(
             attrs={"class": "form-control", "placeholder": "e.g. user@domain.com", }
         ),
-    )
-
-
-class OTPVerificationForm(forms.Form):
-    otp = forms.IntegerField(
-        min_value=100000,
-        max_value=999999,
-        required=True,
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "Enter OTP"}
-        ),
-        label="OTP Code",
     )
 
 class CustomSetPasswordForm(forms.ModelForm):

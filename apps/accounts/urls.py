@@ -42,8 +42,13 @@ urlpatterns = [
     # Reset Password URLs
     path(
         "reset-password/request-otp/",  # Request OTP for password reset
-        views.OTPRequestView.as_view(),
-        name="reset_password_request_otp",
+        views.PasswordResetRequestView.as_view(),
+        name="reset_password_request",
+    ),
+    path(
+        "reset-password/resend-otp/",  # Resend OTP
+        views.ResendOTPVerificationView.as_view(),
+        name="reset_password_resend_otp",
     ),
     path(
         "reset-password/verify-otp/",  # Verify OTP before setting new password

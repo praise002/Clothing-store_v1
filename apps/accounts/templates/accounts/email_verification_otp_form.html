@@ -24,6 +24,7 @@
                 {{ form.otp }}
               </div>
 
+              <p>To receive a new otp <a href="{% url "accounts:resend_verification_email" %}">Click Here!</a></p>
               <button type="submit" class="btn btn-primary btn-block">Verify</button>
             </form>
           </div>

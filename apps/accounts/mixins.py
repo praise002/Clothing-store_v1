@@ -8,8 +8,7 @@ class LogoutRequiredMixin(AccessMixin):
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            # return redirect('projects:projects_list')
-            pass
+            return redirect('shop:home')
             
         return super().dispatch(request, *args, **kwargs)
 

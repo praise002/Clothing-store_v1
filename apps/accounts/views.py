@@ -13,6 +13,7 @@ from django.contrib.auth.views import (
 from .forms import (
     CustomChangePasswordForm,
     OtpForm,
+    PasswordResetRequestForm,
     RegistrationForm,
     OTPRequestForm,
     OTPVerificationForm,
@@ -39,6 +40,7 @@ class RegisterView(LogoutRequiredMixin, View):
         if form.is_valid():
             user = form.save()
             OTPService.send_otp_email(request, user)
+            # store the email in session
             request.session["verification_email"] = user.email
             return redirect('accounts:verify_email')
 
@@ -46,15 +48,16 @@ class RegisterView(LogoutRequiredMixin, View):
 
 
 class LoginView(LogoutRequiredMixin, View):
+    form_class = LoginForm
+    
     def get(self, request):
-        form = LoginForm()
-        # next_url = request.GET.get("next", reverse('projects:projects_list'))
-        # context = {"form": form, "next": next_url}
-        context = {"form": form}
+        form = self.form_class()
+        next_url = request.GET.get("next", reverse('shop:home'))
+        context = {"form": form, "next": next_url}
         return render(request, "accounts/login.html", context)
 
     def post(self, request):
-        form = LoginForm(request.POST)
+        form = self.form_class(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
             email = cd["email"]
@@ -77,26 +80,27 @@ class LoginView(LogoutRequiredMixin, View):
                 )
                 OTPService.send_otp_email(request, user)
                 return render(
-                    request, "accounts/otp_form_verification.html", {"form": form}
+                    request, "accounts/email_verification_otp_form.html", {"form": form}
                 )
 
             # passes all above test, login user
             login(request, user)
 
-            # redirect_url = request.POST.get("next", reverse('projects:projects_list'))
-            # if not url_has_allowed_host_and_scheme(redirect_url, allowed_hosts={request.get_host()}):
-            #     redirect_url = reverse('projects:projects_list')
+            redirect_url = request.POST.get("next", reverse('shop:home'))
+            if not url_has_allowed_host_and_scheme(redirect_url, allowed_hosts={request.get_host()}):
+                redirect_url = reverse('shop:home')
 
-            # return redirect(redirect_url)
-            return redirect("/")
+            return redirect(redirect_url)
 
         context = {"form": form}
         return render(request, "accounts/login.html", context)
 
 
 class VerifyEmail(LogoutRequiredMixin, View):
+    form_class = OtpForm
+    
     def post(self, request, *args, **kwargs):
-        form = OtpForm(request.POST)
+        form = self.form_class(request.POST)
 
         if form.is_valid():
             otp_code = form.cleaned_data["otp"]
@@ -114,7 +118,7 @@ class VerifyEmail(LogoutRequiredMixin, View):
                 user_obj = User.objects.get(email=email)
 
             except User.DoesNotExist:
-                sweetify.error(request, "Invalid user.")
+                sweetify.error(request, "We couldn't find an account associated with this email. Please try again or contact support.")
                 return redirect(reverse("accounts:login"))
 
             # Fetch the OTP record for the user
@@ -138,15 +142,15 @@ class VerifyEmail(LogoutRequiredMixin, View):
 
                     return redirect(reverse("accounts:login"))
                 else:
-                    sweetify.error(request, "Invalid or expired OTP.")
+                    sweetify.error(request, "Invalid or expired OTP. Please request a new one.")
             except Otp.DoesNotExist:
-                sweetify.error(request, "No OTP found for this user.")
+                sweetify.error(request, "No OTP found. Please request a new one.")
 
-        return redirect(reverse("accounts:login"))
+        return render(request, 'accounts/email_verification_otp_form.html', {"form": form})
 
     def get(self, request, *args, **kwargs):
-        form = OtpForm()
-        return render(request, "accounts/otp_form_verification.html", {"form": form})
+        form = self.form_class()
+        return render(request, 'accounts/email_verification_otp_form.html', {"form": form})
 
 
 class ResendVerificationEmail(LogoutRequiredMixin, View):
@@ -156,7 +160,7 @@ class ResendVerificationEmail(LogoutRequiredMixin, View):
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-            sweetify.error(request, "Not allowed")
+            sweetify.error(request, "We couldn't find an account associated with this email. Please try again or contact support.")
             return redirect(reverse("accounts:login"))
 
         if user.is_email_verified:
@@ -165,68 +169,90 @@ class ResendVerificationEmail(LogoutRequiredMixin, View):
             return redirect(reverse("accounts:login"))
 
         OTPService.send_otp_email(request, user)
-        sweetify.toast(self.request, "Email Sent")
-        return render(request, "accounts/otp_form_verification.html")
+        sweetify.toast(request, "Email Sent")
 
 
-class OTPRequestView(View):
-    template_name = "accounts/password_reset_form.html"
+class PasswordResetRequestView(LoginRequiredMixin, View):
+    form_class = PasswordResetRequestForm
     
     def get(self, request):
-        form = OTPRequestForm()
-        return render(request, self.template_name, {"form": form})
+        form = self.form_class()
+        return render(request, "accounts/password_reset_form.html", {"form": form})
 
     def post(self, request):
-        form = OTPRequestForm(request.POST)
+        form = self.form_class(request.POST)
         if form.is_valid():
             email = form.cleaned_data["email"]
-            user = get_object_or_404(User, email=email)
+            
+            try:
+                # Try to get the user by email
+                user = User.objects.get(email=email)
+                
+                if OTPService.send_password_reset_otp(request, user):
+                    # Store email in session after OTP is successfully sent
+                    request.session["reset_email"] = email
 
-            # Send OTP using utility function
-            if OTPService.send_password_reset_otp(request, user):
-                # Store email in session after OTP is successfully sent
-                request.session["reset_email"] = email
-
-                sweetify.success(request, "An OTP has been sent to your email.")
-                return redirect(reverse_lazy("accounts:reset_password_verify_otp"))
-            else:
-                sweetify.error(request, "Failed to send OTP. Please try again.")
+                    sweetify.success(request, "An OTP has been sent to your email.")
+                    return redirect(reverse_lazy("accounts:reset_password_verify_otp"))
+                else:
+                    sweetify.error(request, "Failed to send OTP. Please try again.")
+                
+            except User.DoesNotExist:
+                sweetify.error(request, "Sorry, no account found with this email address. Please check and try again.")
+                return redirect("accounts:reset_password_request")  
 
         # Re-render form with errors if form is invalid
-        return render(request, self.template_name, {"form": form})
+        return render(request, "accounts/password_reset_form.html", {"form": form})
 
 
 class OTPVerificationView(LogoutRequiredMixin, View):
-    form_class = OTPVerificationForm
-    template_name = "accounts/password_reset_otp_form.html"
+    form_class = OtpForm
 
     def get(self, request):
         form = self.form_class()
-        return render(request, self.template_name, {"form": form})
+        return render(request, "accounts/password_reset_otp_form.html", {"form": form})
 
     def post(self, request):
         form = self.form_class(request.POST)
         if form.is_valid():
             otp = form.cleaned_data["otp"]
-            otp_instance = get_object_or_404(Otp, otp=otp, user=request.user)
+            
+            try:
+                otp_instance = Otp.objects.get(otp=otp, user=request.user)
 
-            # Check if the OTP matches and is not expired
-            if otp_instance.is_valid():
-                return redirect(reverse_lazy("accounts:reset_password_form"))
-            else:
-                sweetify.error(request, "Invalid OTP or OTP has expired.")
+                if otp_instance.is_valid:
+                    return redirect(reverse_lazy("accounts:reset_password_form"))
+                else:
+                    sweetify.error(request, "The OTP is invalid or has expired. Please request a new one.")
+
+            except Otp.DoesNotExist:
+                sweetify.error(request, "The OTP could not be found. Please request a new one.")
 
         # Re-render form with errors if OTP is invalid or any other error occurs
-        return render(request, self.template_name, {"form": form})
+        return render(request, "accounts/password_reset_otp_form.html", {"form": form})
 
+class ResendOTPVerificationView(LogoutRequiredMixin, View):
+    def get(self, request):
+        email = request.session.get("reset_email")
+        
+        if not email:
+            sweetify.error(request, "Please request a password reset first.")
+            return redirect(reverse("accounts:reset_password_request"))
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            sweetify.error(request, "We couldn't find an account associated with this email. Please try again or contact support.")
+
+        OTPService.send_password_reset_otp(request, user)
+        sweetify.toast(request, "Email Sent")
 
 class PasswordResetView(View):
-    template_name = "accounts/password_reset_confirm.html"
     form_class = CustomSetPasswordForm
 
     def get(self, request, *args, **kwargs):
         form = self.form_class()
-        return render(request, self.template_name, {"form": form})
+        return render(request, "accounts/password_reset_confirm.html", {"form": form})
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
@@ -234,7 +260,15 @@ class PasswordResetView(View):
         if form.is_valid():
             # Retrieve the email from session
             email = request.session.get("reset_email")
-            user = get_object_or_404(User, email=email)
+            
+            if not email:
+                sweetify.error(request, "Not Allowed.")
+                return redirect(reverse("accounts:reset_password_request"))
+        
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                sweetify.error(request, "We couldn't find an account associated with this email. Please try again or contact support.")
 
             # Set new password
             new_password = form.cleaned_data["new_password1"]
@@ -249,7 +283,7 @@ class PasswordResetView(View):
 
             return redirect(reverse_lazy("accounts:password_reset_complete"))
 
-        return render(request, self.template_name, {"form": form})
+        return render(request, "accounts/password_reset_confirm.html", {"form": form})
 
 
 class CustomPasswordResetCompleteView(LogoutRequiredMixin, PasswordResetCompleteView):
@@ -274,5 +308,3 @@ class LogoutAllDevices(LoginRequiredMixin, View):
             "accounts:login"
         )  # Redirect to the home page or any other desired page
 
-
-# TODO: CHECK ALL THE SWEETIFY.INFO & SUCCESS

@@ -35,7 +35,7 @@ class OTPService:
             "name": user.full_name,
             "otp": otp,
         }
-        message = render_to_string("accounts/otp_email.html", context)
+        message = render_to_string("accounts/emails/email_verification_code.html", context)
         email_message = EmailMessage(subject=subject, body=message, to=[user.email])
         email_message.content_subtype = "html"
         EmailThread(email_message).start()
@@ -48,7 +48,7 @@ class OTPService:
             "domain": domain,
             "name": user.full_name,
         }
-        message = render_to_string("accounts/welcome_message.html", context)
+        message = render_to_string("accounts/emails/welcome_message.html", context)
         email_message = EmailMessage(subject=subject, body=message, to=[user.email])
         email_message.content_subtype = "html"
         EmailThread(email_message).start()
@@ -65,7 +65,7 @@ class OTPService:
             "email": email,
             "otp": otp,
         }
-        message = render_to_string("password_reset_html_email.html", context)
+        message = render_to_string("accounts/emails/password_reset_html_email.html", context)
         email_message = EmailMessage(subject=subject, body=message, to=[email])
         email_message.content_subtype = "html"
         EmailThread(email_message).start()
