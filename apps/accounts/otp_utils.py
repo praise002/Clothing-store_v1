@@ -78,7 +78,7 @@ class OTPService:
             "domain": domain,
             "name": user.full_name,
         }
-        message = render_to_string("password_reset_success.html", context)
+        message = render_to_string("accounts/password_reset_success.html", context)
         email_message = EmailMessage(subject=subject, body=message, to=[user.email])
         email_message.content_subtype = "html"
         EmailThread(email_message).start()

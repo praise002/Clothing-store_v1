@@ -54,11 +54,14 @@
 
               {% if request.user.is_authenticated %}
                 <li class="nav-item">
-                  <a class="nav-link" href="">Logout</a>
+                  <form action="{% url "accounts:logout" %}" method="post">
+                    {% csrf_token %}
+                      <button class="">{% trans "Logout" %}</button>
+                  </form>
                 </li>
               {% else %}
                 <li class="nav-item">
-                  <a class="nav-link" href="">Login/Sign Up</a>
+                  <a class="nav-link" href="{% url 'accounts:register' %}">Login/Sign Up</a>
                 </li>
               {% endif %}
             </ul>

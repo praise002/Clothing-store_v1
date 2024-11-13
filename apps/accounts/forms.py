@@ -35,11 +35,21 @@ class RegistrationForm(UserCreationForm):
     )
     password1 = forms.CharField(
         label="Password",
-        widget=forms.PasswordInput(attrs={"placeholder": "••••••••", "autocomplete": "new-password",}),
+        widget=forms.PasswordInput(
+            attrs={
+                "placeholder": "••••••••",
+                "autocomplete": "new-password",
+            }
+        ),
     )
     password2 = forms.CharField(
         label="Confirm Password",
-        widget=forms.PasswordInput(attrs={"placeholder": "••••••••", "autocomplete": "new-password",}),
+        widget=forms.PasswordInput(
+            attrs={
+                "placeholder": "••••••••",
+                "autocomplete": "new-password",
+            }
+        ),
     )
 
     usable_password = None
@@ -60,6 +70,7 @@ class RegistrationForm(UserCreationForm):
         if len(password1) < 8:
             self.add_error("password1", "Password too short")
 
+
 class OtpForm(forms.Form):
     otp = forms.IntegerField(
         min_value=100000,
@@ -77,12 +88,15 @@ class LoginForm(forms.Form):
         widget=forms.EmailInput(
             attrs={
                 "placeholder": _("Enter your email address..."),
+                "autocomplete": "new-email",
             }
         ),
     )
 
     password = forms.CharField(
-        widget=forms.PasswordInput(attrs={"placeholder": "••••••••"}),
+        widget=forms.PasswordInput(
+            attrs={"placeholder": "••••••••", "autocomplete": "new-password"}
+        ),
     )
 
 
@@ -91,9 +105,13 @@ class PasswordResetRequestForm(forms.Form):
         label="Enter your registered email",
         max_length=254,
         widget=forms.EmailInput(
-            attrs={"class": "form-control", "placeholder": "e.g. user@domain.com", }
+            attrs={
+                "class": "form-control",
+                "placeholder": "e.g. user@domain.com",
+            }
         ),
     )
+
 
 class CustomSetPasswordForm(forms.ModelForm):
     new_password1 = forms.CharField(
@@ -117,7 +135,7 @@ class CustomSetPasswordForm(forms.ModelForm):
             }
         ),
     )
-    
+
     class Meta:
         model = User
         fields = []  # We don't need other fields here, only password reset
@@ -143,6 +161,7 @@ class CustomSetPasswordForm(forms.ModelForm):
         if commit:
             user.save()
         return user
+
 
 class CustomChangePasswordForm(PasswordChangeForm):
     old_password = forms.CharField(
@@ -193,5 +212,3 @@ class UserEditForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ["first_name", "last_name"]
-
-

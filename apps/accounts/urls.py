@@ -47,7 +47,7 @@ urlpatterns = [
     ),
     path(
         "reset-password/resend-otp/",  # Resend OTP
-        views.ResendOTPVerificationView.as_view(),
+        views.ResendOTPRequestView.as_view(),
         name="reset_password_resend_otp",
     ),
     path(

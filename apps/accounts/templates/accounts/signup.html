@@ -15,6 +15,7 @@
         {{ form|crispy }}
         <button type="submit" class="btn btn-primary">Register</button>
       </form>
+      <p class="mt-4">Have an account? <a href="{% url "accounts:login" %}">Login</a></p>
     </div>
   </div>
 {% endblock %}

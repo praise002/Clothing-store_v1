@@ -4,17 +4,19 @@
 {% block title %}Login{% endblock %}
 {% block content %}
 
-<div class="card custom-card" style="padding: 2em 3em;">
+<div class="card custom-card" style="padding: 9em 3em;">
     <div class="card-header">
         <h5 class="card-title">LOGIN USER</h5>
     </div>
     <div class="card-body">
+
+        {% comment %} <form method="POST" novalidate> {% endcomment %}
         <form method="POST">
             {% csrf_token %}
             {{ form|crispy }}
             <button type="submit" class="btn btn-primary">Login</button>
         </form>
-        <p class="mt-4">Have you forgotten your password? <a href="{% url "accounts:reset_password_request_otp" %}">Click here!</a></p>
+        <p class="mt-4">Have you forgotten your password? <a href="{% url "accounts:reset_password_request" %}">Click here!</a></p>
     </div>
 </div>
 

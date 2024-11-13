@@ -15,8 +15,6 @@ from .forms import (
     OtpForm,
     PasswordResetRequestForm,
     RegistrationForm,
-    OTPRequestForm,
-    OTPVerificationForm,
 )
 from .mixins import LoginRequiredMixin, LogoutRequiredMixin
 from .models import User, Otp
@@ -67,12 +65,12 @@ class LoginView(LogoutRequiredMixin, View):
             )  # verify the identity of a user
 
             if not user:
-                sweetify.error(request, "Invalid Credentials")
-                return redirect("accounts:login")
+                form.add_error(None, "There was a problem logging in. Check your email and password or create an account.")
+                return render(request, "accounts/login.html", {"form": form})
 
             if not user.user_active:
-                sweetify.error(request, "Disabled Account")
-                return redirect("accounts:login")
+                form.add_error(None, "This account is disabled.")
+                return render(request, "accounts/login.html", {"form": form})
 
             if not user.is_email_verified:
                 request.session["verification_email"] = (
@@ -172,7 +170,7 @@ class ResendVerificationEmail(LogoutRequiredMixin, View):
         sweetify.toast(request, "Email Sent")
 
 
-class PasswordResetRequestView(LoginRequiredMixin, View):
+class PasswordResetRequestView(LogoutRequiredMixin, View):
     form_class = PasswordResetRequestForm
     
     def get(self, request):
@@ -188,24 +186,24 @@ class PasswordResetRequestView(LoginRequiredMixin, View):
                 # Try to get the user by email
                 user = User.objects.get(email=email)
                 
-                if OTPService.send_password_reset_otp(request, user):
-                    # Store email in session after OTP is successfully sent
-                    request.session["reset_email"] = email
-
-                    sweetify.success(request, "An OTP has been sent to your email.")
-                    return redirect(reverse_lazy("accounts:reset_password_verify_otp"))
-                else:
-                    sweetify.error(request, "Failed to send OTP. Please try again.")
+                OTPService.send_password_reset_otp(request, user)
                 
+                # Store email in session after OTP is successfully sent
+                request.session["reset_email"] = email
+
+                return redirect(reverse("accounts:reset_password_verify_otp"))
             except User.DoesNotExist:
                 sweetify.error(request, "Sorry, no account found with this email address. Please check and try again.")
                 return redirect("accounts:reset_password_request")  
-
+            except Exception:
+                sweetify.error(request, "Failed to send OTP. Please try again.") 
+                
         # Re-render form with errors if form is invalid
         return render(request, "accounts/password_reset_form.html", {"form": form})
 
 
 class OTPVerificationView(LogoutRequiredMixin, View):
+    # if otp is less than min or gt than max the input doesn't submit or respond
     form_class = OtpForm
 
     def get(self, request):
@@ -216,22 +214,37 @@ class OTPVerificationView(LogoutRequiredMixin, View):
         form = self.form_class(request.POST)
         if form.is_valid():
             otp = form.cleaned_data["otp"]
+            email = request.session.get("reset_email")
+            
+            if not email:
+                form.add_error(None, "Session expired. Please request a new OTP.")
+                return render(request, "accounts/password_reset_otp_form.html", {"form": form})
             
             try:
-                otp_instance = Otp.objects.get(otp=otp, user=request.user)
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                form.add_error(None, "No user found for the provided email.")
+                return render(request, "accounts/password_reset_otp_form.html", {"form": form})
+            
+            try:
+                otp_instance = Otp.objects.get(otp=otp, user=user)
 
                 if otp_instance.is_valid:
-                    return redirect(reverse_lazy("accounts:reset_password_form"))
+                    # Invalidate/clear any previous OTPs 
+                    Otp.objects.filter(user=user).delete()
+                    return redirect(reverse("accounts:reset_password_form"))
                 else:
                     sweetify.error(request, "The OTP is invalid or has expired. Please request a new one.")
-
+                    return render(request, "accounts/password_reset_otp_form.html", {"form": form})
+                    
             except Otp.DoesNotExist:
                 sweetify.error(request, "The OTP could not be found. Please request a new one.")
+                return render(request, "accounts/password_reset_otp_form.html", {"form": form})
 
         # Re-render form with errors if OTP is invalid or any other error occurs
         return render(request, "accounts/password_reset_otp_form.html", {"form": form})
 
-class ResendOTPVerificationView(LogoutRequiredMixin, View):
+class ResendOTPRequestView(LogoutRequiredMixin, View):
     def get(self, request):
         email = request.session.get("reset_email")
         
@@ -243,9 +256,12 @@ class ResendOTPVerificationView(LogoutRequiredMixin, View):
             user = User.objects.get(email=email)
         except User.DoesNotExist:
             sweetify.error(request, "We couldn't find an account associated with this email. Please try again or contact support.")
-
+            return redirect(reverse("accounts:reset_password_request"))
+        
         OTPService.send_password_reset_otp(request, user)
-        sweetify.toast(request, "Email Sent")
+        sweetify.success(request, "Email Sent")
+        return redirect(reverse("accounts:reset_password_verify_otp"))
+        
 
 class PasswordResetView(View):
     form_class = CustomSetPasswordForm
@@ -262,7 +278,7 @@ class PasswordResetView(View):
             email = request.session.get("reset_email")
             
             if not email:
-                sweetify.error(request, "Not Allowed.")
+                sweetify.error(request, "Session expired. Please request a new OTP.")
                 return redirect(reverse("accounts:reset_password_request"))
         
             try:
@@ -277,11 +293,13 @@ class PasswordResetView(View):
 
             # Update session to keep user logged in
             update_session_auth_hash(request, user)
+            
+            OTPService.password_reset_success(request, user)
 
             # Clear session data
             request.session.pop("reset_email", None)
 
-            return redirect(reverse_lazy("accounts:password_reset_complete"))
+            return redirect(reverse_lazy("accounts:reset_password_complete"))
 
         return render(request, "accounts/password_reset_confirm.html", {"form": form})
 
