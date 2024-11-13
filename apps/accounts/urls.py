@@ -17,9 +17,9 @@ urlpatterns = [
         name="logout_all_devices",
     ),
     # Email verification
-    path("verify-email/", views.VerifyEmail.as_view(), name="verify_email"),
+    path("email/verify/", views.VerifyEmail.as_view(), name="verify_email"),
     path(
-        "resend-verification-email/",
+        "email/verify/resend/",
         views.ResendVerificationEmail.as_view(),
         name="resend_verification_email",
     ),
@@ -41,27 +41,27 @@ urlpatterns = [
     ),
     # Reset Password URLs
     path(
-        "reset-password/request-otp/",  # Request OTP for password reset
+        "password-reset/otp/",  # Request OTP for password reset
         views.PasswordResetRequestView.as_view(),
         name="reset_password_request",
     ),
     path(
-        "reset-password/resend-otp/",  # Resend OTP
+        "password-reset/otp/resend/",  # Resend OTP
         views.ResendOTPRequestView.as_view(),
         name="reset_password_resend_otp",
     ),
     path(
-        "reset-password/verify-otp/",  # Verify OTP before setting new password
+        "password-reset/otp/verify/",  # Verify OTP before setting new password
         views.OTPVerificationView.as_view(),
         name="reset_password_verify_otp",
     ),
     path(
-        "reset-password/form/",  # Form for entering new password
+        "password-reset/form/",  # Form for entering new password
         views.PasswordResetView.as_view(),
         name="reset_password_form",
     ),
     path(
-        "reset-password/complete/",  # Confirmation of successful password reset
+        "password-reset/complete/",  # Confirmation of successful password reset
         views.CustomPasswordResetCompleteView.as_view(),
         name="reset_password_complete",
     ),

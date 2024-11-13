@@ -1,3 +1,34 @@
 from django.db import models
+from django.conf import settings
+from django.utils.translation import gettext_lazy as _
+from apps.common.models import BaseModel
+from django.urls import reverse
 
-# Create your models here.
+
+class Profile(BaseModel):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    shipping_address = models.CharField(_("Shipping Address"), max_length=100)
+    avatar = models.ImageField(_("Avatar"), upload_to="photos/%Y/%m/%d/", null=True, blank=True)
+    phone = models.CharField(_("Phone"), max_length=255)
+    last_updated = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ["-created"]
+        indexes = [
+            models.Index(fields=["-created"]),
+        ]  
+    
+    def __str__(self):
+        return f"{self.user.full_name}"
+    
+    def get_absolute_url(self):
+        return reverse('profiles:profile_detail', kwargs={'id': self.user.id})
+    
+    @property
+    def image_url(self):
+        try:
+            url = self.photo.url
+        except:
+            url = ''
+        return url
+

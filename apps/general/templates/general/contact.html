@@ -1,0 +1,85 @@
+{% extends "common/base.html" %}
+{% load static %}
+{% block title %}About{% endblock %}
+{% block content %}
+    <!-- Page Content -->
+    <div class="page-heading about-heading header-text">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="text-content">
+              <h4>about us</h4>
+              <h2>our company</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="best-features about-features">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="section-heading">
+              <h2>Our Background</h2>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="right-image">
+              <img src="{% static 'image/feature-image.jpg' %}" alt="">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="left-content">
+              <h4>Who we are &amp; What we do?</h4>
+              <p>{{sitedetail.description}}</p>
+              <ul class="social-icons">
+                <li><a target="_blank" href="{{sitedetail.fb}}"><i class="fa fa-facebook"></i></a></li>
+                <li><a target="_blank" href="{{sitedetail.tw}}"><i class="fa fa-twitter"></i></a></li>
+                <li><a target="_blank" href="{{sitedetail.ln}}"><i class="fa fa-linkedin"></i></a></li>
+                <li><a target="_blank" href="{{sitedetail.ig}}"><i class="fa fa-instagram"></i></a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="team-members">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="section-heading">
+              <h2>Our Team Members</h2>
+            </div>
+          </div>
+          {% for member in teammembers %}
+            <div class="col-md-4">
+              <div class="team-member">
+                <div class="thumb-container">
+                  <img style="height: 15em; object-fit: cover;" src="{{ member.avatar_url }}" alt="">
+                  <div class="hover-effect">
+                    <div class="hover-content">
+                      <ul class="social-icons">
+                        <li><a target="_blank" href="{{ member.company_socials.fb }}"><i class="fa fa-facebook"></i></a></li>
+                        <li><a target="_blank" href="{{ member.company_socials.tw }}"><i class="fa fa-twitter"></i></a></li>
+                        <li><a target="_blank" href="{{ member.company_socials.ln }}"><i class="fa fa-linkedin"></i></a></li>
+                        <li><a target="_blank" href="{{ member.company_socials.ig }}"><i class="fa fa-instagram"></i></a></li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                <div class="down-content">
+                  <h4>{{ member.name }}</h4>
+                  <span>{{ member.role }}</span>
+                  <p>{{member.description}}.</p>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+{% endblock %}

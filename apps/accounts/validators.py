@@ -15,10 +15,3 @@ alternate_validate_name = RegexValidator(
     regex=r"^[a-zA-Z]*$", message="No spaces between names"
 )
 
-def validate_uuid(uuid_string):
-    try:
-        UUID(uuid_string)  
-        return True
-    except ValueError:
-        return False
-

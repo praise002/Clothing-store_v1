@@ -201,13 +201,13 @@ class UserEditForm(forms.ModelForm):
     first_name = forms.CharField(
         validators=[validate_name],
         max_length=50,
-        # widget=forms.TextInput(attrs={"class": "input input--text"})
+        widget=forms.TextInput(attrs={"class": "form-control",})
     )
     last_name = forms.CharField(
         validators=[validate_name],
         max_length=50,
-        # widget=forms.TextInput(attrs={"class": "input input--text"})
-    )  # TODO: FIX CLASSES NAME
+        widget=forms.TextInput(attrs={"class": "form-control",})
+    )  
 
     class Meta:
         model = User
