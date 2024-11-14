@@ -26,7 +26,7 @@ class SiteDetail(BaseModel):
     company_socials = models.OneToOneField(Social, on_delete=models.SET_NULL, null=True)
     map_url = models.URLField(
         default="https://maps.google.com/maps?q=Av.+L%C3%BAcio+Costa,+Rio+de+Janeiro+-+RJ,+Brazil&t=&z=13&ie=UTF8&iwloc=&output=embed"
-    )
+    ) #TODO: MIGHT REMOVE LATER IF NOT USED
 
     def __str__(self):
         return self.name
