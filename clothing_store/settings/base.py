@@ -22,94 +22,95 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY = config("SECRET_KEY")
 
 SITE_ID = 1
 
 DJANGO_APPS = [
     # 'jazzmin',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'whitenoise.runserver_nostatic',  # to enable whitenoise handle static files in development
-    'django.contrib.staticfiles',
-    'django.contrib.sites',
-    'django.contrib.postgres',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "whitenoise.runserver_nostatic",  # to enable whitenoise handle static files in development
+    "django.contrib.staticfiles",
+    "django.contrib.sites",
+    "django.contrib.postgres",
 ]
 
 THIRD_PARTY_APPS = [
-    'cloudinary_storage',
-    'cloudinary',
-    'crispy_forms',
-    'crispy_bootstrap5',
-    'debug_toolbar',
-    'sweetify',
+    "cloudinary_storage",
+    "cloudinary",
+    "crispy_forms",
+    "crispy_bootstrap5",
+    "debug_toolbar",
+    "sweetify",
     # 'rosetta',
-    # 'redisboard',
+    'redisboard',
 ]
 
 LOCAL_APPS = [
-    'apps.accounts',
-    'apps.common',
-    'apps.general',
-    'apps.profiles',
-    'apps.shop',
+    "apps.accounts",
+    "apps.common",
+    "apps.general",
+    "apps.profiles",
+    "apps.shop",
+    "apps.cart",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
-CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
-CRISPY_TEMPLATE_PACK = 'bootstrap5'
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 INTERNAL_IPS = [
-    '127.0.0.1',
+    "127.0.0.1",
 ]
 
-SWEETIFY_SWEETALERT_LIBRARY = 'sweetalert2'
+SWEETIFY_SWEETALERT_LIBRARY = "sweetalert2"
 
 MIDDLEWARE = [
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'clothing_store.urls'
+ROOT_URLCONF = "clothing_store.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'clothing_store.wsgi.application'
+WSGI_APPLICATION = "clothing_store.wsgi.application"
 
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 
@@ -119,16 +120,16 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -136,9 +137,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
@@ -148,48 +149,65 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static/')]
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_URL = "/static/"
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static/")]
 
-MEDIA_URL = '/media/' 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME'),
-    'API_KEY': config('CLOUDINARY_API_KEY'),
-    'API_SECRET': config('CLOUDINARY_API_SECRET'),
-    'MEDIA_TAG': 'clothing_store/media',
-    'STATIC_IMAGES_EXTENSIONS': ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'tif', 'tiff', 'ico'],
+    "CLOUD_NAME": config("CLOUDINARY_CLOUD_NAME"),
+    "API_KEY": config("CLOUDINARY_API_KEY"),
+    "API_SECRET": config("CLOUDINARY_API_SECRET"),
+    "MEDIA_TAG": "clothing_store/media",
+    "STATIC_IMAGES_EXTENSIONS": [
+        "jpg",
+        "jpeg",
+        "png",
+        "gif",
+        "webp",
+        "bmp",
+        "tif",
+        "tiff",
+        "ico",
+    ],
 }
 
 STORAGES = {
-    'default': {
-        'BACKEND': 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    },
-    'staticfiles': {
+    "default": {"BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage"},
+    "staticfiles": {
         # "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-        'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage',
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
 }
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+    }
+}
+
+# CART_SESSION_ID = 'cart'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-AUTH_USER_MODEL = 'accounts.User'
+AUTH_USER_MODEL = "accounts.User"
 
 # Email server configuration
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = config('EMAIL_HOST')
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = config("EMAIL_HOST")
+EMAIL_HOST_USER = config("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
 # EMAIL_PORT = config('EMAIL_PORT')
 # EMAIL_USE_SSL = config('EMAIL_USE_SSL')
-EMAIL_PORT = 587 
+EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
 
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
@@ -209,10 +227,10 @@ EMAIL_OTP_EXPIRE_MINUTES = 15
 #     "site_logo": "images/logo.svg",
 
 #     # Logo to use for your site, must be present in static files, used for login form logo (defaults to site_logo)
-#     "login_logo": "images/logo.svg", 
+#     "login_logo": "images/logo.svg",
 
 #     # CSS classes that are applied to the logo above
-#     "site_logo_classes": "img-circle",  
+#     "site_logo_classes": "img-circle",
 
 #     # Welcome text on the login screen
 #     "welcome_sign": "Welcome to DevSearch",
@@ -221,9 +239,9 @@ EMAIL_OTP_EXPIRE_MINUTES = 15
 #     "copyright": "DevSearch Ltd",
 
 #     # List of model admins to search from the search bar, search bar omitted if excluded
-#     # If you want to use a single search field you dont need to use a list, you can use a simple string 
-#     "search_model": "accounts.User", 
-    
+#     # If you want to use a single search field you dont need to use a list, you can use a simple string
+#     "search_model": "accounts.User",
+
 #     # Field name on user model that contains avatar ImageField/URLField/Charfield or a callable that receives the user
 #     "user_avatar": "photo",
 
@@ -236,13 +254,13 @@ EMAIL_OTP_EXPIRE_MINUTES = 15
 
 #         # Url that gets reversed (Permissions can be added)
 #         {
-#             "name": "Home",  
-#             "url": "admin:index", 
+#             "name": "Home",
+#             "url": "admin:index",
 #             "permissions": ["auth.view_user"]},
 
 #         # App with dropdown menu to all its models pages (Permissions checked against models)
-#         {"app": "accounts"},   
-#         {"app": "profiles"},  
+#         {"app": "accounts"},
+#         {"app": "profiles"},
 #         {"app": "projects"},
 #         {"app": "messaging"},
 #     ],
@@ -253,8 +271,8 @@ EMAIL_OTP_EXPIRE_MINUTES = 15
 
 #     # Additional links to include in the user menu on the top right ("app" url type is not allowed)
 #     "usermenu_links": [
-#         {"name": "DevSearch Frontpage", "url": "/", "new_window": True},  
-#         {"model": "accounts.user"}  
+#         {"name": "DevSearch Frontpage", "url": "/", "new_window": True},
+#         {"model": "accounts.user"}
 #     ],
 
 #     #############
@@ -279,13 +297,13 @@ EMAIL_OTP_EXPIRE_MINUTES = 15
 #         "accounts.user": "fas fa-users-cog",
 #         "auth.Group": "fas fa-users",
 #         "sites.site": "fas fa-globe",
-#         "profiles.profile": "fas fa-id-card",  
-#         "profiles.skill": "fas fa-lightbulb",  
-#         "projects.project": "fas fa-tasks",  
-#         "projects.tag": "fas fa-tags",  
-#         "projects.review": "fas fa-star",  
+#         "profiles.profile": "fas fa-id-card",
+#         "profiles.skill": "fas fa-lightbulb",
+#         "projects.project": "fas fa-tasks",
+#         "projects.tag": "fas fa-tags",
+#         "projects.review": "fas fa-star",
 #         "messaging.message": "fas fa-envelope",
-#     },  
+#     },
 #     # Icons that are used when one is not manually specified
 #     "default_icon_parents": "fas fa-chevron-circle-right",
 #     "default_icon_children": "fas fa-circle",
@@ -305,8 +323,6 @@ EMAIL_OTP_EXPIRE_MINUTES = 15
 #     "changeform_format": "horizontal_tabs",
 #     # override change forms on a per modeladmin basis
 #     "changeform_format_overrides": {
-#         "auth.user": "collapsible", 
+#         "auth.user": "collapsible",
 #         "auth.group": "vertical_tabs"},
 # }
-
-

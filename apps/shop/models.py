@@ -106,7 +106,6 @@ class OrderItem(BaseModel):
     )
     quantity = models.PositiveSmallIntegerField(default=1)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    session_key = models.CharField(max_length=200, null=True, blank=True)
     
     @property
     def get_total(self):
@@ -116,17 +115,3 @@ class OrderItem(BaseModel):
         return f"{self.quantity} of {self.product} in order {self.order.id}"
 
 
-class Cart(BaseModel):
-    pass
-
-
-class CartItem(BaseModel):
-    cart = models.ForeignKey(Cart, related_name="items", on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.PositiveSmallIntegerField(default=1)
-
-    class Meta:
-        unique_together = ("cart", "product")
-
-    def __str__(self):
-        return f"{self.quantity} of {self.product} in cart"
