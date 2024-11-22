@@ -36,7 +36,7 @@ class Product(BaseModel):
     )
     price = models.DecimalField(max_digits=10, decimal_places=2)
     image = models.ImageField(
-        default="fallback.jpg", upload_to="products/", validators=[validate_file_size]
+        upload_to="products/", validators=[validate_file_size]
     )
     in_stock = models.PositiveIntegerField()
     featured = models.BooleanField(default=False)
@@ -60,6 +60,14 @@ class Product(BaseModel):
     @property
     def get_absolute_url(self):
         return reverse("shop:product_detail", args=[str(self.slug)])
+    
+    @property
+    def image_url(self):
+        try:
+            url = self.image.url
+        except:
+            url = 'https://res.cloudinary.com/dq0ow9lxw/image/upload/v1732236163/fallback_ssjbcw.png'
+        return url
 
     class Meta:
         ordering = ["-created"]

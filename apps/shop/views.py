@@ -6,7 +6,7 @@ from django.http import Http404
 from django.core.paginator import Paginator
 
 from apps.shop.forms import ReviewForm
-from apps.shop.utils import get_session_key, sort_products, sort_filter_value
+from apps.shop.utils import sort_products, sort_filter_value
 
 from apps.shop.models import  Category, Product
 

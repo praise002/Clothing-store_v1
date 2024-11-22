@@ -31,6 +31,6 @@ class Profile(BaseModel):
         try:
             url = self.photo.url
         except:
-            url = ''
+            url = 'https://res.cloudinary.com/dq0ow9lxw/image/upload/v1732236186/default-image_foxagq.jpg'
         return url
 
