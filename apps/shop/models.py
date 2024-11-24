@@ -2,7 +2,6 @@ from autoslug import AutoSlugField
 from django.db import models
 from django.urls import reverse
 
-from apps.accounts.models import User
 from apps.profiles.models import Profile
 from apps.common.models import BaseModel
 from django.utils.translation import gettext_lazy as _
@@ -79,7 +78,7 @@ class Review(BaseModel):
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE, related_name="reviews"
     )
-    customer = models.ForeignKey(User, on_delete=models.CASCADE)
+    customer = models.ForeignKey(Profile, on_delete=models.CASCADE)
     text = models.TextField()
     rating = models.SmallIntegerField(choices=RATING_CHOICES)
 

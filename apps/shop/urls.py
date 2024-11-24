@@ -15,6 +15,6 @@ urlpatterns = [
     path(
         "categories/<slug:slug>/products/",
         views.CategoryProductsView.as_view(),
-        name="categories_product",
+        name="category_products",
     ),
 ]

@@ -61,33 +61,34 @@
           </div>
         </div>
         <div class="col-md-12">
-          <ul class="pages">
-            {% if page_obj.has_previous %}
-              <li>
-                <a href="?page={{ page_obj.previous_page_number }}{{ post_param }}"><i class="fa fa-angle-double-left"></i></a>
-              </li>
-              {% if page_obj.number != 2 %}
-                <li><a href="?page=1{{ post_param }}">1</a></li>...
+          {% if page_obj.paginator.count > 0 %} <!-- Check if there are products -->
+            <ul class="pages">
+              {% if page_obj.has_previous %}
+                <li>
+                  <a href="?page={{ page_obj.previous_page_number }}{{ post_param }}"><i class="fa fa-angle-double-left"></i></a>
+                </li>
+                {% if page_obj.number != 2 %}
+                  <li><a href="?page=1{{ post_param }}">1</a></li>...
+                {% endif %}
               {% endif %}
-            {% endif %}
 
-            {% for num in page_obj.paginator.page_range %}
-              {% if page_obj.number == num %}
-                <li class="active"><a href="?page={{ num }}{{ post_param }}">{{ num }}</a></li>
-              {% elif num > page_obj.number|add:'-2' and num < page_obj.number|add:'2' %}
-                <li><a href="?page={{ num }}{{ post_param }}">{{ num }}</a></li>
-              {% endif %}
-            {% endfor %}
+              {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                  <li class="active"><a href="?page={{ num }}{{ post_param }}">{{ num }}</a></li>
+                {% elif num > page_obj.number|add:'-2' and num < page_obj.number|add:'2' %}
+                  <li><a href="?page={{ num }}{{ post_param }}">{{ num }}</a></li>
+                {% endif %}
+              {% endfor %}
 
-            {% if page_obj.has_next %}
-              {% if page_obj.number != page_obj.paginator.num_pages|add: '-1' %}
-                ...<li><a href="?page={{ page_obj.paginator.num_pages }}{{ post_param }}">{{ page_obj.paginator.num_pages }}</a></li>
-              {% endif %}
-              <li>
-                <a href="?page={{ page_obj.next_page_number }}{{ post_param }}"><i class="fa fa-angle-double-right"></i></a>
-              </li>
+              {% if page_obj.has_next %}
+                {% if page_obj.number != page_obj.paginator.num_pages|add:'-1' %}
+                  ...<li><a href="?page={{page_obj.paginator.num_pages}}{{post_param}}">{{page_obj.paginator.num_pages}}</a></li>
+                {% endif %}
+                <li>
+                  <a href="?page={{page_obj.next_page_number}}{{post_param}}"><i class="fa fa-angle-double-right"></i></a>
+                </li>
             {% endif %}
-          </ul>
+          {% endif %}
         </div>
       </div>
     </div>
