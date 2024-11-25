@@ -1,0 +1,56 @@
+{% extends 'common/base.html' %}
+{% load static %}
+{% block title %}
+  Checkout
+{% endblock %}
+
+{% block content %}
+  <div class="container mt-5">
+    <h1 style="margin-top: 3em;">Checkout</h1>
+    <div class="row">
+      <!-- Customer Info Section -->
+      <div class="col-md-6" style="margin-top: 3em;">
+        <div>
+          <p>
+            <strong>Name:</strong> {{ user.first_name }} {{ user.last_name }}
+          </p>
+          <p>
+            <strong>Email:</strong> {{ user.email }}
+          </p>
+          <p>
+            <strong>Shipping Address:</strong> {{ profile.shipping_address }}
+          </p>
+          <p>
+            <strong>Postal Code:</strong> {{ profile.postal_code }}
+          </p>
+          <p>
+            <strong>City:</strong> {{ profile.city }}
+          </p>
+          <p>
+            <a href="{% url 'profiles:profile_edit' %}" class="text-primary">Edit Profile Information</a>
+          </p>
+        </div>
+      </div>
+
+      <!-- Order Summary Section -->
+      <div class="col-md-6" style="margin-top: 3em;">
+        <div class="card p-4 bg-light">
+          <h3 class="card-title mb-3">Your Order</h3>
+          <ul class="list-group mb-3">
+            {% for item in cart %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>{{ item.quantity }}x {{ item.product.name }}</span>
+                <span class="fw-bold">${{ item.total_price }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+          <p class="fw-bold fs-5">Total: ${{ cart.get_total_price }}</p>
+          <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary w-100">Place Order</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

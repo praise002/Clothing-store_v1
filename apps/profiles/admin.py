@@ -4,7 +4,7 @@ from django.utils.html import format_html, urlencode
 from django.urls import reverse
 from .models import Profile
 
-from apps.shop.models import Order
+from apps.orders.models import Order
 
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'shipping_address', 'orders')

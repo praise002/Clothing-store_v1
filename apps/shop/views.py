@@ -1,14 +1,18 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from django.views import View
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView
 from django.db.models.query import QuerySet
 from django.http import Http404
 from django.core.paginator import Paginator
 
+from apps.cart.cart import Cart
 from apps.shop.forms import ReviewForm
 from apps.shop.utils import sort_products, sort_filter_value
 
-from apps.shop.models import  Category, Product
+from apps.shop.models import Category, Product
+
+from apps.cart.forms import CartAddProductForm
+
 
 class HomeView(View):
     def get(self, request):
@@ -18,9 +22,10 @@ class HomeView(View):
             "products": products,
             "categories": categories,
         }
-        return render(request, 'shop/home.html', context)
-    
-class ProductListView(ListView): 
+        return render(request, "shop/home.html", context)
+
+
+class ProductListView(ListView):
     model = Product
     paginate_by = 15
     template_name = "shop/product_list.html"
@@ -36,25 +41,38 @@ class ProductListView(ListView):
         sort_filter_value(self.request, context)
         return context
 
-class ProductDetailView(View): 
+
+class ProductDetailView(View):
     def get(self, request, *args, **kwargs):
         try:
-            product = Product.objects.select_related("category").prefetch_related("reviews", "reviews__customer").get(slug=kwargs["slug"])
+            product = (
+                Product.objects.select_related("category")
+                .prefetch_related("reviews", "reviews__customer")
+                .get(
+                    id=kwargs.get("id"),
+                    slug=kwargs.get("slug"),
+                    in_stock__gt=0,
+                )
+            )
         except Product.DoesNotExist:
             raise Http404("Product does not exist")
 
+        cart_product_form = CartAddProductForm()
         form = ReviewForm()
         context = {
             "product": product,
-            "form": form
+            "form": form,
+            "cart_product_form": cart_product_form,
         }
-        return render(request, 'shop/product_detail.html', context)
-    
+        return render(request, "shop/product_detail.html", context)
+
+
 class CategoriesView(ListView):
     model = Category
     template_name = "shop/categories.html"
     context_object_name = "categories"
-    
+
+
 class CategoryProductsView(View):
     def get(self, request, *args, **kwargs):
         category = get_object_or_404(Category, slug=kwargs["slug"])
@@ -63,11 +81,10 @@ class CategoryProductsView(View):
 
         # Pagination config
         paginated = Paginator(products, 15)
-        page_number = request.GET.get('page')
+        page_number = request.GET.get("page")
         page = paginated.get_page(page_number)
         is_paginated = True if page.paginator.num_pages > 1 else False
 
         context = {"category": category, "page_obj": page, "is_paginated": is_paginated}
         sort_filter_value(self.request, context)
         return render(request, "shop/category_products.html", context)
-    

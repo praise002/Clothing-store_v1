@@ -1,0 +1,17 @@
+{% extends 'common/base.html' %}
+{% load static %}
+{% block title %}
+  Thank You
+{% endblock %}
+
+{% block content %}
+  <div class="text-center" style="margin-top: 5em;">
+    <div class="card shadow p-4">
+      <h1 class="card-title mb-3 text-success">Thank You!</h1>
+      <p class="card-text fs-5">Your order has been successfully completed.</p>
+      <p class="fw-bold fs-4">
+        Order Number: <span class="text-primary">{{ order.id }}</span>
+      </p>
+    </div>
+  </div>
+{% endblock %}
