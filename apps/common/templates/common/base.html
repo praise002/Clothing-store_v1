@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load sweetify %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -11,14 +12,18 @@
     <meta name="author" content="" />
     <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&display=swap" rel="stylesheet" />
 
-    <title>Clothing Store | {% block title %} {% endblock %}</title>
+    <title>
+      Clothing Store |{% block title %}
+
+      {% endblock %}
+    </title>
     <style>
-      html, body {
+      html,
+      body {
         height: 100%;
         margin: 0;
         padding: 0;
-    }
-    
+      }
     </style>
     {% include 'common/includes/static.html' %}
     {% comment %} <script defer src="{% static '' %}"></script> {% endcomment %}
@@ -34,9 +39,7 @@
             <ul class="navbar-nav ml-auto">
               {% url 'shop:home' as home_url %}
               <li class="nav-item {% if request.path == home_url %}active{% endif %}">
-                <a class="nav-link" href="{% url 'shop:home' %}">
-                  Home
-                </a>
+                <a class="nav-link" href="{% url 'shop:home' %}">Home</a>
               </li>
               {% url 'shop:products_list' as products_url %}
               <li class="nav-item {% if request.path == products_url %}active{% endif %}">
@@ -46,7 +49,7 @@
               <li class="nav-item {% if request.path == categories_url %}active{% endif %}">
                 <a class="nav-link" href="{% url 'shop:categories' %}">Categories</a>
               </li>
-              
+
               {% url 'general:about' as about_url %}
               <li class="nav-item {% if request.path == about_url %}active{% endif %}">
                 <a class="nav-link" href="{% url 'general:about' %}">About Us</a>
@@ -56,20 +59,20 @@
                 <a class="nav-link" href="{% url 'general:contact' %}">Contact Us</a>
               </li>
 
-              <li class="nav-item">
-                <a class="nav-link" href="/">Cart</a>
-              </li>
-
               {% if request.user.is_authenticated %}
-              {% url 'accounts:logout' as logout_url %}
+                {% url 'cart:cart_detail' as cart_url %}
+                <li class="nav-item {% if request.path == cart_url %}active{% endif %}">
+                  <a class="nav-link" href="{% url 'cart:cart_detail' %}">Cart</a>
+                </li>
+                {% url 'accounts:logout' as logout_url %}
                 <li class="nav-item {% if request.path == logout_url %}active{% endif %}">
-                  <form class="nav-link p-0" style="display: inline;" action="{% url "accounts:logout" %}" method="post">
+                  <form class="nav-link p-0" style="display: inline;" action="{% url 'accounts:logout' %}" method="post">
                     {% csrf_token %}
-                      <button class="btn btn-link nav-link" style="color: white;">{% trans "Logout" %}</button>
+                    <button class="btn btn-link nav-link" style="color: white;">{% trans 'Logout' %}</button>
                   </form>
                 </li>
               {% else %}
-              {% url 'accounts:register' as register_url %}
+                {% url 'accounts:register' as register_url %}
                 <li class="nav-item {% if request.path == register_url %}active{% endif %}">
                   <a class="nav-link" href="{% url 'accounts:register' %}">Login/Sign Up</a>
                 </li>
@@ -81,19 +84,19 @@
     </header>
     <main class="flex-fill">
       {% block content %}
+
       {% endblock %}
-  </main>
+    </main>
 
     <footer class="py-3 mt-auto">
       <div class="container">
         <p class="text-center">&copy; 2020 Sixteen Clothing Co., Ltd.</p>
-    </div>
+      </div>
     </footer>
 
     <!-- Bootstrap core JavaScript -->
-    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></>
     <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-
 
     <!-- Additional Scripts -->
     <script src="{% static 'assets/js/custom.js' %}"></script>
@@ -103,9 +106,7 @@
     <script src="{% static 'assets/js/accordions.js' %}"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.6.5/sweetalert2.all.min.js"></script>
-    
-    
   </body>
 </html>
-{% load sweetify %}
+
 {% sweetify %}

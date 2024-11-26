@@ -4,6 +4,7 @@ from apps.accounts.mixins import LoginRequiredMixin
 from apps.cart.cart import Cart
 from apps.profiles.models import Profile
 from .models import Order, OrderItem
+from .tasks import order_created
 
 
 class OrderCreate(LoginRequiredMixin, View):
@@ -25,7 +26,7 @@ class OrderCreate(LoginRequiredMixin, View):
         }
 
         return render(request, "orders/order/create.html", order_summary)
-    
+
     def post(self, request):
         """
         Place the order and redirect to a success page.
@@ -36,7 +37,7 @@ class OrderCreate(LoginRequiredMixin, View):
 
         # Create the order
         order = Order.objects.create(
-            customer=profile, status=Order.PAYMENT_STATUS_PENDING
+            customer=profile, payment_status=Order.PAYMENT_STATUS_PENDING
         )
 
         # Add items to the order
@@ -52,8 +53,12 @@ class OrderCreate(LoginRequiredMixin, View):
         # Clear the cart
         cart.clear()
 
+        # launch asynchronous task
+        order_created.delay(order.id)
+
         return redirect("orders:order_created", order_id=order.id)
-    
+
+
 class OrderCreated(LoginRequiredMixin, View):
     def get(self, request, order_id):
         """
@@ -61,3 +66,39 @@ class OrderCreated(LoginRequiredMixin, View):
         """
         order = get_object_or_404(Order, id=order_id, customer__user=request.user)
         return render(request, "orders/order/created.html", {"order": order})
+
+
+class OrderHistory(LoginRequiredMixin, View):
+    def get(self, request):
+        # Fetch orders based on shipping status (Pending, Shipped, Delivered, Canceled)
+        status_filter = request.GET.get("status", "P")
+
+        if status_filter == "P":
+            orders = Order.objects.filter(
+                customer__user=request.user,
+                shipping_status=Order.SHIPPING_STATUS_PENDING,
+            )
+        elif status_filter == "S":
+            orders = Order.objects.filter(
+                customer__user=request.user,
+                shipping_status=Order.SHIPPING_STATUS_SHIPPED,
+            )
+        elif status_filter == "D":
+            orders = Order.objects.filter(
+                customer__user=request.user,
+                shipping_status=Order.SHIPPING_STATUS_DELIVERED,
+            )
+        else:  
+            orders = Order.objects.filter(
+                customer__user=request.user,
+                shipping_status=Order.SHIPPING_STATUS_CANCELED,
+            )
+
+        return render(
+            request,
+            "orders/order/order_history.html",
+            {
+                "orders": orders,
+                "status_filter": status_filter,
+            },
+        )

@@ -16,6 +16,8 @@ DATABASES = {
     }
 }
 
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
+
 
 if DEBUG:
     hide_toolbar_patterns = ["/media/", "/static/"]

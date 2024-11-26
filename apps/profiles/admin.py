@@ -17,7 +17,7 @@ class ProfileAdmin(admin.ModelAdmin):
     @admin.display(ordering='orders_count')
     def orders(self, customer):
         url = (
-            reverse('admin:store_order_changelist')
+            reverse('admin:orders_order_changelist')
             + '?'
             + urlencode({
                 'customer__id': str(customer.id)

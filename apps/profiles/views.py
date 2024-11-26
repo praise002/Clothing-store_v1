@@ -3,9 +3,10 @@ from django.views import View
 from apps.accounts.mixins import LoginRequiredMixin
 from apps.accounts.forms import UserEditForm
 from .forms import ProfileEditForm
-from .models import Profile
+
 
 import sweetify
+
 
 class MyProfileView(LoginRequiredMixin, View):
     def get(self, request):
@@ -23,15 +24,16 @@ class ProfileEditView(LoginRequiredMixin, View):
         profile_form = ProfileEditForm(instance=request.user.profile)
         return render(
             request,
-            "profiles/edit_form.html",
+            "profiles/edit.html",
             {"user_form": user_form, "profile_form": profile_form},
         )
 
     def post(self, request):
-        user_form = UserEditForm(
-            instance=request.user, data=request.POST, files=request.FILES
+        user_form = UserEditForm(instance=request.user, data=request.POST)
+        
+        profile_form = ProfileEditForm(
+            instance=request.user.profile, data=request.POST, files=request.FILES
         )
-        profile_form = ProfileEditForm(instance=request.user.profile, data=request.POST)
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()

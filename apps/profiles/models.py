@@ -11,7 +11,7 @@ class Profile(BaseModel):
     postal_code = models.CharField(max_length=20)
     city = models.CharField(max_length=100)
     avatar = models.ImageField(_("Avatar"), upload_to="photos/%Y/%m/%d/", null=True, blank=True)
-    phone = models.CharField(_("Phone"), max_length=255)
+    phone = models.CharField(_("Phone"), max_length=100)
     last_updated = models.DateTimeField(auto_now=True)
     
     class Meta:
@@ -27,9 +27,9 @@ class Profile(BaseModel):
         return reverse('profiles:profile_detail', kwargs={'id': self.user.id})
     
     @property
-    def image_url(self):
+    def avatar_url(self):
         try:
-            url = self.photo.url
+            url = self.avatar.url
         except:
             url = 'https://res.cloudinary.com/dq0ow9lxw/image/upload/v1732236186/default-image_foxagq.jpg'
         return url
