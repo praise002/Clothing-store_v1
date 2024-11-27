@@ -7,6 +7,11 @@
 </head>
 <body style="font-family: Arial, sans-serif; line-height: 1.6; margin: 20px;">
     <h2 style="color: #4CAF50;">Thank you for your purchase!</h2>
+    <li>
+      <a href="#" onclick="window.print();">
+          Print order
+      </a>
+    </li>
     <p>Dear {{ order.customer.user.first_name }},</p>
     <p>
         You have successfully placed an order. Below are the details:

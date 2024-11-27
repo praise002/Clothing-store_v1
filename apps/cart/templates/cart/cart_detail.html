@@ -6,60 +6,67 @@
 
 {% block content %}
   <div class="container mt-5">
-    <h1 style="margin-top: 3em; margin-bottom: 1em;">Your Shopping Cart</h1>
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Image</th>
-          <th>Product</th>
-          <th>Quantity</th>
-          <th>Remove</th>
-          <th>Unit Price</th>
-          <th>Price</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for item in cart %}
-          {% with product=item.product %}
-            <tr>
-              <td>
-                <a href="{{ product.get_absolute_url }}"><img src="{{ product.image_url }}" alt="{{ product.name }}" style="width: 80px; height: auto;" /></a>
-              </td>
-              <td>{{ product.name }}</td>
-              <td>
-                <form action="{% url 'cart:cart_add' product.id %}" method="post">
-                  {{ item.update_quantity_form.quantity }}
-                  {{ item.update_quantity_form.override }}
-                  <button type="submit" class="btn btn-primary btn-sm">Update</button>
-                  {% csrf_token %}
-                </form>
-              </td>
-              <td>
-                <form action="{% url 'cart:cart_remove' product.id %}" method="post">
-                  <button type="submit" class="btn btn-danger btn-sm">Remove</button>
-                  {% csrf_token %}
-                </form>
-              </td>
-              <td>${{ item.price }}</td>
-              <td>${{ item.total_price }}</td>
-            </tr>
-          {% endwith %}
-        {% endfor %}
-        <tr>
-          <td>
-            <strong>Total</strong>
-          </td>
-          <td colspan="4"></td>
-          <td>
-            <strong>${{ cart.get_total_price }}</strong>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    {% if cart|length == 0 %}
+      <!-- If the cart is empty, show the "Start Shopping" button -->
+      <p style="margin-top: 8em;">Your cart is empty. Start shopping now!</p>
+      <a href="{% url 'shop:products_list' %}" class="btn btn-primary">Start Shopping</a>
+    {% else %}
+      <h1 style="margin-top: 3em; margin-bottom: 1em;">Your Shopping Cart</h1>
+      <!-- If the cart has items, show the table -->
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Remove</th>
+            <th>Unit Price</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in cart %}
+            {% with product=item.product %}
+              <tr>
+                <td>
+                  <a href="{{ product.get_absolute_url }}"><img src="{{ product.image_url }}" alt="{{ product.name }}" style="width: 80px; height: auto;" /></a>
+                </td>
+                <td>{{ product.name }}</td>
+                <td>
+                  <form action="{% url 'cart:cart_add' product.id %}" method="post">
+                    {{ item.update_quantity_form.quantity }}
+                    {{ item.update_quantity_form.override }}
+                    <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                    {% csrf_token %}
+                  </form>
+                </td>
+                <td>
+                  <form action="{% url 'cart:cart_remove' product.id %}" method="post">
+                    <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                    {% csrf_token %}
+                  </form>
+                </td>
+                <td>${{ item.price }}</td>
+                <td>${{ item.total_price }}</td>
+              </tr>
+            {% endwith %}
+          {% endfor %}
+          <tr>
+            <td>
+              <strong>Total</strong>
+            </td>
+            <td colspan="4"></td>
+            <td>
+              <strong>${{ cart.get_total_price }}</strong>
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-    <div class="d-flex justify-content-between mt-4">
-      <a href="{% url 'shop:products_list' %}" class="btn btn-primary">Continue Shopping</a>
-      <a href="{% url 'orders:order_create' %}" class="btn btn-success">Checkout</a>
-    </div>
+      <div class="d-flex justify-content-between mt-4">
+        <a href="{% url 'shop:products_list' %}" class="btn btn-primary">Continue Shopping</a>
+        <a href="{% url 'orders:order_create' %}" class="btn btn-success">Checkout</a>
+      </div>
+    {% endif %}
   </div>
 {% endblock %}

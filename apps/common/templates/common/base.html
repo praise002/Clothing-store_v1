@@ -62,8 +62,12 @@
               {% if request.user.is_authenticated %}
                 {% url 'cart:cart_detail' as cart_url %}
                 <li class="nav-item {% if request.path == cart_url %}active{% endif %}">
-                  <a class="nav-link" href="{% url 'cart:cart_detail' %}">Cart</a>
+                  <a class="nav-link" href="{% url 'cart:cart_detail' %}">
+                    <i class="fas fa-shopping-cart cart-icon"></i>Cart
+                    <span class="badge cart-badge" id="cart-count">{{ cart_length }}</span> <!-- Positioned Badge -->
+                  </a>
                 </li>
+
                 {% url 'accounts:logout' as logout_url %}
                 <li class="nav-item {% if request.path == logout_url %}active{% endif %}">
                   <form class="nav-link p-0" style="display: inline;" action="{% url 'accounts:logout' %}" method="post">
@@ -95,7 +99,7 @@
     </footer>
 
     <!-- Bootstrap core JavaScript -->
-    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></>
+    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
     <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 
     <!-- Additional Scripts -->

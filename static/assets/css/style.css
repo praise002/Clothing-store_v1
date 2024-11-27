@@ -1039,4 +1039,26 @@ footer .inner-content p a {
     }
 }
 
-
+/* Positioning the cart icon */
+.cart-icon {
+    font-size: 1.5em; /* Adjust size of the cart icon */
+    position: relative;
+    /* line-height: 0; */
+  }
+  
+  /* Positioning the badge */
+  .cart-badge {
+    position: absolute;
+    top: 2em; 
+    
+    background-color: #dc3545; /* Red color for the badge */
+    color: white;
+    font-size: 0.75em; /* Adjust the badge size */
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  

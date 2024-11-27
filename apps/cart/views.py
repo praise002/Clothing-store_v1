@@ -28,7 +28,6 @@ class CartRemove(LoginRequiredMixin, View):
     def post(self, request, product_id):
         cart = Cart(request)
         product = get_object_or_404(Product, id=product_id)
-        print(product)
         cart.remove(product)
         return redirect("cart:cart_detail")
 

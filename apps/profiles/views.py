@@ -37,7 +37,7 @@ class ProfileEditView(LoginRequiredMixin, View):
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
-            sweetify.toast(request, "Profile updated successfully")
+            sweetify.success(request, "Profile updated successfully")
             return redirect("profiles:profile")
 
         return render(

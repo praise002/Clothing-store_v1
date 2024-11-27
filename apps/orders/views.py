@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
+import sweetify
 from apps.accounts.mixins import LoginRequiredMixin
 from apps.cart.cart import Cart
 from apps.profiles.models import Profile
@@ -55,8 +56,12 @@ class OrderCreate(LoginRequiredMixin, View):
 
         # launch asynchronous task
         order_created.delay(order.id)
+        
+        # set the order in the session
+        request.session['order_id'] = str(order.id)
 
-        return redirect("orders:order_created", order_id=order.id)
+        # redirect for payment
+        return redirect('payments:process')
 
 
 class OrderCreated(LoginRequiredMixin, View):
@@ -88,7 +93,7 @@ class OrderHistory(LoginRequiredMixin, View):
                 customer__user=request.user,
                 shipping_status=Order.SHIPPING_STATUS_DELIVERED,
             )
-        else:  
+        else:
             orders = Order.objects.filter(
                 customer__user=request.user,
                 shipping_status=Order.SHIPPING_STATUS_CANCELED,
@@ -102,3 +107,18 @@ class OrderHistory(LoginRequiredMixin, View):
                 "status_filter": status_filter,
             },
         )
+
+
+class OrderItemDetailView(LoginRequiredMixin, View):
+    def get(self, request, order_item_id):
+        # Get the specific order item by ID
+        order_item = get_object_or_404(OrderItem, id=order_item_id)
+
+        # Get the product associated with the order item
+        product = order_item.product
+        context = {
+            "product": product,
+            "order_item": order_item,
+            "quantity": order_item.quantity,  # Quantity last bought
+        }
+        return render(request, "orders/order/order_item_detail.html", context)

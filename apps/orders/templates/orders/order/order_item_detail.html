@@ -1,0 +1,33 @@
+{% extends 'common/base.html' %}
+
+{% block title %}
+  Order Item Details | {{ product.name }}
+{% endblock %}
+
+{% block content %}
+  <div class="container mt-5">
+    <h2 class="mb-4 text-center">Order Item Details</h2>
+
+    <!-- Product Card -->
+    <div class="card mb-4 shadow">
+      <div class="row g-0">
+        <div class="col-md-4">
+          <img src="{{ product.image_url }}" alt="{{ product.name }}" class="img-fluid rounded-start" />
+        </div>
+        <div class="col-md-8">
+          <div class="card-body">
+            <h3 class="card-title">{{ product.name }}</h3>
+            <p class="card-text">
+              <strong>Quantity Bought:</strong> {{ quantity }}
+            </p>
+            <p class="card-text">
+              <strong>Price:</strong> ${{ product.price }}
+            </p>
+
+            <button type="submit" class="btn btn-primary float-end" onclick="window.location.href='{{ product.get_absolute_url }}'" style="cursor: pointer;">Buy Again</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

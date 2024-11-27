@@ -49,21 +49,7 @@
     </div>
   </div>
 
-  <div class="container mt-4">
-    <p style="margin-top: 5em; font-size: 1em; color: #000;" class="text-right">
-        {% with total_items=cart|length %}
-            {% if total_items > 0 %}
-                Your cart:
-                <a href="{% url 'cart:cart_detail' %}">
-                    {{ total_items }} item{{ total_items|pluralize }}
-                    ${{ cart.get_total_price }}
-                </a>
-            {% else %}
-                Your cart is empty.
-            {% endif %}
-        {% endwith %}
-        
-    </p>
+  <div class="container" style="margin-top: 5em;">
     <div class="card">
       <img style="width:20em; object-fit:cover;" src="{{ product.image_url }}" class="card-img-top" />
       <div class="card-body">

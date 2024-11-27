@@ -6,4 +6,5 @@ def utils(request):
 
 
 def cart(request):
-    return {"cart": Cart(request)}
+    cart = Cart(request)
+    return {"cart_length": len(cart)}

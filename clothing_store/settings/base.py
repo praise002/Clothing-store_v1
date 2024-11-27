@@ -58,6 +58,7 @@ LOCAL_APPS = [
     "apps.shop",
     "apps.cart",
     "apps.orders",
+    "apps.payments",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -98,6 +99,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "apps.common.context_processors.utils",
+                "apps.common.context_processors.cart",
             ],
         },
     },

@@ -49,8 +49,8 @@
       {% for order in orders %}
         {% for item in order.items.all %}
           <div class="col-md-4 mb-4">
-            <!-- Wrap each product item with a link to the product detail page -->
-            <a href="{{ item.product.get_absolute_url }}">
+            <!-- Wrap each product item with a link to the order detail page -->
+            <a href="{% url 'orders:order_item_detail' order_item_id=item.id %}">
               <div class="order-card">
                 <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}">
                 <div class="order-details">

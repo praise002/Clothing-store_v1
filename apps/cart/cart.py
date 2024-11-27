@@ -29,7 +29,6 @@ class Cart:
         if cart:
             # Load the cart from Redis if it exists
             self.cart = json.loads(cart)
-            print(self.cart)
         else:
             # Create an empty cart if not found
             self.cart = {}

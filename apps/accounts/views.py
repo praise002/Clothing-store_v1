@@ -127,7 +127,7 @@ class VerifyEmail(LogoutRequiredMixin, View):
                 if otp_record.otp == otp_code and otp_record.is_valid:
                     user_obj.is_email_verified = True
                     user_obj.save()
-                    sweetify.toast(request, "Verification successful!")
+                    sweetify.success(request, "Verification successful!")
 
                     # Clear OTP after verification
                     Otp.objects.filter(user=user_obj).delete()
@@ -167,7 +167,7 @@ class ResendVerificationEmail(LogoutRequiredMixin, View):
             return redirect(reverse("accounts:login"))
 
         OTPService.send_otp_email(request, user)
-        sweetify.toast(request, "Email Sent")
+        sweetify.success(request, "Email Sent")
 
 
 class PasswordResetRequestView(LogoutRequiredMixin, View):
