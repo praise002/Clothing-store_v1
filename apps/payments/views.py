@@ -15,8 +15,9 @@ def payment_process(request):
     # retrieve the order_id we'd set in the djago session ealier
     order_id = request.session.get("order_id")
     order = get_object_or_404(Order, id=order_id)
-    print(order)
-    amount = order.get_total_cost()
+    print(order) #TODO: REMOVE LATER
+    amount = order.get_total_cost() * Decimal("100")
+    print(amount) #TODO: REMOVE LATER
 
     if request.method == "POST":
         success_url = request.build_absolute_uri(
@@ -24,29 +25,20 @@ def payment_process(request):
         )  # generate absolute url for the url path
         cancel_url = request.build_absolute_uri(reverse("payments:canceled"))
 
-        # add order items to the paystack checkout session
-        for item in order.items.all():
-            # metadata to pass additional data that
-            # the endpoint doesn't accept naturally.
-            metadata = json.dumps(
-                {
-                    "price_data": {
-                        "unit_amount": int(item.price * Decimal("100")),
-                        "currency": "usd",
-                        "product_data": {
-                            "name": item.product.name,
-                        },
-                        "quantity": item.quantity,
-                        "client_reference_id": str(order_id),
-                        "cancel_action": cancel_url,
-                    }
-                }
-            )
+        
+        # metadata to pass additional data that
+        # the endpoint doesn't accept naturally.
+       
+        metadata= json.dumps({"order_id": order_id,  
+                              "cancel_action": cancel_url,  
+                            #   "client_reference_id": str(order_id), 
+                            })
 
         # Paystack checkout session data
         session_data = {
             "email": order.customer.user.email,
-            "amount": int(amount),
+            "amount": int(amount), # amount in cents
+            "client_reference_id": str(order_id), 
             "callback_url": success_url,
             "metadata": metadata,
         }
@@ -70,6 +62,27 @@ def payment_process(request):
 
 
 def payment_success(request):
+    order_id = request.session.get("order_id", None)
+    order = get_object_or_404(Order, id=order_id)
+    
+    # retrieve the query parameter from the request object
+    ref = request.GET.get('reference', '')
+    
+    # verify transaction endpoint
+    url = f'https://api.paystack.co/transaction/verify/{ref}'
+    
+    # set auth headers
+    headers = {"authorization": f"Bearer {api_key}"}
+    r = requests.get(url, headers=headers)
+    res = r.json()
+    res = res["data"]
+    
+    # verify status before setting payment_ref
+    if res['status'] == "success":
+        # update order payment reference
+        order.payment_ref = ref
+        order.save()
+        
     return render(request, "payments/success.html")
 
 

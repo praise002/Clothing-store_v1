@@ -6,16 +6,6 @@ from apps.shop.models import Product
 
 
 class Order(BaseModel):
-    # Payment status
-    PAYMENT_STATUS_PENDING = "P"
-    PAYMENT_STATUS_COMPLETE = "C"
-    PAYMENT_STATUS_FAILED = "F"
-
-    PAYMENT_STATUS_CHOICES = [
-        (PAYMENT_STATUS_PENDING, "PENDING"),
-        (PAYMENT_STATUS_COMPLETE, "COMPLETE"),
-        (PAYMENT_STATUS_FAILED, "FAILED"),
-    ]
 
     # Shipping status
     SHIPPING_STATUS_PENDING = "P"
@@ -33,13 +23,12 @@ class Order(BaseModel):
     customer = models.ForeignKey(
         Profile, on_delete=models.PROTECT, related_name="orders"
     )
-    payment_status = models.CharField(
-        max_length=1, choices=PAYMENT_STATUS_CHOICES, default=PAYMENT_STATUS_PENDING
-    )
+    paid = models.BooleanField(default=False)
     shipping_status = models.CharField(
-        max_length=1, choices=SHIPPING_STATUS_CHOICES, default=SHIPPING_STATUS_PENDING
+        max_length=1, choices=SHIPPING_STATUS_CHOICES, blank=True
     )
     placed_at = models.DateTimeField(auto_now_add=True)
+    payment_ref = models.CharField(max_length=15, blank=True)
 
     class Meta:
         ordering = ["-placed_at"]

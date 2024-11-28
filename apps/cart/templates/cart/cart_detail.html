@@ -46,8 +46,8 @@
                     {% csrf_token %}
                   </form>
                 </td>
-                <td>${{ item.price }}</td>
-                <td>${{ item.total_price }}</td>
+                <td>₦{{ item.price }}</td>
+                <td>₦{{ item.total_price }}</td>
               </tr>
             {% endwith %}
           {% endfor %}
@@ -57,7 +57,7 @@
             </td>
             <td colspan="4"></td>
             <td>
-              <strong>${{ cart.get_total_price }}</strong>
+              <strong>₦{{ cart.get_total_price }}</strong>
             </td>
           </tr>
         </tbody>

@@ -19,8 +19,13 @@ class Cart:
         )
 
         # Create a unique key for the cart
+        # self.cart_key = (
+        #     f"cart_{request.user.id}" if request.user.is_authenticated else None
+        # )
         self.cart_key = (
-            f"cart_{request.user.id}" if request.user.is_authenticated else None
+            f"cart_{request.user.id}"
+            if request.user.is_authenticated
+            else f"cart_guest_{request.session.session_key}"
         )
 
         # Try to get the cart from Redis
@@ -94,7 +99,7 @@ class Cart:
         return sum(
             Decimal(item["price"]) * item["quantity"] for item in self.cart.values()
         )
-        
+
     def clear(self):
         """
         Clear the cart in Redis.

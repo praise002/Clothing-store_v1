@@ -1,41 +1,51 @@
 {% extends 'common/base.html' %}
 
 {% block title %}
-  Pay your order
+  Pay Your Order
 {% endblock %}
 
 {% block content %}
-  <h1 style="margin-top: 5em;">Order summary</h1>
-  <table>
-    <thead>
-      <tr>
-        <th>Image</th>
-        <th>Product</th>
-        <th>Price</th>
-        <th>Quantity</th>
-        <th>Total</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for item in order.items.all %}
-        <tr class="row {% cycle "1" "2" %}">
-          <td>
-            <img src="{{ item.product.image_url }}" alt="An image of product "{{ item.product.name }}"">
-          </td>
-          <td>{{ item.product.name }}</td>
-          <td>{{ item.price }}</td>
-          <td>{{ item.quantity }}</td>
-          <td>{{ item.get_cost }}</td>
+  <div class="container" style="margin-top: 5em;">
+    <h1 class="text-center mb-4">Order Summary</h1>
+    
+    <table class="table table-bordered table-striped">
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col">Image</th>
+          <th scope="col">Product</th>
+          <th scope="col">Price</th>
+          <th scope="col">Quantity</th>
+          <th scope="col">Total</th>
         </tr>
-      {% endfor %}
-      <tr>
-        <td colspan="4">Total</td>
-        <td>{{ order.get_total_cost }}</td>
-      </tr>
-    </tbody>
-  </table>
-  <form action="{% url "payments:process" %}" method="post">
-    <input type="submit" value="Pay now">
-    {% csrf_token %}
-  </form>
+      </thead>
+      <tbody>
+        {% for item in order.items.all %}
+          <tr>
+            <td>
+              <img src="{{ item.product.image_url }}" alt="A product '{{ item.product.name }}'" class="img-fluid" style="max-width: 100px;">
+            </td>
+            <td>{{ item.product.name }}</td>
+            <td>₦{{ item.price }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>₦{{ item.get_cost }}</td>
+          </tr>
+        {% endfor %}
+        <tr class="font-weight-bold">
+          <td colspan="4" class="text-right">Total</td>
+          <td>₦{{ order.get_total_cost }}</td>
+        </tr>
+        <tr>
+          <td colspan="4" class="text-right">Status</td>
+          <td>{% if payment.paid %}<span class="badge badge-success">Paid</span>{% else %}<span class="badge badge-warning">Pending Payment</span>{% endif %}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="text-center mt-4">
+      <form action="{% url 'payments:process' %}" method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary btn-lg">Pay Now</button>
+      </form>
+    </div>
+  </div>
 {% endblock %}

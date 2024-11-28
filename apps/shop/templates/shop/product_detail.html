@@ -58,7 +58,7 @@
         <p class="card-text mt-2" style="font-weight:bold; font-size:1em;">
           Category - <a href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a>
         </p>
-        <p class="card-text mt-2" style="font-weight:bold; font-size:1em;">Price - ${{ product.price }}</p>
+        <p class="card-text mt-2" style="font-weight:bold; font-size:1em;">Price - ₦{{ product.price }}</p>
         <p class="card-text mt-2" style="font-weight:bold; font-size:1em;">Units Available - {{ product.in_stock }}</p>
         <form action="{% url 'cart:cart_add' product.id %}" method="post">
           <div class="form-row align-items-center">

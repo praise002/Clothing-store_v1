@@ -40,11 +40,11 @@
             {% for item in cart %}
               <li class="list-group-item d-flex justify-content-between align-items-center">
                 <span>{{ item.quantity }}x {{ item.product.name }}</span>
-                <span class="fw-bold">${{ item.total_price }}</span>
+                <span class="fw-bold">₦{{ item.total_price }}</span>
               </li>
             {% endfor %}
           </ul>
-          <p class="fw-bold fs-5">Total: ${{ cart.get_total_price }}</p>
+          <p class="fw-bold fs-5">Total: ₦{{ cart.get_total_price }}</p>
           <form method="post">
             {% csrf_token %}
             <button type="submit" class="btn btn-primary w-100">Place Order</button>

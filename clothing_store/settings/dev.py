@@ -3,7 +3,9 @@ from decouple import config
 
 DEBUG = True
 
-ALLOWED_HOSTS = config("ALLOWED_HOSTS").split(" ")
+# ALLOWED_HOSTS = config("ALLOWED_HOSTS").split(" ")
+ALLOWED_HOSTS = ["*"]
+CSRF_TRUSTED_ORIGINS = ['https://*.ngrok.io', 'https://*.ngrok-free.app']
 
 DATABASES = {
     'default': {

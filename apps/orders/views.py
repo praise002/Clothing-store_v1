@@ -38,7 +38,7 @@ class OrderCreate(LoginRequiredMixin, View):
 
         # Create the order
         order = Order.objects.create(
-            customer=profile, payment_status=Order.PAYMENT_STATUS_PENDING
+            customer=profile
         )
 
         # Add items to the order
