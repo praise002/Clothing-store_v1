@@ -1,7 +1,11 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
-import sweetify
+from django.contrib.admin.views.decorators import staff_member_required
 from apps.accounts.mixins import LoginRequiredMixin
+import weasyprint
+from django.contrib.staticfiles import finders
+from django.http import HttpResponse
+from django.template.loader import render_to_string
 from apps.cart.cart import Cart
 from apps.profiles.models import Profile
 from .models import Order, OrderItem
@@ -37,9 +41,7 @@ class OrderCreate(LoginRequiredMixin, View):
         profile = get_object_or_404(Profile, user=user)
 
         # Create the order
-        order = Order.objects.create(
-            customer=profile
-        )
+        order = Order.objects.create(customer=profile)
 
         # Add items to the order
         cart = Cart(request)
@@ -56,18 +58,18 @@ class OrderCreate(LoginRequiredMixin, View):
 
         # launch asynchronous task
         order_created.delay(order.id)
-        
+
         # set the order in the session
-        request.session['order_id'] = str(order.id)
+        request.session["order_id"] = str(order.id)
 
         # redirect for payment
-        return redirect('payments:process')
+        return redirect("payments:process")
 
 
 class OrderCreated(LoginRequiredMixin, View):
     def get(self, request, order_id):
         """
-        Display a success message after placing an order.
+        Display a success page after placing an order.
         """
         order = get_object_or_404(Order, id=order_id, customer__user=request.user)
         return render(request, "orders/order/created.html", {"order": order})
@@ -76,7 +78,8 @@ class OrderCreated(LoginRequiredMixin, View):
 class OrderHistory(LoginRequiredMixin, View):
     def get(self, request):
         # Fetch orders based on shipping status (Pending, Shipped, Delivered, Canceled)
-        status_filter = request.GET.get("status", "P")
+        status_filter = request.GET.get("shipping_status", "P")
+        unpaid_orders = Order.objects.filter(paid=False)
 
         if status_filter == "P":
             orders = Order.objects.filter(
@@ -96,7 +99,7 @@ class OrderHistory(LoginRequiredMixin, View):
         else:
             orders = Order.objects.filter(
                 customer__user=request.user,
-                shipping_status=Order.SHIPPING_STATUS_CANCELED,
+                paid=False,
             )
 
         return render(
@@ -105,6 +108,7 @@ class OrderHistory(LoginRequiredMixin, View):
             {
                 "orders": orders,
                 "status_filter": status_filter,
+                "unpaid orders": unpaid_orders,
             },
         )
 
@@ -122,3 +126,21 @@ class OrderItemDetailView(LoginRequiredMixin, View):
             "quantity": order_item.quantity,  # Quantity last bought
         }
         return render(request, "orders/order/order_item_detail.html", context)
+
+
+@staff_member_required
+def admin_order_detail(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    return render(request, "admin/orders/order/detail.html", {"order": order})
+
+
+@staff_member_required
+def admin_order_pdf(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    html = render_to_string("orders/order/pdf.html", {"order": order})
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = f"filename=order_{order.id}.pdf"
+    weasyprint.HTML(string=html).write_pdf(
+        response, stylesheets=[weasyprint.CSS(finders.find("assets/css/pdf.css"))]
+    )
+    return response

@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 from decouple import config
+from celery.schedules import crontab
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -218,6 +219,14 @@ DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 EMAIL_OTP_EXPIRE_MINUTES = 15
+
+CELERY_BEAT_SCHEDULE = {
+    'cancel-expired-orders': {
+        'task': 'apps.orders.tasks.cancel_expired_orders',
+        # 'schedule': crontab(hour=0, minute=0), # Every day at midnight 
+        'schedule': 1, 
+    },
+}
 
 # JAZZMIN_SETTINGS = {
 #     # title of the window (Will default to current_admin_site.site_title if absent or None)

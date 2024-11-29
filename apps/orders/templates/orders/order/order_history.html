@@ -39,37 +39,66 @@
     <h1 class="mb-4">Your Order History</h1>
 
     <div class="btn-group mb-4" role="group" aria-label="Order Status Filter">
-      <a href="?status=P" class="btn btn-outline-primary">Pending Orders</a>
-      <a href="?status=S" class="btn btn-outline-warning">Shipped Orders</a>
-      <a href="?status=D" class="btn btn-outline-success">Delivered Orders</a>
-      <a href="?status=C" class="btn btn-outline-danger">Canceled Orders</a>
+      <a href="?shipping_status=unpaid" class="btn btn-outline-primary">Pending Payment</a>
+      <a href="?shipping_status=P" class="btn btn-outline-primary">Pending Orders</a>
+      <a href="?shipping_status=S" class="btn btn-outline-warning">Shipped Orders</a>
+      <a href="?shipping_status=D" class="btn btn-outline-success">Delivered Orders</a>
     </div>
 
+    <!-- Loop through the filtered orders and render their items -->
     <div class="row">
       {% for order in orders %}
-        {% for item in order.items.all %}
-          <div class="col-md-4 mb-4">
-            <!-- Wrap each product item with a link to the order detail page -->
-            <a href="{% url 'orders:order_item_detail' order_item_id=item.id %}">
-              <div class="order-card">
-                <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}">
-                <div class="order-details">
-                  <div class="product-name">{{ item.product.name }}</div>
-                  <div class="order-status {% if order.shipping_status == 'P' %}text-primary{% elif order.shipping_status == 'S' %}text-warning{% elif order.shipping_status == 'D' %}text-success{% else %}text-danger{% endif %}">
-                    {% if order.shipping_status == 'P' %}Pending{% elif order.shipping_status == 'S' %}Shipped{% elif order.shipping_status == 'D' %}Delivered{% else %}Canceled{% endif %}
+        {% if order.shipping_status == '' %}
+          <!-- Render the payment process page for unpaid orders -->
+          {% include 'orders/order/includes/pending_payment_orders.html' %}
+        {% else %}
+          {% for item in order.items.all %}
+            <div class="col-md-4 mb-4">
+              <a href="{% url 'orders:order_item_detail' order_item_id=item.id %}">
+                <div class="order-card">
+                  <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" />
+                  <div class="order-details">
+                    <div class="product-name">{{ item.product.name }}</div>
+
+                    <!-- Order status section -->
+                    <div class="order-status 
+                      {% if order.shipping_status == 'P' %}
+                         text-primary
+
+                      {% elif order.shipping_status == 'S' %}
+                         text-warning
+
+                      {% elif order.shipping_status == 'D' %}
+                         text-success
+                      
+
+                      {% else %}
+                         text-primary
+
+                      {% endif %}">
+                      {% if order.shipping_status == 'P' %}
+                        Pending
+                      {% elif order.shipping_status == 'S' %}
+                        Shipped
+                      {% elif order.shipping_status == 'D' %}
+                        Delivered
+                      {% endif %}
+                    </div>
+
+                    <div class="text-muted">Order Date: {{ order.placed_at|date:'F j, Y' }}</div>
+                    {% if order.delivered_at %}
+                      <div class="text-muted">Delivered Date: {{ order.delivered_at|date:'F j, Y' }}</div>
+                    {% endif %}
                   </div>
-                  <div class="text-muted">Order Date: {{ order.placed_at|date:"F j, Y" }}</div>
-                  {% if order.delivered_at %}
-                    <div class="text-muted">Delivered Date: {{ order.delivered_at|date:"F j, Y" }}</div>
-                  {% endif %}
                 </div>
-              </div>
-            </a>
-          </div>
-        {% endfor %}
+              </a>
+            </div>
+          {% endfor %}
+        {% endif %}
       {% empty %}
         <p>No orders found.</p>
       {% endfor %}
     </div>
+    
   </div>
 {% endblock %}

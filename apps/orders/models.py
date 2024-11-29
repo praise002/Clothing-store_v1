@@ -11,13 +11,11 @@ class Order(BaseModel):
     SHIPPING_STATUS_PENDING = "P"
     SHIPPING_STATUS_SHIPPED = "S"
     SHIPPING_STATUS_DELIVERED = "D"
-    SHIPPING_STATUS_CANCELED = "C"
 
     SHIPPING_STATUS_CHOICES = [
         (SHIPPING_STATUS_PENDING, "PENDING"),
         (SHIPPING_STATUS_SHIPPED, "SHIPPED"),
         (SHIPPING_STATUS_DELIVERED, "DELIVERED"),
-        (SHIPPING_STATUS_CANCELED, "CANCELED"),
     ]
 
     customer = models.ForeignKey(
@@ -44,7 +42,7 @@ class Order(BaseModel):
 
 
 class OrderItem(BaseModel):
-    order = models.ForeignKey(Order, related_name="items", on_delete=models.PROTECT)
+    order = models.ForeignKey(Order, related_name="items", on_delete=models.CASCADE)
     product = models.ForeignKey(
         Product, on_delete=models.PROTECT, related_name="order_items"
     )

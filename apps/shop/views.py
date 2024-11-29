@@ -5,7 +5,6 @@ from django.db.models.query import QuerySet
 from django.http import Http404
 from django.core.paginator import Paginator
 
-from apps.cart.cart import Cart
 from apps.shop.forms import ReviewForm
 from apps.shop.utils import sort_products, sort_filter_value
 

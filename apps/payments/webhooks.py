@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from apps.orders.models import Order
 from decouple import config
+from .tasks import payment_completed
 
 secret = config("PAYSTACK_TEST_SECRET_KEY")
 
@@ -61,5 +62,8 @@ def stack_webhook(request):
             if not order.shipping_status:
                 order.shipping_status = Order.SHIPPING_STATUS_PENDING
             order.save(force_update=True)
+            
+            # launch asynchronous task
+            payment_completed.delay(order.id)
             
         return HttpResponse(status=200)
