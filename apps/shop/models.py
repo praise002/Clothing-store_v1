@@ -25,6 +25,7 @@ class Category(BaseModel):
     def get_absolute_url(self):
         return reverse("shop:category_products", args=[str(self.slug)])
 
+#NOTE: USE PERMSSIONS IN ADMIN TO PREVENT ACCIDENTAL DELETION OF PRODUCT
 
 class Product(BaseModel):
     name = models.CharField(max_length=255)
@@ -40,6 +41,7 @@ class Product(BaseModel):
     in_stock = models.PositiveIntegerField()
     featured = models.BooleanField(default=False)
     flash_deals = models.BooleanField(default=False)
+    is_available = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
@@ -85,5 +87,16 @@ class Review(BaseModel):
     customer = models.ForeignKey(Profile, on_delete=models.CASCADE)
     text = models.TextField()
     rating = models.SmallIntegerField(choices=RATING_CHOICES)
+    
+    def __str__(self):
+        return f"{self.customer.user.full_name} review on {self.product.name}"
 
 
+class Wishlist(models.Model):
+    profile = models.OneToOneField(Profile, on_delete=models.CASCADE)
+    products = models.ManyToManyField(Product, related_name="wishlists", blank=True)
+    added_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.profile.user.full_name} wishlist"
+    

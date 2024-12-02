@@ -4,11 +4,13 @@ from django.views.generic import ListView
 from django.db.models.query import QuerySet
 from django.http import Http404
 from django.core.paginator import Paginator
+from django.contrib.auth.decorators import login_required
+from requests import get
 
 from apps.shop.forms import ReviewForm
 from apps.shop.utils import sort_products, sort_filter_value
 
-from apps.shop.models import Category, Product
+from apps.shop.models import Category, Product, Wishlist
 
 from apps.cart.forms import CartAddProductForm
 
@@ -87,3 +89,26 @@ class CategoryProductsView(View):
         context = {"category": category, "page_obj": page, "is_paginated": is_paginated}
         sort_filter_value(self.request, context)
         return render(request, "shop/category_products.html", context)
+
+
+@login_required
+def view_wishlist(request):
+    wishlist, _ = Wishlist.objects.get_or_create(profile=request.user.profile)
+    return render(request, "shop/wishlist.html", {"wishlist": wishlist})
+
+
+@login_required
+def add_to_wishlist(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    # if wishlist has been created, get it, else create it
+    wishlist, _ = Wishlist.objects.get_or_create(profile=request.user.profile)
+    wishlist.products.add(product)
+    return redirect('shop:view_wishlist')
+
+
+@login_required
+def remove_from_wishlist(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    wishlist = get_object_or_404(Wishlist, profile=request.user.profile)
+    wishlist.products.remove(product)
+    return redirect('shop:view_wishlist')

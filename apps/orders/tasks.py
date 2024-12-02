@@ -26,7 +26,7 @@ def order_created(order_id):
 def order_canceled(order_id): 
     order = Order.objects.get(id=order_id)
     user = order.customer.user
-    subject = f"Order nr. {order.id}"
+    subject = f"Canceled Order nr. {order.id} - Your order could not be completed"
     context = {
         "order": order,
         "domain": "http://127.0.0.1:8000",

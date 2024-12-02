@@ -223,8 +223,8 @@ EMAIL_OTP_EXPIRE_MINUTES = 15
 CELERY_BEAT_SCHEDULE = {
     'cancel-expired-orders': {
         'task': 'apps.orders.tasks.cancel_expired_orders',
-        # 'schedule': crontab(hour=0, minute=0), # Every day at midnight 
-        'schedule': 1, 
+        'schedule': crontab(hour=0, minute=0), # Every day at midnight 
+        # 'schedule': 1, 
     },
 }
 

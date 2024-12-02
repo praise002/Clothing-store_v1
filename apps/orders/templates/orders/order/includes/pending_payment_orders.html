@@ -1,5 +1,10 @@
 {% block content %}
   <div class="container" style="margin-top: 1em;">
+    <p>
+      The order will be deleted in 24 hours if payment is not made. If you still
+      wish to preserve your order, please make payment as soon as possible or add
+      to wishlist.
+    </p>
 
     <table class="table table-bordered table-striped">
       <thead class="thead-dark">
@@ -9,6 +14,7 @@
           <th scope="col">Price</th>
           <th scope="col">Quantity</th>
           <th scope="col">Total</th>
+          <th scope="col"></th>
         </tr>
       </thead>
       <tbody>
@@ -21,6 +27,12 @@
             <td>₦{{ item.price }}</td>
             <td>{{ item.quantity }}</td>
             <td>₦{{ item.get_cost }}</td>
+            <td>
+              <form action="{% url 'shop:add_to_wishlist' item.product.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-secondary btn-sm">Add to Wishlist</button>
+              </form>
+            </td>
           </tr>
         {% endfor %}
         <tr class="font-weight-bold">
@@ -40,11 +52,11 @@
       </tbody>
     </table>
 
-    <div class="text-center mt-4">
+    <div class="d-flex justify-content-between mt-4">
       <form action="{% url 'payments:process' %}" method="post">
         {% csrf_token %}
         <button type="submit" class="btn btn-primary btn-lg">Pay Now</button>
-      </form>
+      </form>   
     </div>
   </div>
 {% endblock %}

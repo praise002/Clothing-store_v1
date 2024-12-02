@@ -73,11 +73,15 @@
               {% endfor %}
               {% csrf_token %}
               <div class="form-group col-auto">
-                <input class="btn btn-primary mt-2" type="submit" value="Add to Cart" />
+                <input class="btn btn-primary mt-2" type="submit" value="Add to Cart" />               
               </div>
             </div>
           {% endif %}
         </form>
+        <form action="{% url 'shop:add_to_wishlist' product.id %}" method="post">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-secondary">Add to Wishlist</button>
+        </form> 
       </div>
     </div>
 

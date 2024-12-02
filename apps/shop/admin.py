@@ -10,7 +10,7 @@ class ProductAdmin(admin.ModelAdmin):
     autocomplete_fields = ["category"]
     list_display = ["name", "price", "category"]
     list_editable = ["price"]
-    list_filter = ["category", "in_stock", "flash_deals"]
+    list_filter = ["category", "in_stock", "flash_deals", "is_available"]
     list_per_page = 10
     list_select_related = ["category"]
     search_fields = ["name"]
@@ -33,5 +33,13 @@ class CategoryAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         return super().get_queryset(request).annotate(products_count=Count("products"))
 
+admin.site.register(models.Review)
 
-
+@admin.register(models.Wishlist)
+class WishlistAdmin(admin.ModelAdmin):
+    list_display = ["profile", "added_at"]
+    list_filter = ["added_at"]
+    search_fields = ["profile__user__full_name"]
+    date_hierarchy = "added_at"
+    ordering = ["-added_at"]
+    filter_horizontal = ('products',)

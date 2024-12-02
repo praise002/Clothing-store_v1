@@ -88,7 +88,7 @@ class LoginForm(forms.Form):
         widget=forms.EmailInput(
             attrs={
                 "placeholder": _("Enter your email address..."),
-                "autocomplete": "new-email",
+                # "autocomplete": "new-email",
             }
         ),
     )
