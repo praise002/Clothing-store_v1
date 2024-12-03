@@ -99,4 +99,3 @@ class Wishlist(models.Model):
     
     def __str__(self):
         return f"{self.profile.user.full_name} wishlist"
-    

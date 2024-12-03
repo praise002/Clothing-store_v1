@@ -24,21 +24,18 @@
         margin: 0;
         padding: 0;
       }
+      
+      
     </style>
     {% include 'common/includes/static.html' %}
     {% comment %} <script defer src="{% static '' %}"></script> {% endcomment %}
   </head>
 
   <body class="d-flex flex-column min-vh-100">
-    
     <header>
       <nav class="navbar navbar-expand-lg">
         <div class="container">
           <a class="navbar-brand" href="#"><h2>Sixteen <em>Clothing</em></h2></a>
-          <form class="form-inline my-2 my-lg-0" action="" method="get">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search for products..." aria-label="Search" name="q">
-            {% comment %} TODO: MAKE RESPONSIVE FOR MOBILE LATER {% endcomment %}
-          </form>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
           <div class="collapse navbar-collapse" id="navbarResponsive">
             <ul class="navbar-nav ml-auto">
@@ -54,16 +51,16 @@
               <li class="nav-item {% if request.path == categories_url %}active{% endif %}">
                 <a class="nav-link" href="{% url 'shop:categories' %}">Categories</a>
               </li>
-    
+
               {% url 'general:about' as about_url %}
               <li class="nav-item {% if request.path == about_url %}active{% endif %}">
-                <a class="nav-link" href="{% url 'general:about' %}">About Us</a>
+                <a class="nav-link" href="{% url 'general:about' %}">About</a>
               </li>
               {% url 'general:contact' as contact_url %}
               <li class="nav-item {% if request.path == contact_url %}active{% endif %}">
-                <a class="nav-link" href="{% url 'general:contact' %}">Contact Us</a>
+                <a class="nav-link" href="{% url 'general:contact' %}">Contact</a>
               </li>
-    
+
               {% if request.user.is_authenticated %}
                 <!-- Cart -->
                 {% url 'cart:cart_detail' as cart_url %}
@@ -71,14 +68,13 @@
                   <a class="nav-link" href="{% url 'cart:cart_detail' %}">
                     <i class="fas fa-shopping-cart cart-icon"></i>Cart
                     <span class="badge cart-badge" id="cart-count">{{ cart_length }}</span>
+                    <span class="badge cart-badge-sm" id="cart-count">{{ cart_length }}</span>
                   </a>
                 </li>
-    
+
                 <!-- User Account Dropdown -->
                 <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Account
-                  </a>
+                  <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Account</a>
                   <div class="dropdown-menu" aria-labelledby="userDropdown">
                     <a class="dropdown-item" href="{% url 'profiles:profile' %}">Profile</a>
                     <a class="dropdown-item" href="{% url 'shop:view_wishlist' %}">Wishlist</a>
@@ -96,17 +92,12 @@
                   <a class="nav-link" href="{% url 'accounts:register' %}">Login/Sign Up</a>
                 </li>
               {% endif %}
-
-              {% comment %} <form class="form-inline my-2 my-lg-0" action="" method="get">
-                <input class="form-control mr-sm-2" type="search" placeholder="Search for products..." aria-label="Search" name="q">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-              </form> {% endcomment %}
             </ul>
           </div>
         </div>
       </nav>
     </header>
-    
+
     <main class="flex-fill">
       {% block content %}
 

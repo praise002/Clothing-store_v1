@@ -1,5 +1,4 @@
 {% extends 'common/base.html' %}
-{% load static %}
 {% block title %}
   Products
 {% endblock %}
@@ -8,6 +7,16 @@
   <div class="products">
     <div class="container">
       <div class="row">
+        <form class="form-inline my-lg-0 w-100" style="margin-bottom: 2em !important;" action="" method="get">
+          <input
+            class="form-control w-75"
+            type="search"
+            placeholder="Search for products..."
+            aria-label="Search"
+            name="q"
+          />
+          <button class="btn btn-outline-dark ml-2" type="submit">Search</button>
+        </form>
         <!-- Filters Section -->
         <div class="col-md-12">
           <div class="filters">

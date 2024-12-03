@@ -51,17 +51,42 @@
               </tr>
             {% endwith %}
           {% endfor %}
+
+          {% if cart.coupon %}
+            <tr class="subtotal">
+              <td>Subtotal</td>
+              <td colspan="4"></td>
+              <td class="">${{ cart.get_total_price|floatformat:2 }}</td>
+            </tr>
+            <tr>
+              <td>"{{ cart.coupon.code }}" coupon ({{ cart.coupon.discount }}% off)</td>
+              <td colspan="4"></td>
+              <td class="">- ${{ cart.get_discount|floatformat:2 }}</td>
+            </tr>
+          {% endif %}
           <tr>
             <td>
               <strong>Total</strong>
             </td>
             <td colspan="4"></td>
             <td>
-              <strong>₦{{ cart.get_total_price }}</strong>
+              <strong>₦{{ cart.get_total_price_after_discount|floatformat:2 }}</strong>
             </td>
           </tr>
         </tbody>
       </table>
+
+      <p class="ml-3 font-weight-bold">Apply a coupon:</p>
+      <form class="form-inline" action="{% url 'coupons:apply' %}" method="post">
+        {% for field in coupon_apply_form %}
+          <div class="form-group mx-sm-3 mb-2">
+            <label for="{{ field.id_for_label }}" class="sr-only">Passwor{{ field.label }}</label>
+            {{ field }}
+          </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary mb-2">Apply</button>
+        {% csrf_token %}
+      </form>
 
       <div class="d-flex justify-content-between mt-4">
         <a href="{% url 'shop:products_list' %}" class="btn btn-primary">Continue Shopping</a>

@@ -1,0 +1,102 @@
+
+<div class="products">
+  <div class="container">
+    <div class="row">
+      {% if page_obj %}
+        <form class="form-inline my-lg-0 w-100" style="margin-bottom: 2em !important;" action="" method="get">
+          <input
+            class="form-control w-75"
+            type="search"
+            placeholder="Search for products..."
+            aria-label="Search"
+            name="q"
+          />
+          <button class="btn btn-outline-dark ml-2" type="submit">Search</button>
+        </form>
+      {% endif %}
+      <!-- Filters Section -->
+      <div class="col-md-12">
+        <div class="filters">
+          <ul>
+            <!-- Filter Options -->
+            <li class="{% if not filter_value %}active{% endif %}" onclick="window.location.href='{{ request.path }}'">All Products</li>
+            <li class="{% if filter_value == 'featured' %}active{% endif %}" onclick="window.location.href='?filter=featured'">Featured</li>
+            <li class="{% if filter_value == 'flash_deals' %}active{% endif %}" onclick="window.location.href='?filter=flash_deals'">Flash Deals</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Products Section -->
+      <div class="col-md-12">
+        <div class="filters-content">
+          <div class="row grid">
+            {% for product in page_obj %}
+              <div class="col-lg-4 col-md-4 all">
+                <div class="product-item">
+                  <!-- Product Image -->
+                  <a href="{{ product.get_absolute_url }}">
+                    <img style="height: 10em; object-fit: cover;" src="{{ product.image_url }}" alt="An image of {{ product.name }}">
+                  </a>
+                  <div class="down-content">
+                    <!-- Product Details -->
+                    <a href="{{ product.get_absolute_url }}">
+                      <h4>{{ product.name }}</h4>
+                    </a>
+                    <h6>₦{{ product.price }}</h6>
+                    <p>{{ product.desc|truncatechars:35 }}</p>
+                    <!-- Product Rating -->
+                    <ul class="stars">
+                      {% for i in rating_range %}
+                        <li>
+                          <i class="fa fa-star" {% if forloop.counter > product.avg_rating %} style="color:#121212;" {% endif %}></i>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                    {% comment %} <span>Reviews ({{ product.reviews.count }})</span> {% endcomment %}
+                    <span>Reviews ({{ product.num_of_reviews }})</span>
+                  </div>
+                </div>
+              </div>
+            {% empty %}
+              <!-- No Products Message -->
+              <div class="all col">
+                <p class="text-center font-weight-bold text-primary" style="margin-bottom: 3em;">There are no products here yet.</p>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12">
+        {% if page_obj.paginator.count > 0 %} <!-- Check if there are products -->
+          <ul class="pages">
+            {% if page_obj.has_previous %}
+              <li>
+                <a href="?page={{ page_obj.previous_page_number }}{{ post_param }}"><i class="fa fa-angle-double-left"></i></a>
+              </li>
+              {% if page_obj.number != 2 %}
+                <li><a href="?page=1{{ post_param }}">1</a></li>...
+              {% endif %}
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+              {% if page_obj.number == num %}
+                <li class="active"><a href="?page={{ num }}{{ post_param }}">{{ num }}</a></li>
+              {% elif num > page_obj.number|add:'-2' and num < page_obj.number|add:'2' %}
+                <li><a href="?page={{ num }}{{ post_param }}">{{ num }}</a></li>
+              {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+              {% if page_obj.number != page_obj.paginator.num_pages|add:'-1' %}
+                ...<li><a href="?page={{page_obj.paginator.num_pages}}{{post_param}}">{{page_obj.paginator.num_pages}}</a></li>
+              {% endif %}
+              <li>
+                <a href="?page={{page_obj.next_page_number}}{{post_param}}"><i class="fa fa-angle-double-right"></i></a>
+              </li>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+

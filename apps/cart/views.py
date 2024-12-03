@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 
 from apps.accounts.mixins import LoginRequiredMixin
+from apps.coupons.forms import CouponApplyForm
 from apps.orders.models import Order, OrderItem
 from apps.profiles.models import Profile
 from apps.shop.models import Product
@@ -40,4 +41,10 @@ class CartDetail(LoginRequiredMixin, View):
                 initial={"quantity": item["quantity"], "override": True}
             )
 
-        return render(request, "cart/cart_detail.html", {"cart": cart})
+        coupon_apply_form = CouponApplyForm()
+
+        return render(
+            request,
+            "cart/cart_detail.html",
+            {"cart": cart, "coupon_apply_form": coupon_apply_form},
+        )

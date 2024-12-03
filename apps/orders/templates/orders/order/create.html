@@ -43,6 +43,12 @@
                 <span class="fw-bold">₦{{ item.total_price }}</span>
               </li>
             {% endfor %}
+            {% if cart.coupon %}
+              <li>
+                "{{ cart.coupon.code }}" ({{ cart.coupon.discount }}% off)
+                <span class="">- ${{ cart.get_total_price_after_discount|floatformat:2 }}</span>
+              </li>
+            {% endif %}
           </ul>
           <p class="fw-bold fs-5">Total: ₦{{ cart.get_total_price }}</p>
           <form method="post">

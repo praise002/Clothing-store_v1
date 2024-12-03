@@ -1,6 +1,9 @@
+from decimal import Decimal
 from django.db import models
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 from apps.common.models import BaseModel
+from apps.coupons.models import Coupon
 from apps.profiles.models import Profile
 from apps.shop.models import Product
 
@@ -27,6 +30,12 @@ class Order(BaseModel):
     )
     placed_at = models.DateTimeField(auto_now_add=True)
     payment_ref = models.CharField(max_length=15, blank=True)
+    coupon = models.ForeignKey(
+        Coupon, related_name="orders", null=True, blank=True, on_delete=models.SET_NULL
+    )
+    discount = models.SmallIntegerField(
+        default=0, validators=[MinValueValidator(0), MaxValueValidator(100)]
+    )  # if coupon gets deleted. order is preserved
 
     class Meta:
         ordering = ["-placed_at"]
@@ -38,7 +47,28 @@ class Order(BaseModel):
         return f"Order {self.id} by {self.customer.user.full_name}"
 
     def get_total_cost(self):
+        total_cost = self.get_total_cost_before_discount()
+        return total_cost - self.get_discount()
+
+    def get_total_cost_before_discount(self):
         return sum(item.get_cost() for item in self.items.all())
+
+    def get_discount(self):
+        total_cost = self.get_total_cost_before_discount()
+        if self.discount:
+            return total_cost * (self.discount / Decimal(100))
+        return Decimal(0)
+
+    def apply_discount(self):
+        # First-time buyer discount
+        if not Order.objects.filter(customer=self.customer).exists():
+            self.discount_applied = (
+                self.get_total_cost() * 0.1
+            )  # 10% discount for first purchase
+
+        # Calculate final price
+        self.final_price = self.total_price - self.discount_applied
+        self.save()
 
 
 class OrderItem(BaseModel):

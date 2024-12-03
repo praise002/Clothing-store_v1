@@ -1044,13 +1044,13 @@ footer .inner-content p a {
     font-size: 1.5em; /* Adjust size of the cart icon */
     position: relative;
     /* line-height: 0; */
-  }
-  
-  /* Positioning the badge */
-  .cart-badge {
+}
+
+/* Positioning the badge */
+.cart-badge {
     position: absolute;
-    top: 2em; 
-    
+    top: 2em;
+
     background-color: #dc3545; /* Red color for the badge */
     color: white;
     font-size: 0.75em; /* Adjust the badge size */
@@ -1060,5 +1060,20 @@ footer .inner-content p a {
     display: flex;
     justify-content: center;
     align-items: center;
-  }
-  
+}
+
+@media (max-width: 993px) {
+    .cart-badge {
+        display: none;
+    }
+}
+
+.cart-badge-sm {
+    display: none;
+}
+
+@media (max-width: 993px) {
+    .cart-badge-sm {
+        display: inline-block;
+    }
+}
