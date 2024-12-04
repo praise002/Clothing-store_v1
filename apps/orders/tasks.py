@@ -23,6 +23,7 @@ def order_created(order_id):
     email_message.content_subtype = "html"
     email_message.send(fail_silently=False)
 
+@shared_task
 def order_canceled(order_id): 
     order = Order.objects.get(id=order_id)
     user = order.customer.user

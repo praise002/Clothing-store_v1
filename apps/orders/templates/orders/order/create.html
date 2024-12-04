@@ -27,7 +27,7 @@
             <strong>City:</strong> {{ profile.city }}
           </p>
           <p>
-            <a href="{% url 'profiles:profile_edit' %}" class="text-primary">Edit Profile Information</a>
+            <a href="{% url 'profiles:profile_edit' %}" class="text-primary">Edit Shipping Information</a>
           </p>
         </div>
       </div>
@@ -44,13 +44,13 @@
               </li>
             {% endfor %}
             {% if cart.coupon %}
-              <li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
                 "{{ cart.coupon.code }}" ({{ cart.coupon.discount }}% off)
-                <span class="">- ${{ cart.get_total_price_after_discount|floatformat:2 }}</span>
+                <span class="">- ₦{{ cart.get_discount|floatformat:2 }}</span>
               </li>
             {% endif %}
           </ul>
-          <p class="fw-bold fs-5">Total: ₦{{ cart.get_total_price }}</p>
+          <p class="fs-5 text-right" style="font-weight: bold !important;">Total: ₦{{ cart.get_total_price_after_discount|floatformat:2  }}</p>
           <form method="post">
             {% csrf_token %}
             <button type="submit" class="btn btn-primary w-100">Place Order</button>

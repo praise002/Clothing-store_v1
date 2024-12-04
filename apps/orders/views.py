@@ -7,6 +7,7 @@ from django.contrib.staticfiles import finders
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from apps.cart.cart import Cart
+from apps.coupons.models import CouponUsage
 from apps.profiles.models import Profile
 from .models import Order, OrderItem
 from .tasks import order_created
@@ -41,10 +42,23 @@ class OrderCreate(LoginRequiredMixin, View):
         profile = get_object_or_404(Profile, user=user)
 
         # Create the order
-        order = Order.objects.create(customer=profile)
+        # order = Order.objects.create(customer=profile)
+        
+        # Create the order instance but do not save it yet
+        order = Order(customer=profile)  # Create an in-memory instance
 
-        # Add items to the order
+        # Add coupon details if available
         cart = Cart(request)
+        
+        if cart.coupon:
+            order.coupon = cart.coupon
+            order.discount = cart.coupon.discount
+            coupon_usage = CouponUsage(profile=profile, coupon=order.coupon)
+        
+        # Save the order after making all changes
+        order.save()
+        coupon_usage.save()
+        
         for item in cart:
             OrderItem.objects.create(
                 order=order,
@@ -55,6 +69,9 @@ class OrderCreate(LoginRequiredMixin, View):
 
         # Clear the cart
         cart.clear()
+        
+        # clear the coupon
+        request.session.pop("coupon_id", None)
 
         # launch asynchronous task
         order_created.delay(order.id)
