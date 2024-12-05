@@ -53,11 +53,9 @@ class OrderCreate(LoginRequiredMixin, View):
         if cart.coupon:
             order.coupon = cart.coupon
             order.discount = cart.coupon.discount
-            coupon_usage = CouponUsage(profile=profile, coupon=order.coupon)
         
         # Save the order after making all changes
         order.save()
-        coupon_usage.save()
         
         for item in cart:
             OrderItem.objects.create(
@@ -78,7 +76,7 @@ class OrderCreate(LoginRequiredMixin, View):
 
         # set the order in the session
         request.session["order_id"] = str(order.id)
-
+        
         # redirect for payment
         return redirect("payments:process")
 

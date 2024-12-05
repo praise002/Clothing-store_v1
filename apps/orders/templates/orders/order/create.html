@@ -43,6 +43,7 @@
                 <span class="fw-bold">₦{{ item.total_price }}</span>
               </li>
             {% endfor %}
+
             {% if cart.coupon %}
               <li class="list-group-item d-flex justify-content-between align-items-center">
                 "{{ cart.coupon.code }}" ({{ cart.coupon.discount }}% off)

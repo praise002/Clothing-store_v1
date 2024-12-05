@@ -53,15 +53,15 @@
           {% endfor %}
 
           {% if cart.coupon %}
-            <tr class="subtotal">
-              <td>Subtotal</td>
+            <tr class="">
+              <td><strong>Subtotal</strong></td>
               <td colspan="4"></td>
-              <td class="">${{ cart.get_total_price|floatformat:2 }}</td>
+              <td class=""><strong>₦{{ cart.get_total_price|floatformat:2 }}</strong></td>
             </tr>
             <tr>
               <td>"{{ cart.coupon.code }}" coupon ({{ cart.coupon.discount }}% off)</td>
               <td colspan="4"></td>
-              <td class="">- ${{ cart.get_discount|floatformat:2 }}</td>
+              <td class="">- ₦{{ cart.get_discount|floatformat:2 }}</td>
             </tr>
           {% endif %}
           <tr>
@@ -77,7 +77,7 @@
       </table>
 
       <p class="ml-3 font-weight-bold">Apply a coupon:</p>
-      {% comment %} TODO: CLEAR INPUT AFTER ERROR {% endcomment %}
+      {% comment %}TODO: CLEAR INPUT AFTER ERROR{% endcomment %}
       {% if coupon_apply_form.non_field_errors %}
         <span class="alert alert-danger d-inline-block ml-3" role="alert">
           {% for error in coupon_apply_form.non_field_errors %}

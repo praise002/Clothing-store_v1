@@ -1,4 +1,5 @@
 from apps.cart.cart import Cart
+from apps.orders.models import Order
 
 
 def utils(request):
@@ -7,4 +8,4 @@ def utils(request):
 
 def cart(request):
     cart = Cart(request)
-    return {"cart_length": len(cart)}
+    return {"cart_length": len(cart), "cart": cart}

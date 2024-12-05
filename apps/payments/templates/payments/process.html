@@ -35,12 +35,12 @@
           <tr class="subtotal">
             <td>Subtotal</td>
             <td colspan="3"></td>
-            <td class="">${{ order.get_total_cost_before_discount|floatformat:2 }}</td>
+            <td class="">₦{{ order.get_total_cost_before_discount|floatformat:2 }}</td>
           </tr>
           <tr>
             <td>"{{ order.coupon.code }}" coupon ({{ order.discount }}% off)</td>
             <td colspan="3"></td>
-            <td class="">- ${{ order.get_discount|floatformat:2 }}</td>
+            <td class="">- ₦{{ order.get_discount|floatformat:2 }}</td>
           </tr>
         {% endif %}
 

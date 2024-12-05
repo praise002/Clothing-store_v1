@@ -46,5 +46,5 @@ class CartDetail(LoginRequiredMixin, View):
         return render(
             request,
             "cart/cart_detail.html",
-            {"cart": cart, "coupon_apply_form": coupon_apply_form},
+            {"cart": cart, "coupon_apply_form": coupon_apply_form,},
         )

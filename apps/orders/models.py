@@ -59,17 +59,6 @@ class Order(BaseModel):
             return total_cost * (self.discount / Decimal(100))
         return Decimal(0)
 
-    def apply_discount(self):
-        # First-time buyer discount
-        if not Order.objects.filter(customer=self.customer).exists():
-            self.discount_applied = (
-                self.get_total_cost() * 0.1
-            )  # 10% discount for first purchase
-
-        # Calculate final price
-        self.final_price = self.total_price - self.discount_applied
-        self.save()
-
 
 class OrderItem(BaseModel):
     order = models.ForeignKey(Order, related_name="items", on_delete=models.CASCADE)
