@@ -102,6 +102,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "apps.common.context_processors.utils",
                 "apps.common.context_processors.cart",
+                "apps.common.context_processors.discount",
             ],
         },
     },

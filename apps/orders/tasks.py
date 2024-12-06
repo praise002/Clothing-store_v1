@@ -23,7 +23,6 @@ def order_created(order_id):
     email_message.content_subtype = "html"
     email_message.send(fail_silently=False)
 
-@shared_task
 def order_canceled(order_id): 
     order = Order.objects.get(id=order_id)
     user = order.customer.user
@@ -39,7 +38,7 @@ def order_canceled(order_id):
     
 @shared_task
 def cancel_expired_orders():
-    expiration = timezone.now() - timedelta(hours=24)
+    expiration = timezone.now() + timedelta(hours=24)
     expired_orders = Order.objects.filter(
         paid=False, # Check if the order is not paid
         placed_at__gt=expiration  # Check expiration

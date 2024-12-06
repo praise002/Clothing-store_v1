@@ -31,6 +31,14 @@
           </tr>
         {% endfor %}
 
+        {% if order.customer.first_purchase %}
+          <tr>
+            <td>{{ first_purchase_discount }}% off first purchase</td>
+            <td colspan="3"></td>
+            <td class="">- ₦{{ order.get_first_purchase_discount|floatformat:2 }}</td>
+          </tr>
+        {% endif %}
+
         {% if order.coupon %}
           <tr class="subtotal">
             <td>Subtotal</td>

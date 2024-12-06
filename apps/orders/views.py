@@ -43,20 +43,20 @@ class OrderCreate(LoginRequiredMixin, View):
 
         # Create the order
         # order = Order.objects.create(customer=profile)
-        
+
         # Create the order instance but do not save it yet
         order = Order(customer=profile)  # Create an in-memory instance
 
         # Add coupon details if available
         cart = Cart(request)
-        
+
         if cart.coupon:
             order.coupon = cart.coupon
             order.discount = cart.coupon.discount
-        
+
         # Save the order after making all changes
         order.save()
-        
+
         for item in cart:
             OrderItem.objects.create(
                 order=order,
@@ -67,7 +67,7 @@ class OrderCreate(LoginRequiredMixin, View):
 
         # Clear the cart
         cart.clear()
-        
+
         # clear the coupon
         request.session.pop("coupon_id", None)
 
@@ -76,7 +76,7 @@ class OrderCreate(LoginRequiredMixin, View):
 
         # set the order in the session
         request.session["order_id"] = str(order.id)
-        
+
         # redirect for payment
         return redirect("payments:process")
 
@@ -149,10 +149,19 @@ def admin_order_detail(request, order_id):
     return render(request, "admin/orders/order/detail.html", {"order": order})
 
 
+from apps.common.context_processors import FIRST_PURCHASE_DISCOUNT  # TODO: REMOVE LATER
+
+
 @staff_member_required
 def admin_order_pdf(request, order_id):
     order = get_object_or_404(Order, id=order_id)
-    html = render_to_string("orders/order/pdf.html", {"order": order})
+    html = render_to_string(
+        "orders/order/pdf.html",
+        {
+            "order": order,
+            "first_purchase_discount": FIRST_PURCHASE_DISCOUNT, # has to be added cos context_processors only works for render
+        },
+    )
     response = HttpResponse(content_type="application/pdf")
     response["Content-Disposition"] = f"filename=order_{order.id}.pdf"
     weasyprint.HTML(string=html).write_pdf(

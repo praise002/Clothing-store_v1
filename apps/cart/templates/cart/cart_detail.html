@@ -52,6 +52,14 @@
             {% endwith %}
           {% endfor %}
 
+          {% if cart.get_first_purchase_discount %}
+            <tr>
+              <td>{{ first_purchase_discount }}% off first purchase</td>
+              <td colspan="4"></td>
+              <td class="">- ₦{{ cart.get_first_purchase_discount|floatformat:2 }}</td>
+            </tr>
+          {% endif %}
+
           {% if cart.coupon %}
             <tr class="">
               <td><strong>Subtotal</strong></td>

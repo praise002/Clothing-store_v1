@@ -13,6 +13,7 @@ class Profile(BaseModel):
     avatar = models.ImageField(_("Avatar"), upload_to="photos/%Y/%m/%d/", null=True, blank=True)
     phone = models.CharField(_("Phone"), max_length=100)
     last_updated = models.DateTimeField(auto_now=True)
+    first_purchase = models.BooleanField(default=True)
     
     class Meta:
         ordering = ["-created"]

@@ -48,7 +48,7 @@ class Order(BaseModel):
 
     def get_total_cost(self):
         total_cost = self.get_total_cost_before_discount()
-        return total_cost - self.get_discount()
+        return total_cost - self.get_discount() - self.get_first_purchase_discount()
 
     def get_total_cost_before_discount(self):
         return sum(item.get_cost() for item in self.items.all())
@@ -57,6 +57,13 @@ class Order(BaseModel):
         total_cost = self.get_total_cost_before_discount()
         if self.discount:
             return total_cost * (self.discount / Decimal(100))
+        return Decimal(0)
+
+    def get_first_purchase_discount(self):
+        total_cost = self.get_total_cost_before_discount()
+        discount = 10 # TODO; REMOVE LATER AND IMPORT FROM A UTILITY FN
+        if self.customer.first_purchase:
+            return total_cost * (discount / Decimal(100))
         return Decimal(0)
 
 
