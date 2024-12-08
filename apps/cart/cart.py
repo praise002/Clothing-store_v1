@@ -12,12 +12,6 @@ class Cart:
         """
         Initialize the cart.
         """
-        self.FIRST_PURCHASE_DISCOUNT = 10 #TODO: REMOVE LATER AND IMPORT FROM UTILITY FN
-        self.profile = (
-            request.user.profile
-            if request.user.is_authenticated
-            else request.session.session_key
-        )
 
         # Connect to Redis
         self.redis_client = redis.StrictRedis(
@@ -135,20 +129,6 @@ class Cart:
         return Decimal(0)
 
     def get_total_price_after_discount(self):
-        return (
-            self.get_total_price()
-            - self.get_discount()
-            - self.get_first_purchase_discount()
-        )
-
-    # def first_purchase(self):
-    #     if self.profile.first_purchase:
-    #         return True
-        
-    def get_first_purchase_discount(self):
-        if self.profile.first_purchase:
-            print(self.profile.first_purchase)
-            discount = self.FIRST_PURCHASE_DISCOUNT # 10%  discount off first purchase
-            return (discount / Decimal(100)) * self.get_total_price()
-
-        return Decimal(0)
+        return self.get_total_price() - self.get_discount()
+    
+#TODO: PREVIOUS ORDER PENDING WITH COUPON AND NEW ORDER WITH COUPON CLASHES

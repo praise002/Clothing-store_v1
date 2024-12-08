@@ -102,7 +102,6 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "apps.common.context_processors.utils",
                 "apps.common.context_processors.cart",
-                "apps.common.context_processors.discount",
             ],
         },
     },
@@ -229,6 +228,8 @@ CELERY_BEAT_SCHEDULE = {
         # 'schedule': 1, 
     },
 }
+
+FIRST_PURCHASE_DISCOUNT = 10
 
 # JAZZMIN_SETTINGS = {
 #     # title of the window (Will default to current_admin_site.site_title if absent or None)

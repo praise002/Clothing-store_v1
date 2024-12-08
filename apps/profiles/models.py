@@ -13,7 +13,6 @@ class Profile(BaseModel):
     avatar = models.ImageField(_("Avatar"), upload_to="photos/%Y/%m/%d/", null=True, blank=True)
     phone = models.CharField(_("Phone"), max_length=100)
     last_updated = models.DateTimeField(auto_now=True)
-    first_purchase = models.BooleanField(default=True)
     
     class Meta:
         ordering = ["-created"]
@@ -26,6 +25,7 @@ class Profile(BaseModel):
     
     def get_absolute_url(self):
         return reverse('profiles:profile_detail', kwargs={'id': self.user.id})
+    
     
     @property
     def avatar_url(self):

@@ -32,7 +32,9 @@ class CouponApply(LoginRequiredMixin, View):
                 return render(
                     request,
                     "cart/cart_detail.html",
-                    {"cart": cart, "coupon_apply_form": form},
+                    {
+                    "cart": cart, 
+                     "coupon_apply_form": form},
                 )
 
             # Ensure user hasn't already redeemed this coupon
@@ -44,7 +46,9 @@ class CouponApply(LoginRequiredMixin, View):
                 return render(
                     request,
                     "cart/cart_detail.html",
-                    {"cart": cart, "coupon_apply_form": form},
+                    {
+                    # "cart": cart, 
+                     "coupon_apply_form": form},
                 )
 
             return redirect("cart:cart_detail")

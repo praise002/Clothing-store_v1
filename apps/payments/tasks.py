@@ -1,4 +1,5 @@
 from io import BytesIO
+from django.conf import settings
 import weasyprint
 from celery import shared_task
 from django.contrib.staticfiles import finders
@@ -22,7 +23,12 @@ def payment_completed(order_id):
     message = render_to_string("orders/emails/order_paid.html", context)
 
     # Generate PDF
-    html = render_to_string("orders/order/pdf.html", {"order": order})
+    html = render_to_string(
+        "orders/order/pdf.html",
+        {
+            "order": order,
+        },
+    )
     out = BytesIO()
     stylesheets = [weasyprint.CSS(finders.find("assets/css/pdf.css"))]
     weasyprint.HTML(string=html).write_pdf(out, stylesheets=stylesheets)

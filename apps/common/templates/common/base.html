@@ -1,4 +1,3 @@
-{% load i18n %}
 {% load sweetify %}
 {% load static %}
 <!DOCTYPE html>
@@ -76,13 +75,22 @@
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Account</a>
                   <div class="dropdown-menu" aria-labelledby="userDropdown">
-                    <a class="dropdown-item" href="{% url 'profiles:profile' %}">Profile</a>
-                    <a class="dropdown-item" href="{% url 'shop:view_wishlist' %}">Wishlist</a>
+                    <a class="dropdown-item" href="{% url 'profiles:profile' %}">
+                      <i class="fas fa-user mr-1"></i>
+                      Profile
+                    </a>
+                    <a class="dropdown-item" href="{% url 'shop:view_wishlist' %}">
+                      <i class="fas fa-heart mr-1"></i>
+                      Wishlist
+                    </a>
                     <div class="dropdown-divider"></div>
-                    {% url 'accounts:logout' as logout_url %}
-                    <form class="nav-link p-0" style="display: inline;" action="{% url 'accounts:logout' %}" method="post">
+                    
+                    <form class=""  action="{% url 'accounts:logout' %}" method="post">
                       {% csrf_token %}
-                      <button class="btn btn-link nav-link" style="color: black;">{% trans 'Logout' %}</button>
+                      <button class="btn btn-link dropdown-item" style="color: black;">
+                        <i class="fas fa-sign-out-alt mr-1"></i>
+                        Logout
+                      </button>
                     </form>
                   </div>
                 </li>
@@ -111,17 +119,17 @@
     </footer>
 
     <!-- Bootstrap core JavaScript -->
-    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
-    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script defer src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+    <script defer src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 
     <!-- Additional Scripts -->
-    <script src="{% static 'assets/js/custom.js' %}"></script>
-    <script src="{% static 'assets/js/owl.js' %}"></script>
-    <script src="{% static 'assets/js/slick.js' %}"></script>
-    <script src="{% static 'assets/js/isotope.js' %}"></script>
-    <script src="{% static 'assets/js/accordions.js' %}"></script>
+    <script defer src="{% static 'assets/js/custom.js' %}"></script>
+    <script defer src="{% static 'assets/js/owl.js' %}"></script>
+    <script defer src="{% static 'assets/js/slick.js' %}"></script>
+    <script defer src="{% static 'assets/js/isotope.js' %}"></script>
+    <script defer src="{% static 'assets/js/accordions.js' %}"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.6.5/sweetalert2.all.min.js"></script>
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.6.5/sweetalert2.all.min.js"></script>
   </body>
 </html>
 

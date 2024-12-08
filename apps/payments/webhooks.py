@@ -1,7 +1,6 @@
 import hmac
 import hashlib
 import json
-import logging
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from decouple import config
@@ -9,7 +8,6 @@ from apps.coupons.models import CouponUsage
 from apps.orders.models import Order
 from .tasks import payment_completed
 
-logger = logging.getLogger(__name__)
 secret = config("PAYSTACK_TEST_SECRET_KEY")
 
 
@@ -17,45 +15,58 @@ secret = config("PAYSTACK_TEST_SECRET_KEY")
 def stack_webhook(request):
     payload = request.body
     sig_header = request.headers.get("x-paystack-signature")
-    if not sig_header:
-        return HttpResponse("Missing signature header", status=400)
+    body = None
+    event = None
 
     try:
-        hash = hmac.new(secret.encode("utf-8"), payload, digestmod=hashlib.sha512).hexdigest()
-        if hash != sig_header:
-            raise ValueError("Invalid signature")
+        # sign the payload with `HMAC SHA512`
+        hash = hmac.new(
+            secret.encode("utf-8"), payload, digestmod=hashlib.sha512
+        ).hexdigest()
 
-        body = json.loads(payload.decode("utf-8"))
-        event = body.get("event")
-    except (ValueError, KeyError) as e:
-        logger.error("Webhook error: %s", str(e))
+        # compare our signature with paystacks signature
+        if hash == sig_header:
+            # if signature matches,
+            # proceed to retrive event status from payload
+            body_unicode = payload.decode("utf-8")
+            body = json.loads(body_unicode)
+            # event status
+            event = body["event"]
+        else:
+            raise Exception
+    except Exception as e:
+        # Invalid payload
+        return HttpResponse(status=400)
+    except KeyError as e:
+        # Invalid payload
+        return HttpResponse(status=400)
+    except:
+        # Invalid signature
         return HttpResponse(status=400)
 
     if event == "charge.success":
-        data = body["data"]
-        metadata = data.get("metadata", {})
-        order_id = metadata.get("order_id")
+        # if event status equals 'charge.success'
+        # get the data and the `payment_id`
+        # we'd set in the metadata ealier
+        data, order_id = body["data"], body["data"]["metadata"]["order_id"]
 
-        if not order_id:
-            return HttpResponse("Order ID not found in metadata", status=400)
-
-        try:
-            order = Order.objects.get(id=order_id)
-        except Order.DoesNotExist:
-            return HttpResponse("Order not found", status=404)
-
-        if not order.paid and data["status"] == "success" and data["gateway_response"] == "Successful":
+        # validate status and gateway_response
+        if (data["status"] == "success") and (data["gateway_response"] == "Successful"):
+            try:
+                order = Order.objects.get(id=order_id)
+            except Order.DoesNotExist:
+                return HttpResponse(status=404)
+            # mark payment as paid
             order.paid = True
             order.shipping_status = Order.SHIPPING_STATUS_PENDING
-            order.save()
-
-            if order.coupon:
-                CouponUsage.objects.create(profile=order.customer.profile, coupon=order.coupon)
-
-            if order.customer.first_purchase:
-                order.customer.first_purchase = False
-                order.customer.save()
+            order.save(force_update=True)
+            print("PAID")
 
             payment_completed.delay(order.id)
+
+            if order.coupon:
+                CouponUsage.objects.create(
+                    profile=order.customer.profile, coupon=order.coupon
+                )
 
     return HttpResponse(status=200)

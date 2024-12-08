@@ -1,4 +1,5 @@
 from decimal import Decimal
+from django.conf import settings
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
@@ -9,7 +10,6 @@ from apps.shop.models import Product
 
 
 class Order(BaseModel):
-
     # Shipping status
     SHIPPING_STATUS_PENDING = "P"
     SHIPPING_STATUS_SHIPPED = "S"
@@ -48,7 +48,7 @@ class Order(BaseModel):
 
     def get_total_cost(self):
         total_cost = self.get_total_cost_before_discount()
-        return total_cost - self.get_discount() - self.get_first_purchase_discount()
+        return total_cost - self.get_discount() 
 
     def get_total_cost_before_discount(self):
         return sum(item.get_cost() for item in self.items.all())
@@ -58,14 +58,7 @@ class Order(BaseModel):
         if self.discount:
             return total_cost * (self.discount / Decimal(100))
         return Decimal(0)
-
-    def get_first_purchase_discount(self):
-        total_cost = self.get_total_cost_before_discount()
-        discount = 10 # TODO; REMOVE LATER AND IMPORT FROM A UTILITY FN
-        if self.customer.first_purchase:
-            return total_cost * (discount / Decimal(100))
-        return Decimal(0)
-
+    
 
 class OrderItem(BaseModel):
     order = models.ForeignKey(Order, related_name="items", on_delete=models.CASCADE)

@@ -15,9 +15,7 @@ def payment_process(request):
     # retrieve the order_id we'd set in the djago session ealier
     order_id = request.session.get("order_id")
     order = get_object_or_404(Order, id=order_id)
-    print(order) #TODO: REMOVE LATER
     amount = order.get_total_cost() * Decimal("100")
-    print(amount) #TODO: REMOVE LATER
 
     if request.method == "POST":
         success_url = request.build_absolute_uri(

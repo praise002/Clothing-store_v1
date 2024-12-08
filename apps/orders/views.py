@@ -7,7 +7,6 @@ from django.contrib.staticfiles import finders
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from apps.cart.cart import Cart
-from apps.coupons.models import CouponUsage
 from apps.profiles.models import Profile
 from .models import Order, OrderItem
 from .tasks import order_created
@@ -149,9 +148,6 @@ def admin_order_detail(request, order_id):
     return render(request, "admin/orders/order/detail.html", {"order": order})
 
 
-from apps.common.context_processors import FIRST_PURCHASE_DISCOUNT  # TODO: REMOVE LATER
-
-
 @staff_member_required
 def admin_order_pdf(request, order_id):
     order = get_object_or_404(Order, id=order_id)
@@ -159,7 +155,6 @@ def admin_order_pdf(request, order_id):
         "orders/order/pdf.html",
         {
             "order": order,
-            "first_purchase_discount": FIRST_PURCHASE_DISCOUNT, # has to be added cos context_processors only works for render
         },
     )
     response = HttpResponse(content_type="application/pdf")
