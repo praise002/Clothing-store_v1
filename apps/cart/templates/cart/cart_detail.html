@@ -54,9 +54,13 @@
 
           {% if cart.coupon %}
             <tr class="">
-              <td><strong>Subtotal</strong></td>
+              <td>
+                <strong>Subtotal</strong>
+              </td>
               <td colspan="4"></td>
-              <td class=""><strong>₦{{ cart.get_total_price|floatformat:2 }}</strong></td>
+              <td class="">
+                <strong>₦{{ cart.get_total_price|floatformat:2 }}</strong>
+              </td>
             </tr>
             <tr>
               <td>"{{ cart.coupon.code }}" coupon ({{ cart.coupon.discount }}% off)</td>
@@ -101,6 +105,25 @@
       <div class="d-flex justify-content-between mt-4">
         <a href="{% url 'shop:products_list' %}" class="btn btn-primary">Continue Shopping</a>
         <a href="{% url 'orders:order_create' %}" class="btn btn-success">Checkout</a>
+      </div>
+    {% endif %}
+
+    {% if recommended_products %}
+      <h3 class="mb-5">People who bought this also bought</h3>
+      <div class="row">
+        {% for p in recommended_products %}
+          <div class="col-lg-4 col-md-6 col-12 mb-4">
+            <a href="{{ p.get_absolute_url }}">
+              <div class="card">
+                <img src="{{ p.image_url }}" class="card-img-top" alt="{{ p.name }}" />
+
+                <div class="card-body">
+                  <h5 class="card-title">{{ product.name }}</h5>
+                </div>
+              </div>
+            </a>
+          </div>
+        {% endfor %}
       </div>
     {% endif %}
   </div>

@@ -3,9 +3,8 @@ from django.views import View
 
 from apps.accounts.mixins import LoginRequiredMixin
 from apps.coupons.forms import CouponApplyForm
-from apps.orders.models import Order, OrderItem
-from apps.profiles.models import Profile
 from apps.shop.models import Product
+from apps.shop.recommender import Recommender
 from .cart import Cart
 from .forms import CartAddProductForm
 
@@ -43,10 +42,19 @@ class CartDetail(LoginRequiredMixin, View):
 
         coupon_apply_form = CouponApplyForm()
 
+        r = Recommender()
+        cart_products = [item["product"] for item in cart]
+        if cart_products:
+            recommended_products = r.suggest_products_for(cart_products, max_results=4)
+        else:
+            recommended_products = []
+
         return render(
             request,
             "cart/cart_detail.html",
             {
-            "cart": cart, 
-             "coupon_apply_form": coupon_apply_form,},
+                "cart": cart,
+                "coupon_apply_form": coupon_apply_form,
+                'recommended_products': recommended_products,
+            },
         )

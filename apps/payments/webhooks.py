@@ -6,6 +6,8 @@ from django.views.decorators.csrf import csrf_exempt
 from decouple import config
 from apps.coupons.models import CouponUsage
 from apps.orders.models import Order
+from apps.shop.models import Product
+from apps.shop.recommender import Recommender
 from .tasks import payment_completed
 
 secret = config("PAYSTACK_TEST_SECRET_KEY")
@@ -56,17 +58,24 @@ def stack_webhook(request):
                 order = Order.objects.get(id=order_id)
             except Order.DoesNotExist:
                 return HttpResponse(status=404)
+            
             # mark payment as paid
             order.paid = True
             order.shipping_status = Order.SHIPPING_STATUS_PENDING
             order.save(force_update=True)
             print("PAID")
 
-            payment_completed.delay(order.id)
-
             if order.coupon:
                 CouponUsage.objects.create(
                     profile=order.customer.profile, coupon=order.coupon
                 )
+                
+            # save items bought for product recommendations
+            product_ids = order.items.values_list('product_id')
+            products = Product.objects.filter(id__in=product_ids)
+            r = Recommender()
+            r.products_bought(products)
+            
+            payment_completed.delay(order.id)
 
     return HttpResponse(status=200)

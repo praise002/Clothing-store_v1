@@ -7,6 +7,7 @@ from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 
 from apps.shop.forms import ReviewForm
+from apps.shop.recommender import Recommender
 from apps.shop.utils import sort_products, sort_filter_value
 
 from apps.shop.models import Category, Product, Wishlist
@@ -59,10 +60,15 @@ class ProductDetailView(View):
 
         cart_product_form = CartAddProductForm()
         form = ReviewForm()
+
+        r = Recommender()
+        recommended_products = r.suggest_products_for([product], 4)
+
         context = {
             "product": product,
             "form": form,
             "cart_product_form": cart_product_form,
+            "recommended_products": recommended_products,
         }
         return render(request, "shop/product_detail.html", context)
 
@@ -102,7 +108,7 @@ def add_to_wishlist(request, product_id):
     # if wishlist has been created, get it, else create it
     wishlist, _ = Wishlist.objects.get_or_create(profile=request.user.profile)
     wishlist.products.add(product)
-    return redirect('shop:view_wishlist')
+    return redirect("shop:view_wishlist")
 
 
 @login_required
@@ -110,4 +116,4 @@ def remove_from_wishlist(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     wishlist = get_object_or_404(Wishlist, profile=request.user.profile)
     wishlist.products.remove(product)
-    return redirect('shop:view_wishlist')
+    return redirect("shop:view_wishlist")
