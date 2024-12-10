@@ -5,6 +5,64 @@
 {% endblock %}
 
 {% block content %}
+  <style>
+    .card {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      border-radius: 0.25rem;
+      border: 1px solid #ddd;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card img {
+      width: 30%;
+      object-fit: cover;
+      border-top-right-radius: 0;
+      border-bottom-left-radius: calc(0.25rem - 1px);
+    }
+    
+    .card-body {
+      padding: 1.5em;
+      flex: 1;
+    }
+    
+    .card-title {
+      font-weight: bold;
+      font-size: 1.5em;
+    }
+    
+    .card-text {
+      margin-top: 1em;
+      font-size: 1.1em;
+    }
+    
+    .form-group label {
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+    
+    @media only screen and (max-width: 768px) {
+      .card {
+        flex-direction: column;
+        align-items: center;
+      }
+    
+      .card img {
+        width: 80%;
+      }
+    
+      .card-body {
+        padding: 1em;
+      }
+    }
+    
+    @media only screen and (max-width: 1200px) {
+      .card img {
+        width: 40%;
+      }
+    }
+  </style>
   <div class="container mt-5">
     {% if cart|length == 0 %}
       <!-- If the cart is empty, show the "Start Shopping" button -->
@@ -118,7 +176,7 @@
                 <img src="{{ p.image_url }}" class="card-img-top" alt="{{ p.name }}" />
 
                 <div class="card-body">
-                  <h5 class="card-title">{{ product.name }}</h5>
+                  <h5 class="card-title">{{ p.name }}</h5>
                 </div>
               </div>
             </a>

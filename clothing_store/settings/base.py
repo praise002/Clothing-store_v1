@@ -49,6 +49,7 @@ THIRD_PARTY_APPS = [
     "sweetify",
     # 'rosetta',
     'redisboard',
+    "django_meili",
 ]
 
 LOCAL_APPS = [
@@ -64,6 +65,19 @@ LOCAL_APPS = [
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
+MEILISEARCH = {
+    'HTTPS': False, # Whether HTTPS is enabled for the meilisearch server
+    'HOST': 'localhost', # The host for the meilisearch server
+    'MASTER_KEY': None, # The master key for meilisearch. See https://www.meilisearch.com/docs/learn/security/basic_security for more detail
+    'PORT': 7700, # The port for the meilisearch server
+    'TIMEOUT': None, # The timeout to wait for when using sync meilisearch server
+    'CLIENT_AGENTS': None, # The client agents for the meilisearch server
+    'DEBUG': True, # Whether to throw exceptions on failed creation of documents
+    'SYNC': False, # Whether to execute operations to meilisearch in a synchronous manner (waiting for each rather than letting the task queue operate)
+    'OFFLINE': False, # Whether to make any http requests for the application.
+    'DEFAULT_BATCH_SIZE': 1000, # For syncindex the default batch size for import queryset
+}
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 

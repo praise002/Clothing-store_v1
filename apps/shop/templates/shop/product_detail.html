@@ -6,39 +6,64 @@
 {% block content %}
   <style>
     .card {
+      display: flex;
       flex-direction: row;
       align-items: center;
+      border-radius: 0.25rem;
+      border: 1px solid #ddd;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
-    .card-title {
-      font-weight: bold;
-    }
+
     .card img {
       width: 30%;
+      object-fit: cover;
       border-top-right-radius: 0;
       border-bottom-left-radius: calc(0.25rem - 1px);
     }
+
+    .card-body {
+      padding: 1.5em;
+      flex: 1;
+    }
+
+    .card-title {
+      font-weight: bold;
+      font-size: 1.5em;
+    }
+
+    .card-text {
+      margin-top: 1em;
+      font-size: 1.1em;
+    }
+
+    .form-group label {
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+
     @media only screen and (max-width: 768px) {
-      a {
-        display: none;
+      .card {
+        flex-direction: column;
+        align-items: center;
       }
-      .card-body {
-        padding: 0.5em 1.2em;
-      }
-      .card-body .card-text {
-        margin: 0;
-      }
+
       .card img {
-        width: 50%;
+        width: 80%;
+      }
+
+      .card-body {
+        padding: 1em;
       }
     }
+
     @media only screen and (max-width: 1200px) {
       .card img {
         width: 40%;
       }
     }
   </style>
-  <!-- Page Content -->
 
+  <!-- Page Content -->
   <div class="container">
     <div class="row">
       <div class="col-md-12">
@@ -51,7 +76,10 @@
     <div class="row">
       <div class="col-md-12">
         <div class="card" style="margin-top: 5em;">
-          <img style="width:20em; object-fit:cover;" src="{{ product.image_url }}" class="card-img-top" />
+          <!-- Product Image -->
+          <img src="{{ product.image_url }}" class="card-img-top" alt="{{ product.name }}" />
+
+          <!-- Product Info -->
           <div class="card-body">
             <h5 class="card-title">{{ product.name }}</h5>
             <p class="card-text">{{ product.desc }}</p>
@@ -60,6 +88,8 @@
             </p>
             <p class="card-text mt-2" style="font-weight:bold; font-size:1em;">Price - ₦{{ product.price }}</p>
             <p class="card-text mt-2" style="font-weight:bold; font-size:1em;">Units Available - {{ product.in_stock }}</p>
+            
+            <!-- Add to Cart Form -->
             <form action="{% url 'cart:cart_add' product.id %}" method="post">
               {% if request.user.is_authenticated %}
                 <div class="form-row align-items-center">
@@ -78,91 +108,94 @@
                 </div>
               {% endif %}
             </form>
+
+            <!-- Add to Wishlist Form -->
             <form action="{% url 'shop:add_to_wishlist' product.id %}" method="post">
               {% csrf_token %}
               <button type="submit" class="btn btn-secondary">Add to Wishlist</button>
             </form>
           </div>
-
-          <!-- List of Reviews -->
-          <div class="mt-5">
-            {% comment %} <h3>Reviews ({{ product.reviews.count }})</h3> {% endcomment %}
-            <h3>Reviews ({{ product.num_of_reviews }})</h3>
-            <table class="table table-responsive-md" style="width:100%;">
-              <thead>
-                <tr>
-                  <th scope="col">#</th>
-                  <th scope="col">Name</th>
-                  <th scope="col">Review</th>
-                  <th scope="col">Rating</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for review in product.reviews.all %}
-                  <tr>
-                    <th scope="row">{{ forloop.counter }}</th>
-                    <td>{{ review.customer.user.full_name }}</td>
-                    <td>{{ review.rating }}</td>
-                    <td>
-                      <ul class="stars d-flex">
-                        {% for i in rating_range %}
-                          <li class="mr-1">
-                            <i class="fa fa-star {% if forloop.counter <= review.rating %} text-danger {% endif %}"></i>
-                          </li>
-                        {% endfor %}
-                      </ul>
-                    </td>
-                  </tr>
-                {% empty %}
-                  <tr>
-                    <td colspan="8">
-                      <p class="text-center font-weight-bold text-primary">No reviews here yet!</p>
-                    </td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-
-            <!-- Add a Review Form -->
-            {% if request.user.is_authenticated %}
-              <div class="row mt-5">
-                <div class="col-md-12">
-                  <h3>Add Your Review</h3>
-                  <form method="POST">
-                    {% csrf_token %}
-                    <div class="form-group">
-                      <label for="reviewText">Your Review</label>
-                      {{ form.text }}
-                    </div>
-                    <div class="form-group">
-                      <label for="rating">Rating</label>
-                      <ul class="stars d-flex">
-                        {% for i in rating_range %}
-                          <li class="mr-1">
-                            <i class="fa fa-star"></i>
-                          </li>
-                        {% endfor %}
-                      </ul>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Submit Review</button>
-                  </form>
-                </div>
-              </div>
-            {% endif %}
-          </div>
         </div>
       </div>
     </div>
 
+    <!-- Reviews Section -->
+    <div class="row mt-5">
+      <div class="col-md-12">
+        <h3>Reviews ({{ product.num_of_reviews }})</h3>
+        <table class="table table-responsive-md" style="width:100%;">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Name</th>
+              <th scope="col">Review</th>
+              <th scope="col">Rating</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for review in product.reviews.all %}
+              <tr>
+                <th scope="row">{{ forloop.counter }}</th>
+                <td>{{ review.customer.user.full_name }}</td>
+                <td>{{ review.rating }}</td>
+                <td>
+                  <ul class="stars d-flex">
+                    {% for i in rating_range %}
+                      <li class="mr-1">
+                        <i class="fa fa-star {% if forloop.counter <= review.rating %} text-danger {% endif %}"></i>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="8">
+                  <p class="text-center font-weight-bold text-primary">No reviews here yet!</p>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <!-- Add a Review Form -->
+        {% if request.user.is_authenticated %}
+          <div class="row mt-5">
+            <div class="col-md-12">
+              <h3>Add Your Review</h3>
+              <form method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                  <label for="reviewText">Your Review</label>
+                  {{ form.text }}
+                </div>
+                <div class="form-group">
+                  <label for="rating">Rating</label>
+                  <ul class="stars d-flex">
+                    {% for i in rating_range %}
+                      <li class="mr-1">
+                        <i class="fa fa-star"></i>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Review</button>
+              </form>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Suggested Products Section -->
     {% if recommended_products %}
-      <h3 style="margin-top: 3rem;">People who bought this also bought</h3>
+      <h3 style="margin-block: 2rem;">People who bought this also bought</h3>
       <div class="row">
         {% for p in recommended_products %}
           <div class="col-sm-5 col-md-6 mb-4">
             <a href="{{ p.get_absolute_url }}">
               <div class="card">
                 <img src="{{ p.image_url }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="{{ p.name }}" />
-
                 <div class="card-body">
                   <h5 class="card-title">{{ p.name }}</h5>
                 </div>

@@ -63,7 +63,7 @@ ul.social-icons li a:hover {
     color: #fff;
 }
 
-a.filled-button {
+/* a.filled-button {
     background-color: #f33f3f;
     color: #fff;
     font-size: 14px;
@@ -78,7 +78,7 @@ a.filled-button {
 a.filled-button:hover {
     background-color: #121212;
     color: #fff;
-}
+} */
 
 .section-heading {
     text-align: left;
