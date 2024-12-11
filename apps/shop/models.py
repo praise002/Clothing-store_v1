@@ -1,6 +1,4 @@
-from uuid import UUID
 from autoslug import AutoSlugField
-from django_meili.models import IndexMixin
 from django.db import models
 from django.urls import reverse
 
@@ -10,41 +8,6 @@ from django.utils.translation import gettext_lazy as _
 from statistics import mean
 
 from apps.common.validators import validate_file_size
-
-
-class CustomIndexMixin(IndexMixin):
-    class MeiliMeta:
-        primary_key = "id"
-
-    # def meili_serialize(self):
-    #     from json import loads
-    #     from django.core.serializers import serialize
-
-    #     # Serialize the model instance to JSON
-    #     serialized_model = loads(
-    #         serialize(
-    #             "json",
-    #             [self],
-    #             use_natural_foreign_keys=True,
-    #             use_natural_primary_keys=True,
-    #         )
-    #     )[0]
-
-    #     fields = serialized_model["fields"]
-
-    #     # Fix UUID serialization
-    #     for field_name, field_value in fields.items():
-    #         if isinstance(field_value, UUID):  # Check if the value is a UUID
-    #             fields[field_name] = str(field_value)  # Convert UUID to string
-
-    #     # Include primary key if specified in MeiliMeta
-    #     if getattr(self.MeiliMeta, "include_pk_in_search", False):
-    #         primary_key_value = getattr(self, self.MeiliMeta.primary_key)
-    #         if isinstance(primary_key_value, UUID):  # Check if the pk is a UUID
-    #             primary_key_value = str(primary_key_value)  # Convert to string
-    #         fields[self.MeiliMeta.primary_key] = primary_key_value
-
-    #     return fields
 
 
 class Category(BaseModel):
@@ -66,7 +29,7 @@ class Category(BaseModel):
 # NOTE: USE PERMSSIONS IN ADMIN TO PREVENT ACCIDENTAL DELETION OF PRODUCT
 
 
-class Product(CustomIndexMixin, BaseModel):
+class Product(BaseModel):
     name = models.CharField(max_length=255)
     slug = AutoSlugField(populate_from="name", unique=True, always_update=True)
     description = models.TextField()
@@ -113,21 +76,6 @@ class Product(CustomIndexMixin, BaseModel):
 
     class Meta:
         ordering = ["-created"]
-
-    def meili_data(self):
-        data = super().meili_data()
-        # Convert UUIDs to strings
-        for key, value in data.items():
-            if isinstance(value, UUID):
-                data[key] = str(value)
-            if "category" in data and data["category"] is not None:
-                data["category"] = str(self.category.name)
-        return data
-
-    class MeiliMeta:
-        filterable_fields = ("category", "price")
-        searchable_fields = ("id", "name", "description")
-        displayed_fields = ("id", "name", "description", "price")
 
 
 class Review(BaseModel):

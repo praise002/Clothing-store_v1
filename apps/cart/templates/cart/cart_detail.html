@@ -1,4 +1,5 @@
 {% extends 'common/base.html' %}
+{% load cloudinary %}
 
 {% block title %}
   Your shopping cart
@@ -41,27 +42,6 @@
       font-weight: bold;
       font-size: 1.1em;
     }
-    
-    @media only screen and (max-width: 768px) {
-      .card {
-        flex-direction: column;
-        align-items: center;
-      }
-    
-      .card img {
-        width: 80%;
-      }
-    
-      .card-body {
-        padding: 1em;
-      }
-    }
-    
-    @media only screen and (max-width: 1200px) {
-      .card img {
-        width: 40%;
-      }
-    }
   </style>
   <div class="container mt-5">
     {% if cart|length == 0 %}
@@ -69,74 +49,78 @@
       <p style="margin-top: 8em;">Your cart is empty. Start shopping now!</p>
       <a href="{% url 'shop:products_list' %}" class="btn btn-primary">Start Shopping</a>
     {% else %}
-      <h1 style="margin-top: 3em; margin-bottom: 1em;">Your Shopping Cart</h1>
-      <!-- If the cart has items, show the table -->
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>Image</th>
-            <th>Product</th>
-            <th>Quantity</th>
-            <th>Remove</th>
-            <th>Unit Price</th>
-            <th>Price</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for item in cart %}
-            {% with product=item.product %}
-              <tr>
-                <td>
-                  <a href="{{ product.get_absolute_url }}"><img src="{{ product.image_url }}" alt="{{ product.name }}" style="width: 80px; height: auto;" /></a>
-                </td>
-                <td>{{ product.name }}</td>
-                <td>
-                  <form action="{% url 'cart:cart_add' product.id %}" method="post">
-                    {{ item.update_quantity_form.quantity }}
-                    {{ item.update_quantity_form.override }}
-                    <button type="submit" class="btn btn-primary btn-sm">Update</button>
-                    {% csrf_token %}
-                  </form>
-                </td>
-                <td>
-                  <form action="{% url 'cart:cart_remove' product.id %}" method="post">
-                    <button type="submit" class="btn btn-danger btn-sm">Remove</button>
-                    {% csrf_token %}
-                  </form>
-                </td>
-                <td>₦{{ item.price }}</td>
-                <td>₦{{ item.total_price }}</td>
-              </tr>
-            {% endwith %}
-          {% endfor %}
+      {% comment %} <h2 style="margin-top: 3em; margin-bottom: 1em;">Your Shopping Cart</h2> {% endcomment %}
+      <h2 style="margin-top: 3em; margin-bottom: 1em;" class="text-center fw-bold border-bottom pb-3">Shopping Cart Summary</h2>
 
-          {% if cart.coupon %}
-            <tr class="">
-              <td>
-                <strong>Subtotal</strong>
-              </td>
-              <td colspan="4"></td>
-              <td class="">
-                <strong>₦{{ cart.get_total_price|floatformat:2 }}</strong>
-              </td>
-            </tr>
+      <!-- If the cart has items, show the table -->
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+          <thead>
             <tr>
-              <td>"{{ cart.coupon.code }}" coupon ({{ cart.coupon.discount }}% off)</td>
-              <td colspan="4"></td>
-              <td class="">- ₦{{ cart.get_discount|floatformat:2 }}</td>
+              <th>Image</th>
+              <th>Product</th>
+              <th>Quantity</th>
+              <th>Remove</th>
+              <th>Unit Price</th>
+              <th>Price</th>
             </tr>
-          {% endif %}
-          <tr>
-            <td>
-              <strong>Total</strong>
-            </td>
-            <td colspan="4"></td>
-            <td>
-              <strong>₦{{ cart.get_total_price_after_discount|floatformat:2 }}</strong>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {% for item in cart %}
+              {% with product=item.product %}
+                <tr>
+                  <td>
+                    <a href="{{ product.get_absolute_url }}"><img src="{{ product.image_url }}" alt="{{ product.name }}" style="width: 80px; height: auto;" /></a>
+                  </td>
+                  <td>{{ product.name }}</td>
+                  <td>
+                    <form class="d-flex align-items-center" action="{% url 'cart:cart_add' product.id %}" method="post">
+                      {{ item.update_quantity_form.quantity }}
+                      {{ item.update_quantity_form.override }}
+                      <button type="submit" class="btn btn-primary btn-sm ml-1">Update</button>
+                      {% csrf_token %}
+                    </form>
+                  </td>
+                  <td>
+                    <form action="{% url 'cart:cart_remove' product.id %}" method="post">
+                      <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                      {% csrf_token %}
+                    </form>
+                  </td>
+                  <td>₦{{ item.price }}</td>
+                  <td>₦{{ item.total_price }}</td>
+                </tr>
+              {% endwith %}
+            {% endfor %}
+
+            {% if cart.coupon %}
+              <tr class="">
+                <td>
+                  <strong>Subtotal</strong>
+                </td>
+                <td colspan="4"></td>
+                <td class="">
+                  <strong>₦{{ cart.get_total_price|floatformat:2 }}</strong>
+                </td>
+              </tr>
+              <tr>
+                <td>"{{ cart.coupon.code }}" coupon ({{ cart.coupon.discount }}% off)</td>
+                <td colspan="4"></td>
+                <td class="">- ₦{{ cart.get_discount|floatformat:2 }}</td>
+              </tr>
+            {% endif %}
+            <tr>
+              <td>
+                <strong>Total</strong>
+              </td>
+              <td colspan="4"></td>
+              <td>
+                <strong>₦{{ cart.get_total_price_after_discount|floatformat:2 }}</strong>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       <p class="ml-3 font-weight-bold">Apply a coupon:</p>
       {% comment %}TODO: CLEAR INPUT AFTER ERROR{% endcomment %}
@@ -167,17 +151,17 @@
     {% endif %}
 
     {% if recommended_products %}
-      <h3 class="mb-5">People who bought this also bought</h3>
+      <h3 class="my-5">People who bought this also bought</h3>
       <div class="row">
         {% for p in recommended_products %}
           <div class="col-lg-4 col-md-6 col-12 mb-4">
             <a href="{{ p.get_absolute_url }}">
-              <div class="card">
-                <img src="{{ p.image_url }}" class="card-img-top" alt="{{ p.name }}" />
-
-                <div class="card-body">
-                  <h5 class="card-title">{{ p.name }}</h5>
-                </div>
+              <div class="" style="width: 18rem;">
+                <img style="aspect-ratio: 1/1; object-fit: cover;" src="{{ p.image_url }}" class="img-thumbnail" alt="{{ p.name }}" />
+                {% comment %} {% cloudinary "{{ p.image_url }}" width=100 height=150 crop="fill" %} {% endcomment %}
+              </div>
+              <div >
+                <h5 class="text-dark">{{ p.name }}</h5>
               </div>
             </a>
           </div>
