@@ -432,9 +432,9 @@ header .navbar {
 }
 
 .product-item .down-content h4 {
-    font-size: 17px;
+    font-size: 12px;
     color: #1a6692;
-    margin-bottom: 20px;
+    /* margin-bottom: 20px; */
 }
 
 .product-item .down-content h6 {
@@ -445,8 +445,12 @@ header .navbar {
     color: #121212;
 }
 
-.product-item .down-content p {
+/* .product-item .down-content p {
     margin-bottom: 20px;
+} */
+
+.product-item .down-content ul {
+    margin-top: 20px;
 }
 
 .product-item .down-content ul li {

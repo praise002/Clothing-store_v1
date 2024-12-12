@@ -9,6 +9,9 @@ from statistics import mean
 
 from apps.common.validators import validate_file_size
 
+from cloudinary.models import CloudinaryField
+from cloudinary import CloudinaryImage
+
 
 class Category(BaseModel):
     name = models.CharField(max_length=255)
@@ -30,18 +33,28 @@ class Category(BaseModel):
 
 
 class Product(BaseModel):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=19)
     slug = AutoSlugField(populate_from="name", unique=True, always_update=True)
-    description = models.TextField()
+    description = models.TextField(max_length=255)
     category = models.ForeignKey(
         Category, related_name="products", on_delete=models.SET_NULL, null=True
     )
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    image = models.ImageField(upload_to="products/", validators=[validate_file_size])
+    # image = models.ImageField(upload_to="products/", validators=[validate_file_size])
     in_stock = models.PositiveIntegerField()
     featured = models.BooleanField(default=False)
     flash_deals = models.BooleanField(default=False)
     is_available = models.BooleanField(default=True)
+    image = CloudinaryField("image", folder="products/")
+
+    def get_cropped_image_url(self, width=250, height=250):
+        # Generate a cropped image URL using Cloudinary transformations
+        return CloudinaryImage(self.image.public_id).build_url(
+            width=width,
+            height=height,
+            crop="fill",
+            gravity="auto",
+        )
 
     def __str__(self):
         return self.name

@@ -63,12 +63,18 @@ class ProductDetailView(View):
 
         r = Recommender()
         recommended_products = r.suggest_products_for([product], 4)
+        
+        order_item = product.order_items.filter(
+            order__customer=request.user.profile,
+            order__shipping_status='D'
+        )
 
         context = {
             "product": product,
             "form": form,
             "cart_product_form": cart_product_form,
             "recommended_products": recommended_products,
+            "order_item": order_item,
         }
         return render(request, "shop/product_detail.html", context)
 
