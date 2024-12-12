@@ -23,8 +23,6 @@
         margin: 0;
         padding: 0;
       }
-      
-      
     </style>
     {% include 'common/includes/static.html' %}
     {% comment %} <script defer src="{% static '' %}"></script> {% endcomment %}
@@ -34,32 +32,15 @@
     <header>
       <nav class="navbar navbar-expand-lg">
         <div class="container">
-          <a class="navbar-brand" href="#"><h2>Sixteen <em>Clothing</em></h2></a>
+          <a class="navbar-brand" href="{% url 'shop:home' %}"><h2>Sixteen <em>Clothing</em></h2></a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
           <div class="collapse navbar-collapse" id="navbarResponsive">
             <ul class="navbar-nav ml-auto">
               {% url 'shop:home' as home_url %}
               <li class="nav-item {% if request.path == home_url %}active{% endif %}">
                 <a class="nav-link" href="{% url 'shop:home' %}">Home</a>
+                {% comment %}FIXME: FIX THE MOVEMENT WHEN HOVERING{% endcomment %}
               </li>
-              {% url 'shop:products_list' as products_url %}
-              <li class="nav-item {% if request.path == products_url %}active{% endif %}">
-                <a class="nav-link" href="{% url 'shop:products_list' %}">Products</a>
-              </li>
-              {% url 'shop:categories' as categories_url %}
-              <li class="nav-item {% if request.path == categories_url %}active{% endif %}">
-                <a class="nav-link" href="{% url 'shop:categories' %}">Categories</a>
-              </li>
-
-              {% url 'general:about' as about_url %}
-              <li class="nav-item {% if request.path == about_url %}active{% endif %}">
-                <a class="nav-link" href="{% url 'general:about' %}">About</a>
-              </li>
-              {% url 'general:contact' as contact_url %}
-              <li class="nav-item {% if request.path == contact_url %}active{% endif %}">
-                <a class="nav-link" href="{% url 'general:contact' %}">Contact</a>
-              </li>
-
               {% if request.user.is_authenticated %}
                 <!-- Cart -->
                 {% url 'cart:cart_detail' as cart_url %}
@@ -84,8 +65,8 @@
                       Wishlist
                     </a>
                     <div class="dropdown-divider"></div>
-                    
-                    <form class=""  action="{% url 'accounts:logout' %}" method="post">
+
+                    <form class="" action="{% url 'accounts:logout' %}" method="post">
                       {% csrf_token %}
                       <button class="btn btn-link dropdown-item" style="color: black;">
                         <i class="fas fa-sign-out-alt mr-1"></i>
@@ -100,6 +81,23 @@
                   <a class="nav-link" href="{% url 'accounts:register' %}">Login/Sign Up</a>
                 </li>
               {% endif %}
+              {% url 'shop:products_list' as products_url %}
+              <li class="nav-item {% if request.path == products_url %}active{% endif %}">
+                <a class="nav-link" href="{% url 'shop:products_list' %}">Products</a>
+              </li>
+              {% url 'shop:categories' as categories_url %}
+              <li class="nav-item {% if request.path == categories_url %}active{% endif %}">
+                <a class="nav-link" href="{% url 'shop:categories' %}">Categories</a>
+              </li>
+
+              {% url 'general:about' as about_url %}
+              <li class="nav-item {% if request.path == about_url %}active{% endif %}">
+                <a class="nav-link" href="{% url 'general:about' %}">About</a>
+              </li>
+              {% url 'general:contact' as contact_url %}
+              <li class="nav-item {% if request.path == contact_url %}active{% endif %}">
+                <a class="nav-link" href="{% url 'general:contact' %}">Contact</a>
+              </li>
             </ul>
           </div>
         </div>

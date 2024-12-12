@@ -67,7 +67,7 @@ class ProductDetailView(View):
         order_item = product.order_items.filter(
             order__customer=request.user.profile,
             order__shipping_status='D'
-        )
+        ).values_list("product_id", flat=True)  # List of product IDs
 
         context = {
             "product": product,

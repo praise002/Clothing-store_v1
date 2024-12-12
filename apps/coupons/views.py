@@ -47,7 +47,7 @@ class CouponApply(LoginRequiredMixin, View):
                     request,
                     "cart/cart_detail.html",
                     {
-                    # "cart": cart, 
+                    "cart": cart, 
                      "coupon_apply_form": form},
                 )
 

@@ -5,61 +5,63 @@
 {% endblock %}
 
 {% block content %}
-  <div class="container" style="margin-top: 5em;">
+  <div class="container" style="margin-top: 6rem;">
     <h1 class="text-center mb-4">Order Summary</h1>
 
-    <table class="table table-bordered table-striped">
-      <thead class="thead-dark">
-        <tr>
-          <th scope="col">Image</th>
-          <th scope="col">Product</th>
-          <th scope="col">Price</th>
-          <th scope="col">Quantity</th>
-          <th scope="col">Total</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for item in order.items.all %}
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
           <tr>
+            <th scope="col">Image</th>
+            <th scope="col">Product</th>
+            <th scope="col">Price</th>
+            <th scope="col">Quantity</th>
+            <th scope="col">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in order.items.all %}
+            <tr>
+              <td>
+                <img src="{{ item.product.image_url }}" alt="A product '{{ item.product.name }}'" class="img-fluid" style="max-width: 100px;" />
+              </td>
+              <td>{{ item.product.name }}</td>
+              <td>₦{{ item.price }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>₦{{ item.get_cost }}</td>
+            </tr>
+          {% endfor %}
+
+          {% if order.coupon %}
+            <tr class="subtotal">
+              <td>Subtotal</td>
+              <td colspan="3"></td>
+              <td class="">₦{{ order.get_total_cost_before_discount|floatformat:2 }}</td>
+            </tr>
+            <tr>
+              <td>"{{ order.coupon.code }}" coupon ({{ order.discount }}% off)</td>
+              <td colspan="3"></td>
+              <td class="">- ₦{{ order.get_discount|floatformat:2 }}</td>
+            </tr>
+          {% endif %}
+
+          <tr class="font-weight-bold">
+            <td colspan="4" class="text-right">Total</td>
+            <td>₦{{ order.get_total_cost|floatformat:2 }}</td>
+          </tr>
+          <tr>
+            <td colspan="4" class="text-right">Status</td>
             <td>
-              <img src="{{ item.product.image_url }}" alt="A product '{{ item.product.name }}'" class="img-fluid" style="max-width: 100px;" />
+              {% if payment.paid %}
+                <span class="badge badge-success">Paid</span>
+              {% else %}
+                <span class="badge badge-warning">Pending Payment</span>
+              {% endif %}
             </td>
-            <td>{{ item.product.name }}</td>
-            <td>₦{{ item.price }}</td>
-            <td>{{ item.quantity }}</td>
-            <td>₦{{ item.get_cost }}</td>
           </tr>
-        {% endfor %}
-
-        {% if order.coupon %}
-          <tr class="subtotal">
-            <td>Subtotal</td>
-            <td colspan="3"></td>
-            <td class="">₦{{ order.get_total_cost_before_discount|floatformat:2 }}</td>
-          </tr>
-          <tr>
-            <td>"{{ order.coupon.code }}" coupon ({{ order.discount }}% off)</td>
-            <td colspan="3"></td>
-            <td class="">- ₦{{ order.get_discount|floatformat:2 }}</td>
-          </tr>
-        {% endif %}
-
-        <tr class="font-weight-bold">
-          <td colspan="4" class="text-right">Total</td>
-          <td>₦{{ order.get_total_cost|floatformat:2 }}</td>
-        </tr>
-        <tr>
-          <td colspan="4" class="text-right">Status</td>
-          <td>
-            {% if payment.paid %}
-              <span class="badge badge-success">Paid</span>
-            {% else %}
-              <span class="badge badge-warning">Pending Payment</span>
-            {% endif %}
-          </td>
-        </tr>
-      </tbody>
-    </table>
+        </tbody>
+      </table>
+    </div>
 
     <div class="text-center mt-4">
       <form action="{% url 'payments:process' %}" method="post">

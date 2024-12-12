@@ -46,7 +46,7 @@
                       {% endfor %}
                       {% csrf_token %}
                       <div class="form-group col-auto">
-                        <input class="btn btn-primary" type="submit" value="Add to Cart" />
+                        <input class="btn btn-primary mt-4" type="submit" value="Add to Cart" />
                       </div>
                     </div>
                   {% endif %}
@@ -69,8 +69,7 @@
       <div class="col-md-12">
         <!-- Add a Review Form -->
         {% if request.user.is_authenticated %}
-          {% comment %} FIXME: NOT WORKING {% endcomment %}
-          {% if product in order_item %}
+          {% if product.id in order_item %}
             <div class="row mt-2">
               <div class="col-md-12">
                 <h3 class="mb-1">Add Your Review</h3>
@@ -95,7 +94,7 @@
         {% endif %}
         <h3>Reviews ({{ product.num_of_reviews }})</h3>
 
-        <section style="">
+        <section style="" class="bg-light">
           <div class="py-2 mt-2">
             <div class="row d-flex justify-content-center">
               <div class="col-md-12 col-lg-10 col-xl-8">

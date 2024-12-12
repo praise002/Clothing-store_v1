@@ -39,7 +39,7 @@ class Recommender:
             # multiple products, combine scores of all products
             # store the resulting sorted set in a temporary key
             keys = [self.get_product_key(id) for id in product_ids]
-            r.unionscore(tmp_key, keys)
+            r.zunionstore(tmp_key, keys)
             # remove ids for the products the recommendation is for
             r.zrem(tmp_key, *product_ids)
             # get the product ids by their score, descendant sort

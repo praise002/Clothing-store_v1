@@ -23,13 +23,13 @@ def payment_process(request):
     if order.coupon:
         # Check if the coupon has been redeemed
         coupon_usage = CouponUsage.objects.filter(
-            profile=order.customer.profile,
+            profile=order.customer,
             coupon=order.coupon,
         ).exists()
 
         if coupon_usage:
             # Remove the coupon from the order
-            order.coupon = ''
+            order.coupon = None
             order.discount = 0
             order.save(force_update=True)
             # Update the order total if the coupon affects it

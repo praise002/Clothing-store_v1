@@ -98,7 +98,7 @@ class OrderHistory(LoginRequiredMixin, View):
         if status_filter == "P":
             orders = Order.objects.filter(
                 customer__user=request.user,
-                shipping_status=Order.SHIPPING_STATUS_PENDING,
+                shipping_status=Order.SHIPPING_STATUS_PENDING,    
             )
         elif status_filter == "S":
             orders = Order.objects.filter(
