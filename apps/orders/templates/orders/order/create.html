@@ -44,21 +44,14 @@
               </li>
             {% endfor %}
 
-            {% if cart.first_purchase %}
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                {{ cart.first_purchase_discount }}% off first purchase
-                <span class="">- ₦{{ cart.get_first_purchase_discount|floatformat:2 }}</span>
-              </li>
-            {% endif %}
-
             {% if cart.coupon %}
               <li class="list-group-item d-flex justify-content-between align-items-center">
                 "{{ cart.coupon.code }}" ({{ cart.coupon.discount }}% off)
-                <span class="">- ₦{{ cart.get_discount|floatformat:2 }}</span>
+                <span>- ₦{{ cart.get_discount|floatformat:2 }}</span>
               </li>
             {% endif %}
           </ul>
-          <p class="fs-5 text-right" style="font-weight: bold !important;">Total: ₦{{ cart.get_total_price_after_discount|floatformat:2  }}</p>
+          <p class="fs-5 text-right" style="font-weight: bold !important;">Total: ₦{{ cart.get_total_price_after_discount|floatformat:2 }}</p>
           <form method="post">
             {% csrf_token %}
             <button type="submit" class="btn btn-primary w-100">Place Order</button>

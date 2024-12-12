@@ -8,7 +8,7 @@ from django.http import HttpResponse
 from django.template.loader import render_to_string
 from apps.cart.cart import Cart
 from apps.profiles.models import Profile
-from .models import Order, OrderItem
+from .models import Delivery, Order, OrderItem
 from .tasks import order_created
 
 
@@ -44,7 +44,9 @@ class OrderCreate(LoginRequiredMixin, View):
         # order = Order.objects.create(customer=profile)
 
         # Create the order instance but do not save it yet
-        order = Order(customer=profile)  # Create an in-memory instance
+        order = Order(
+            customer=profile, delivery=Delivery.objects.first()
+        )  # Create an in-memory instance
 
         # Add coupon details if available
         cart = Cart(request)
@@ -55,6 +57,10 @@ class OrderCreate(LoginRequiredMixin, View):
 
         # Save the order after making all changes
         order.save()
+        
+        if order.delivery:
+            order.delivery_fee = order.delivery.fee
+            order.save(force_update=True)
 
         for item in cart:
             OrderItem.objects.create(
@@ -98,7 +104,7 @@ class OrderHistory(LoginRequiredMixin, View):
         if status_filter == "P":
             orders = Order.objects.filter(
                 customer__user=request.user,
-                shipping_status=Order.SHIPPING_STATUS_PENDING,    
+                shipping_status=Order.SHIPPING_STATUS_PENDING,
             )
         elif status_filter == "S":
             orders = Order.objects.filter(

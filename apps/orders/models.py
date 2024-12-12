@@ -8,7 +8,17 @@ from apps.coupons.models import Coupon
 from apps.profiles.models import Profile
 from apps.shop.models import Product
 
+class Delivery(models.Model):
+    fee = models.PositiveSmallIntegerField(default=3000)
+    delivery_time = models.CharField(max_length=50, default="1-3 business days")  
 
+    class Meta:
+        verbose_name = "Delivery"
+        verbose_name_plural = "Deliveries"
+
+    def __str__(self):
+        return f"{self.delivery_time} - Fee: {self.fee}"
+    
 class Order(BaseModel):
     # Shipping status
     SHIPPING_STATUS_PENDING = "P"
@@ -36,7 +46,11 @@ class Order(BaseModel):
     discount = models.SmallIntegerField(
         default=0, validators=[MinValueValidator(0), MaxValueValidator(100)]
     )  # if coupon gets deleted. order is preserved
-
+    delivery = models.ForeignKey(Delivery, on_delete=models.SET_NULL, null=True, blank=True)
+    delivery_fee = models.PositiveSmallIntegerField(
+        default=0
+    )  # if delivery gets deleted. order is preserved
+    
     class Meta:
         ordering = ["-placed_at"]
         indexes = [
@@ -47,11 +61,11 @@ class Order(BaseModel):
         return f"Order {self.id} by {self.customer.user.full_name}"
 
     def get_total_cost(self):
-        total_cost = self.get_total_cost_before_discount()
+        total_cost = self.get_total_cost_before_discount() 
         return total_cost - self.get_discount() 
 
     def get_total_cost_before_discount(self):
-        return sum(item.get_cost() for item in self.items.all())
+        return sum(item.get_cost() for item in self.items.all()) + self.delivery_fee
 
     def get_discount(self):
         total_cost = self.get_total_cost_before_discount()

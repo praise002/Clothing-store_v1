@@ -45,6 +45,14 @@
             </tr>
           {% endif %}
 
+          <tr>
+            <td colspan="4" class="text-right">Delivery Fee</td>
+            <td>₦{{ order.delivery_fee|floatformat:2 }}</td>
+          </tr>
+          <tr>
+            <td colspan="4" class="text-right">Delivery Time</td>
+            <td>{{ order.delivery.delivery_time }}</td>
+          </tr>
           <tr class="font-weight-bold">
             <td colspan="4" class="text-right">Total</td>
             <td>₦{{ order.get_total_cost|floatformat:2 }}</td>

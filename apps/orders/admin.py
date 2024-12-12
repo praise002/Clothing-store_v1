@@ -38,3 +38,5 @@ class OrderAdmin(admin.ModelAdmin):
         order_detail,
         order_pdf,
     ]
+
+admin.site.register(models.Delivery)
