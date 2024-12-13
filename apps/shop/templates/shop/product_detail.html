@@ -73,13 +73,14 @@
             <div class="row mt-2">
               <div class="col-md-12">
                 <h3 class="mb-1">Add Your Review</h3>
-                <form method="POST">
+                <form method="POST" id="review-form">
                   {% csrf_token %}
                   <div class="form-group">{{ form.text }}</div>
+                  {{ form.rating }}
                   <div class="form-group">
-                    <ul class="stars d-flex">
+                    <ul class="d-flex">
                       {% for i in rating_range %}
-                        <li class="mr-1">
+                        <li class="star mr-1">
                           <i class="fa-regular fa-star"></i>
                         </li>
                       {% endfor %}
@@ -90,7 +91,6 @@
               </div>
             </div>
           {% endif %}
-          
         {% endif %}
         <h3>Reviews ({{ product.num_of_reviews }})</h3>
 
@@ -103,16 +103,63 @@
                     <!-- Added margin bottom for spacing between reviews -->
                     <div class="card-body">
                       <h6 class="fw-bold text-primary mb-1">{{ review.customer.user.full_name }}</h6>
-                      <ul class="stars d-flex">
+                      <ul class="d-flex">
                         {% for i in rating_range %}
                           <li class="mr-1">
-                            <i class="fa fa-star {% if forloop.counter <= review.rating %} text-danger {% endif %}"></i>
+                            <i class="
+                              {% if forloop.counter <= review.rating %}
+                                
+                                
+                                
+                                
+                                
+                                
+                                
+                                
+                                
+                      
+                              fa fa-star text-danger
+
+
+
+
+
+
+
+
+
+
+
+                              {% else %}
+                                
+                                
+                                
+                                
+                                
+                                
+                                
+                                
+                                
+                          
+                              fa-regular fa-star text-danger
+
+
+
+
+
+
+
+
+
+
+
+                              {% endif %}">
+
+                            </i>
                           </li>
                         {% endfor %}
                       </ul>
-                      <p class="text-muted small mb-0">
-                        {{ review.created|date:"j M Y" }}
-                      </p>
+                      <p class="text-muted small mb-0">{{ review.created|date:'j M Y' }}</p>
                       <p class="mt-3 mb-4 pb-2">{{ review.text }}</p>
                     </div>
                   </div>
@@ -143,4 +190,52 @@
       </div>
     {% endif %}
   </div>
+
+  <script>
+    const stars = document.querySelectorAll('.star i');
+    const rating = document.querySelector('#star-rating');
+    let selectedRating = 0;
+
+    console.log(rating);
+    console.log(stars);
+    
+    for (let i = 0; i < stars.length; i++) {
+        stars[i].starValue = i + 1;
+        ['click', 'mouseover', 'mouseout'].forEach(function (e) {
+            stars[i].addEventListener(e, starRate);
+        });
+    }
+    
+    function starRate(e) {
+        let type = e.type;
+        let starValue = this.starValue;
+        if (type === 'click') {
+            selectedRating = starValue;
+            rating.value = starValue;
+            console.log(rating);
+        }
+    
+        stars.forEach(function (element, index) {
+            if (type === 'click' || type === 'mouseover') {
+                if (index < starValue) {
+                    element.classList.remove('fa-regular', 'fa-star');
+                    element.classList.add('fa', 'fa-star');
+                } else {
+                    element.classList.remove('fa', 'fa-star');
+                    element.classList.add('fa-regular', 'fa-star');
+                }
+            }
+    
+            if (type === 'mouseout') {
+                if (index < selectedRating) {
+                    element.classList.remove('fa-regular', 'fa-star');
+                    element.classList.add('fa', 'fa-star');
+                } else {
+                    element.classList.remove('fa', 'fa-star');
+                    element.classList.add('fa-regular', 'fa-star');
+                }
+            }
+        });
+    }
+</script>
 {% endblock %}

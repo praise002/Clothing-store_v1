@@ -40,19 +40,21 @@
         {% for product in products %}
             <div class="col-md-4">
                 <div class="product-item">
-                    <a href="{{ product.get_absolute_url }}"><img style="height: 10em; object-fit: contain;" src="{{ product.image_url }}" alt=""></a>
+                    {% comment %} <a href="{{ product.get_absolute_url }}"><img style="height: 10em; object-fit: contain;" src="{{ product.image_url }}" alt=""></a> {% endcomment %}
                     <div class="down-content">
                         <a href="{{ product.get_absolute_url }}"><h4>{{ product.name }}</h4></a>
                         <h6>₦{{ product.price }}</h6>
                         
-                        <ul class="stars">
+                        <ul>
                             {% for i in rating_range %}
                                 <li>
                                     <i 
-                                        class="fa fa-star" 
+                                        class="
                                         {% if forloop.counter > product.avg_rating %}
-                                        style="color:#121212;"
-                                        {% endif %}
+                                        fa-regular fa-star
+                                        {% else %}
+                                        fa fa-star
+                                        {% endif %}"
                                         >
                                     </i>
                                 </li>

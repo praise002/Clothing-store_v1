@@ -44,10 +44,18 @@
                     </a>
                     <h6>₦{{ product.price }}</h6>
                     <!-- Product Rating -->
-                    <ul class="stars">
+                    <ul>
                       {% for i in rating_range %}
                         <li>
-                          <i class="fa fa-star" {% if forloop.counter > product.avg_rating %} style="color:#121212;" {% endif %}></i>
+                          <i 
+                          class="
+                            {% if forloop.counter > product.avg_rating %}
+                            fa-regular fa-star
+                            {% else %}
+                            fa fa-star
+                            {% endif %}"
+                          >
+                        </i>
                         </li>
                       {% endfor %}
                     </ul>
