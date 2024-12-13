@@ -2,7 +2,7 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.views import View
 from django.views.generic import ListView
 from django.db.models.query import QuerySet
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 
@@ -78,6 +78,34 @@ class ProductDetailView(View):
         }
         return render(request, "shop/product_detail.html", context)
 
+    def post(self, request, *args, **kwargs):
+        product = get_object_or_404(Product, id=kwargs['id'])
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.product = product
+            review.customer = request.user.profile
+            review.text = form.cleaned_data['text']
+            review.rating = form.cleaned_data['rating']
+            print("Review:", review)
+            print(review.text)
+            print(review.rating)
+            # review.save()
+            response_data = {
+                'success': True,
+                'review': {
+                    'text': review.text,
+                    'rating': review.rating,
+                    'customer': {
+                        'email': review.customer.user.email,
+                    },
+                }
+            }
+            print(response_data)
+            return JsonResponse(response_data)
+        
+        response_data = {'success': False, 'errors': form.errors}
+        return JsonResponse(response_data)
 
 class CategoriesView(ListView):
     model = Category
