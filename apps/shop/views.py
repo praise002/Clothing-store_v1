@@ -1,12 +1,15 @@
-
 from django.shortcuts import redirect, render, get_object_or_404
 from django.views import View
 from django.views.generic import ListView
 from django.db.models.query import QuerySet
+
 from django.http import Http404, JsonResponse
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
 
+from apps.shop import search_index
+from apps.shop.business_logic import get_opt_params
 from apps.shop.forms import ReviewForm
 from apps.shop.recommender import Recommender
 from apps.shop.utils import sort_products, sort_filter_value
@@ -18,7 +21,7 @@ from apps.cart.forms import CartAddProductForm
 
 class HomeView(View):
     def get(self, request):
-        products = Product.objects.all()[:6]
+        products = Product.objects.filter(in_stock__gt=0, is_available=True).all()[:6]
         categories = Category.objects.all()
         context = {
             "products": products,
@@ -34,7 +37,9 @@ class ProductListView(ListView):
     context_object_name = "products"
 
     def get_queryset(self) -> QuerySet[Product]:
-        products = Product.objects.prefetch_related("reviews")
+        products = Product.objects.filter(
+            in_stock__gt=0, is_available=True
+        ).prefetch_related("reviews")
         products = sort_products(self.request, products)
         return products
 
@@ -54,6 +59,7 @@ class ProductDetailView(View):
                     id=kwargs.get("id"),
                     slug=kwargs.get("slug"),
                     in_stock__gt=0,
+                    is_available=True,
                 )
             )
         except Product.DoesNotExist:
@@ -64,18 +70,19 @@ class ProductDetailView(View):
 
         r = Recommender()
         recommended_products = r.suggest_products_for([product], 4)
-        
+
         # check if the product has been delivered
         order_item = product.order_items.filter(
-            order__customer=request.user.profile,
-            order__shipping_status='D'
-        ).values_list("product_id", flat=True)  # List of product IDs
+            order__customer=request.user.profile, order__shipping_status="D"
+        ).values_list(
+            "product_id", flat=True
+        )  # List of product IDs
 
         # Check if user has already reviewed
         has_reviewed = False
-        
+
         has_reviewed = product.reviews.filter(customer=request.user.profile).exists()
-            
+
         context = {
             "product": product,
             "form": form,
@@ -87,28 +94,29 @@ class ProductDetailView(View):
         return render(request, "shop/product_detail.html", context)
 
     def post(self, request, *args, **kwargs):
-        product = get_object_or_404(Product, id=kwargs['id'])
+        product = get_object_or_404(Product, id=kwargs["id"])
         form = ReviewForm(request.POST)
         if form.is_valid():
             review = form.save(commit=False)
             review.product = product
             review.customer = request.user.profile
-            review.text = form.cleaned_data['text']
-            review.rating = form.cleaned_data['rating']
+            review.text = form.cleaned_data["text"]
+            review.rating = form.cleaned_data["rating"]
             review.save()
             response_data = {
-                'success': True,
-                'review': {
-                    'text': review.text,
-                    'rating': review.rating,
-                    'customer': review.customer.user.full_name,
-                }
+                "success": True,
+                "review": {
+                    "text": review.text,
+                    "rating": review.rating,
+                    "customer": review.customer.user.full_name,
+                },
             }
-            print(response_data)
+
             return JsonResponse(response_data)
-        
-        response_data = {'success': False, 'errors': form.errors}
+
+        response_data = {"success": False, "errors": form.errors}
         return JsonResponse(response_data)
+
 
 class CategoriesView(ListView):
     model = Category
@@ -119,7 +127,9 @@ class CategoriesView(ListView):
 class CategoryProductsView(View):
     def get(self, request, *args, **kwargs):
         category = get_object_or_404(Category, slug=kwargs["slug"])
-        products = Product.objects.filter(category=category).prefetch_related("reviews")
+        products = Product.objects.filter(
+            category=category, in_stock__gt=0, is_available=True
+        ).prefetch_related("reviews")
         products = sort_products(self.request, products)
 
         # Pagination config
@@ -154,3 +164,37 @@ def remove_from_wishlist(request, product_id):
     wishlist = get_object_or_404(Wishlist, profile=request.user.profile)
     wishlist.products.remove(product)
     return redirect("shop:view_wishlist")
+
+@require_http_methods(["POST", "GET"])
+def search(request):
+    context, query_dict = {}, {}
+    
+    # use template partial for htmx requests
+    template_name = "shop/search.html"
+    if request.htmx:
+        template_name = "shop/search_partial.html"
+    else:
+        context.update(Product.objects.get_filter_attributes())
+        
+    # fetch and format search query parameters
+    query_dict = request.GET if request.method == "GET" else request.POST
+    opt_params = get_opt_params(query_dict) 
+    query = query_dict.get("query", None)
+    
+    # fetch results from the index and add them to the context
+    results = search_index.search(query=query, opt_params=opt_params)
+    context.update(
+        {
+            "products": results["hits"],
+            "total": results["nbHits"],
+            "processing_time": results["processingTimeMs"],
+            "offset": opt_params.get("offset", 0),
+        }
+    )
+    
+    return render(request, template_name, context)
+
+def preview_product(request, doc_id):
+    product = search_index.get_document(doc_id)
+    template_name = "shop/preview.html"
+    return render(request, template_name, {"product": product})

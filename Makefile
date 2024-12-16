@@ -38,6 +38,15 @@ reqn:
 ureqn:
 	pip freeze > requirements.txt
 
+help:  ## makefile documentation.
+	@sed -ne '/@sed/!s/## //p' $(MAKEFILE_LIST)
+
+lint: ## lint & format
+	pre-commit run --all-files
+
+seed_db: ## seed db
+	python manage.py seed_db
+
 # DOCKER COMMANDS
 build:
 	docker-compose up --build -d --remove-orphans

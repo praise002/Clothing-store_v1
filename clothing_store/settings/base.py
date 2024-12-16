@@ -231,6 +231,9 @@ CELERY_BEAT_SCHEDULE = {
 
 FIRST_PURCHASE_DISCOUNT = 10
 
+MEILISEARCH_URL = config("MEILISEARCH_URL")
+MEILISEARCH_API_TOKEN = config("MEILISEARCH_API_TOKEN") 
+
 # JAZZMIN_SETTINGS = {
 #     # title of the window (Will default to current_admin_site.site_title if absent or None)
 #     "site_title": "DevSearch Admin",

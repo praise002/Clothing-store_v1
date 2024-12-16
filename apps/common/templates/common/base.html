@@ -10,7 +10,12 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
     <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&display=swap" rel="stylesheet" />
-
+    
+    <!-- In production save these to your static files -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://unpkg.com/hyperscript.org@0.9.5"></script>
+    
+    <script defer src="{% static 'assets/js/htmx.min.js' %}"></script>
     <title>
       Clothing Store |{% block title %}
 

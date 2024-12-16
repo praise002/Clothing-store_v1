@@ -12,6 +12,8 @@ from apps.common.validators import validate_file_size
 from cloudinary.models import CloudinaryField
 from cloudinary import CloudinaryImage
 
+from apps.shop.managers import ProductManager
+
 
 class Category(BaseModel):
     name = models.CharField(max_length=255)
@@ -42,10 +44,26 @@ class Product(BaseModel):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     # image = models.ImageField(upload_to="products/", validators=[validate_file_size])
     in_stock = models.PositiveIntegerField()
+    is_available = models.BooleanField(default=True)
     featured = models.BooleanField(default=False)
     flash_deals = models.BooleanField(default=False)
-    is_available = models.BooleanField(default=True)
     image = CloudinaryField("image", folder="products/")
+    
+    objects = ProductManager()
+    
+    def dict(self):
+        return {
+            "id": str(self.id),
+            "name": self.name,
+            "description": self.description,
+            "category": float(self.category),
+            "price": self.price,
+            "in_stock": self.in_stock,
+            "is_available": self.is_available,
+            "featured": self.featured,
+            "flash_deals": self.flash_deals,
+            "image_url": self.image_url,
+        }
 
     def get_cropped_image_url(self, width=250, height=250):
         # Generate a cropped image URL using Cloudinary transformations
