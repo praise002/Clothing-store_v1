@@ -104,6 +104,9 @@ class Review(BaseModel):
     def __str__(self):
         return f"{self.customer.user.full_name} review on {self.product.name}"
 
+    class Meta:
+        ordering = ["-created"]
+
 
 class Wishlist(models.Model):
     profile = models.OneToOneField(Profile, on_delete=models.CASCADE)

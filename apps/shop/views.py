@@ -1,3 +1,4 @@
+
 from django.shortcuts import redirect, render, get_object_or_404
 from django.views import View
 from django.views.generic import ListView
@@ -64,17 +65,24 @@ class ProductDetailView(View):
         r = Recommender()
         recommended_products = r.suggest_products_for([product], 4)
         
+        # check if the product has been delivered
         order_item = product.order_items.filter(
             order__customer=request.user.profile,
             order__shipping_status='D'
         ).values_list("product_id", flat=True)  # List of product IDs
 
+        # Check if user has already reviewed
+        has_reviewed = False
+        
+        has_reviewed = product.reviews.filter(customer=request.user.profile).exists()
+            
         context = {
             "product": product,
             "form": form,
             "cart_product_form": cart_product_form,
             "recommended_products": recommended_products,
             "order_item": order_item,
+            "has_reviewed": has_reviewed,
         }
         return render(request, "shop/product_detail.html", context)
 
@@ -87,18 +95,13 @@ class ProductDetailView(View):
             review.customer = request.user.profile
             review.text = form.cleaned_data['text']
             review.rating = form.cleaned_data['rating']
-            print("Review:", review)
-            print(review.text)
-            print(review.rating)
-            # review.save()
+            review.save()
             response_data = {
                 'success': True,
                 'review': {
                     'text': review.text,
                     'rating': review.rating,
-                    'customer': {
-                        'email': review.customer.user.email,
-                    },
+                    'customer': review.customer.user.full_name,
                 }
             }
             print(response_data)
