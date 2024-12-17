@@ -10,12 +10,7 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
     <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&display=swap" rel="stylesheet" />
-    
-    <!-- In production save these to your static files -->
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <script defer src="https://unpkg.com/hyperscript.org@0.9.5"></script>
-    
-    <script defer src="{% static 'assets/js/htmx.min.js' %}"></script>
+
     <title>
       Clothing Store |{% block title %}
 
@@ -30,10 +25,30 @@
       }
     </style>
     {% include 'common/includes/static.html' %}
-    {% comment %} <script defer src="{% static '' %}"></script> {% endcomment %}
   </head>
 
   <body class="d-flex flex-column min-vh-100">
+    {% comment %} FIXME: NOT WORKING {% endcomment %}
+    {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+          <li class="{{ message.tags }}">
+            {{ message|safe }}
+            <a href="#" class="close">x</a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    {% if messages %}
+      {% for message in messages %}
+        <script>
+          Toast.fire({
+            icon: '{{ message.level_tag }}',
+            title: '{{ message }}'
+          })
+        </script>
+      {% endfor %}
+    {% endif %}
     <header>
       <nav class="navbar navbar-expand-lg">
         <div class="container">
@@ -121,18 +136,9 @@
       </div>
     </footer>
 
-    <!-- Bootstrap core JavaScript -->
-    <script defer src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
-    <script defer src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    {% block js %}
 
-    <!-- Additional Scripts -->
-    <script defer src="{% static 'assets/js/custom.js' %}"></script>
-    <script defer src="{% static 'assets/js/owl.js' %}"></script>
-    <script defer src="{% static 'assets/js/slick.js' %}"></script>
-    <script defer src="{% static 'assets/js/isotope.js' %}"></script>
-    <script defer src="{% static 'assets/js/accordions.js' %}"></script>
-
-    <script async src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.6.5/sweetalert2.all.min.js"></script>
+    {% endblock %}
   </body>
 </html>
 

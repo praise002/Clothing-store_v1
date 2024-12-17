@@ -206,6 +206,7 @@
       </div>
     {% endif %}
   </div>
+  {% block js %} 
   <script>
     const stars = document.querySelectorAll('.star i')
     const rating = document.querySelector('#star-rating')
@@ -243,7 +244,7 @@
         }
     
         if (type === 'mouseout') {
-          if (index < selectedRating) {
+          if (index <script selectedRating) {
             element.classList.remove('fa-regular', 'fa-star')
             element.classList.add('fa', 'fa-star')
           } else {
@@ -301,4 +302,5 @@
       })
     }
   </script>
+  {% endblock js %}
 {% endblock %}

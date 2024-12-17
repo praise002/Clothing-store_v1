@@ -47,7 +47,9 @@
               {% if product.is_available %}
                 <a href="{{ product.get_absolute_url }}" class="btn btn-info btn-sm btn-margin-sm">View</a>
               {% endif %}
-              <a href="{% url 'shop:remove_from_wishlist' product.id %}" class="btn btn-danger btn-sm">Remove</a>
+              {% comment %} <a href="{% url 'shop:remove_from_wishlist' product.id %}" class="btn btn-danger btn-sm">Remove</a> {% endcomment %}
+              <a href="{% url 'shop:remove_from_wishlist' product.id %}" class="btn btn-danger btn-sm" hx-delete="{% url 'shop:remove_from_wishlist' product.id %}"
+              hx-confirm="Are you sure you want to remove this item from your wishlist?">Remove</a>
             </td>
           </tr>
         {% endfor %}

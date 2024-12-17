@@ -1,11 +1,9 @@
 from django.shortcuts import redirect, render
 from django.views import View
+from django.contrib import messages
 from apps.accounts.mixins import LoginRequiredMixin
 from apps.accounts.forms import UserEditForm
 from .forms import ProfileEditForm
-
-
-import sweetify
 
 
 class MyProfileView(LoginRequiredMixin, View):
@@ -30,14 +28,15 @@ class ProfileEditView(LoginRequiredMixin, View):
 
     def post(self, request):
         user_form = UserEditForm(instance=request.user, data=request.POST)
-        
+
         profile_form = ProfileEditForm(
             instance=request.user.profile, data=request.POST, files=request.FILES
         )
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
-            sweetify.success(request, "Profile updated successfully")
+            messages.success(request, "Profile updated successfully")
+            print("Message added:", list(messages.get_messages(request)))  # Debug print
             return redirect("profiles:profile")
 
         return render(
