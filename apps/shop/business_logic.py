@@ -5,9 +5,9 @@ from apps.shop.search_index import search_index
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_FILTER_ATTRS = ["category", "is_available", "in_stock", "featured", "flash_deals"]
-DEFAULT_SORT_ATTRS = ["price", "name", "created_at", "in_stock"]
-DEFAULT_SEARCH_ATTRS = ["name", "description", "category"]
+DEFAULT_FILTER_ATTRS = ["category"]
+DEFAULT_SORT_ATTRS = ["price"] # asc or desc will be specified in query params(field:direction)
+DEFAULT_SEARCH_ATTRS = ["name", "description"]
 
 def format_search_str(param):
     """Enclose in quotes if there is a space"""
@@ -69,10 +69,10 @@ def setup_attributes():
     search_index.update_sortable_attributes(DEFAULT_SORT_ATTRS)
 
 
-def index_homes(docs=None):
-    """Index all the homes"""
-    # docs = docs or [d.dict() for d in Product.filter(in_stock__gt=0, is_available=True).objects.all()]
-    docs = docs or [d.dict() for d in Product.objects.all()]
+def index_products(docs=None):
+    """Index all the products"""
+    docs = docs or [d.dict() for d in Product.filter(in_stock__gt=0, is_available=True).objects.all()]
+    # docs = docs or [d.dict() for d in Product.objects.all()]
 
     logger.info("indexing...")
     result = search_index.add_documents(docs)

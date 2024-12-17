@@ -51,12 +51,12 @@ class Product(BaseModel):
     
     objects = ProductManager()
     
-    def dict(self):
+    def dict(self): 
         return {
             "id": str(self.id),
             "name": self.name,
             "description": self.description,
-            "category": float(self.category),
+            "category": self.category,
             "price": self.price,
             "in_stock": self.in_stock,
             "is_available": self.is_available,

@@ -1,0 +1,45 @@
+{% extends 'common/base.html' %}
+
+{% block content %}
+  <div>
+    <form id="searchForm" class="form-inline my-lg-0 w-100" style="margin-bottom: 2em !important;" hx-post="{% url 'shop:search' %}" hx-target="#search-results">
+      {% include 'shop/components/filters.html' %}
+      {% include 'shop/components/sort.html' %}
+      {% include 'shop/components/offset.html' %}
+      {% include 'shop/components/search_field.html' %}
+    </form>
+  </div>
+  <div>
+    {% include 'shop/htmx/stats.html' %}
+  </div>
+
+  <!-- Content -->
+  <div>
+    <section>
+      <ul id="search-results">
+        {% include 'shop/htmx/gallery.html' %}
+      </ul>
+    </section>
+  </div>
+{% endblock %}
+
+{% block footer_js %}
+  <script>
+  function infiniteScroll(){
+      const form = document.getElementById("searchForm")
+      const formData = new FormData(form)
+      
+      formData.append('apply_offset', true);
+      let data = {}
+      formData.forEach(function(value, key){
+          data[key] = value;
+      });
+
+      data.country = formData.getAll('country')
+      const context = {
+        target:'#search-results', swap:'beforeend', values: data
+      }
+      htmx.ajax('POST', '{% url 'mybnb:search' %}', context)
+  }
+</script>
+{% endblock %}

@@ -172,7 +172,7 @@ def search(request):
     # use template partial for htmx requests
     template_name = "shop/search.html"
     if request.htmx:
-        template_name = "shop/search_partial.html"
+        template_name = "shop/htmx/search_results_partial.html"
     else:
         context.update(Product.objects.get_filter_attributes())
         
@@ -185,16 +185,26 @@ def search(request):
     results = search_index.search(query=query, opt_params=opt_params)
     context.update(
         {
-            "products": results["hits"],
-            "total": results["nbHits"],
-            "processing_time": results["processingTimeMs"],
-            "offset": opt_params.get("offset", 0),
+            "products": results["hits"], # Search results
+            "total": results["nbHits"],  # Total matches
+            "processing_time": results["processingTimeMs"], # Search time
+            "offset": opt_params.get("offset", 0), # Pagination offset
         }
     )
     
     return render(request, template_name, context)
 
 def preview_product(request, doc_id):
+    # Get product details from Meilisearch index using document ID
     product = search_index.get_document(doc_id)
-    template_name = "shop/preview.html"
+    
+    # Use HTMX partial template for preview
+    template_name = "shop/htmx/preview.html"
     return render(request, template_name, {"product": product})
+
+# TODO: FOR TEST, REMOVE LATER
+products = Product.objects.get_filter_attributes()
+print(products)
+print(Product.objects.get_flash_deals())
+print(Product.objects.get_featured())
+print(Product.objects.get_index_objects())

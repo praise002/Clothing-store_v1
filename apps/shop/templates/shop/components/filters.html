@@ -1,0 +1,31 @@
+<div id="filters" 
+     x-data="{ open: false }">
+    <div>
+        <button type="button">
+            ...
+            <span>Filters</span>
+        </button>
+    </div>
+    <div
+        x-show="open" x-cloak
+    >
+        <div
+            @click.away="open = false"
+        >
+           
+            <div >
+                {% for product in products|slice:"1:10" %}
+                    {% include "shop/components/_filter_checkbox.html" with prefix='product' name=product %}
+                {% endfor %}
+            </div>
+            <div>
+                <div >
+                    <button type="submit"
+                        @click="open = false">
+                        <span>Apply</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

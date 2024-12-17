@@ -49,6 +49,7 @@ THIRD_PARTY_APPS = [
     "sweetify",
     # 'rosetta',
     'redisboard',
+    'django_htmx',
 ]
 
 LOCAL_APPS = [
@@ -85,6 +86,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'django_htmx.middleware.HtmxMiddleware',
 ]
 
 ROOT_URLCONF = "clothing_store.urls"
@@ -230,9 +232,6 @@ CELERY_BEAT_SCHEDULE = {
 }
 
 FIRST_PURCHASE_DISCOUNT = 10
-
-MEILISEARCH_URL = config("MEILISEARCH_URL")
-MEILISEARCH_API_TOKEN = config("MEILISEARCH_API_TOKEN") 
 
 # JAZZMIN_SETTINGS = {
 #     # title of the window (Will default to current_admin_site.site_title if absent or None)

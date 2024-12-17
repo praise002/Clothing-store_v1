@@ -281,6 +281,8 @@
     `;
 
         reviewContainer.insertAdjacentHTML('afterbegin', newReview)
+        // reviewHeader.style.display = 'none';
+        // reviewForm.style.display = 'none';
       }
       
       $.ajax({
@@ -292,8 +294,9 @@
           const currentCount = parseInt(reviewsCount.textContent)
           reviewsCount.textContent = currentCount + 1
           newReview(data)
-          reviewHeader.style.display = 'none';
-          reviewForm.style.display = 'none';
+          $("#review-header").hide()
+          $("#review-form").hide()
+          
         }
       })
     }
