@@ -36,7 +36,6 @@ class ProfileEditView(LoginRequiredMixin, View):
             user_form.save()
             profile_form.save()
             messages.success(request, "Profile updated successfully")
-            print("Message added:", list(messages.get_messages(request)))  # Debug print
             return redirect("profiles:profile")
 
         return render(

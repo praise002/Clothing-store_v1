@@ -69,7 +69,7 @@ class Message(BaseModel):
     sent_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.full_name
+        return self.name
 
     class Meta:
         ordering = ["-created"]

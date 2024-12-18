@@ -2,8 +2,8 @@
 const Toast = Swal.mixin({
     // Creates toast notifications instead of modal popups
     toast: true,
-    // Shows in top-right corner
-    position: "center",
+    // Shows in bottom-end corner
+    position: "bottom-end",
     // White icon color
     iconColor: "white",
     // Custom CSS class for styling
