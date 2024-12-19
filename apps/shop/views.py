@@ -3,7 +3,7 @@ from django.views import View
 from django.views.generic import ListView
 from django.db.models.query import QuerySet
 from django.contrib import messages
-from django.http import Http404, JsonResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
@@ -159,48 +159,57 @@ def add_to_wishlist(request, product_id):
 
 
 @login_required
+@require_http_methods(["DELETE"])
 def remove_from_wishlist(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     wishlist = get_object_or_404(Wishlist, profile=request.user.profile)
     wishlist.products.remove(product)
-    return redirect("shop:view_wishlist")
+    
+    # To support htmx and standard http request
+    if request.headers.get("HX-Request"):
+        return HttpResponse(status=200)  # or return HttpResponse('')
+    else:
+        return redirect("shop:view_wishlist")
+
 
 @require_http_methods(["POST", "GET"])
 def search(request):
     context, query_dict = {}, {}
-    
+
     # use template partial for htmx requests
     template_name = "shop/search.html"
     if request.htmx:
         template_name = "shop/htmx/search_results_partial.html"
     else:
         context.update(Product.objects.get_filter_attributes())
-        
+
     # fetch and format search query parameters
     query_dict = request.GET if request.method == "GET" else request.POST
-    opt_params = get_opt_params(query_dict) 
+    opt_params = get_opt_params(query_dict)
     query = query_dict.get("query", None)
-    
+
     # fetch results from the index and add them to the context
     results = search_index.search(query=query, opt_params=opt_params)
     context.update(
         {
-            "products": results["hits"], # Search results
+            "products": results["hits"],  # Search results
             "total": results["nbHits"],  # Total matches
-            "processing_time": results["processingTimeMs"], # Search time
-            "offset": opt_params.get("offset", 0), # Pagination offset
+            "processing_time": results["processingTimeMs"],  # Search time
+            "offset": opt_params.get("offset", 0),  # Pagination offset
         }
     )
-    
+
     return render(request, template_name, context)
+
 
 def preview_product(request, doc_id):
     # Get product details from Meilisearch index using document ID
     product = search_index.get_document(doc_id)
-    
+
     # Use HTMX partial template for preview
     template_name = "shop/htmx/preview.html"
     return render(request, template_name, {"product": product})
+
 
 # TODO: FOR TEST, REMOVE LATER
 products = Product.objects.get_filter_attributes()

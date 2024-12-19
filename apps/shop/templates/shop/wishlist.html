@@ -12,6 +12,11 @@
     .out-of-stock {
       filter: grayscale(100%) opacity(50%); /* Dim and grayscale the image */
     }
+
+    tr.htmx-swapping td {
+      opacity: 0;
+      transition: opacity 1s ease-out;
+    }
     
     @media screen and (max-width: 409px) {
       .btn-margin-sm {
@@ -31,7 +36,7 @@
             <th scope="col">Actions</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody hx-confirm="Are you sure you want to remove this item?" hx-target="closest tr" hx-swap="outerHTML swap:1s">
           {% for product in wishlist.products.all %}
             <tr id="wishlist-item-{{ product.id }}">
               <td>
@@ -48,7 +53,11 @@
                   <a href="{{ product.get_absolute_url }}" class="btn btn-info btn-sm btn-margin-sm">View</a>
                 {% endif %}
                 {% comment %} TODO: USE HTMX + SWEETALERT {% endcomment %}
-                <a href="{% url 'shop:remove_from_wishlist' product.id %}" class="btn btn-danger btn-sm">Remove</a>
+                <button 
+                class="btn btn-danger btn-sm"
+                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                hx-delete="{% url 'shop:remove_from_wishlist' product.id %}"
+                >Remove</button>
               </td>
             </tr>
           {% endfor %}
@@ -59,7 +68,7 @@
     {% endif %}
   </div>
   {% block js %}
-    <script>
+    {% comment %} <script>
       function handleDelete(event, element) {
         event.preventDefault()
         Swal.fire({
@@ -77,6 +86,6 @@
           }
         })
       }
-    </script>
+    </script> {% endcomment %}
   {% endblock %}
 {% endblock %}
