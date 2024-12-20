@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 
@@ -25,11 +26,19 @@ class CartAdd(LoginRequiredMixin, View):
 
 
 class CartRemove(LoginRequiredMixin, View):
-    def post(self, request, product_id):
+    def delete(self, request, product_id):
         cart = Cart(request)
         product = get_object_or_404(Product, id=product_id)
         cart.remove(product)
-        return redirect("cart:cart_detail")
+
+        # To support htmx and standard http request
+        if request.headers.get("HX-Request"):
+            if len(cart) == 0:
+                # Return 204 No Content for empty cart
+                return HttpResponse(status=204)
+            return HttpResponse(status=200)  # or return HttpResponse('')
+        else:
+            return redirect("cart:cart_detail")
 
 
 class CartDetail(LoginRequiredMixin, View):
@@ -55,6 +64,6 @@ class CartDetail(LoginRequiredMixin, View):
             {
                 "cart": cart,
                 "coupon_apply_form": coupon_apply_form,
-                'recommended_products': recommended_products,
+                "recommended_products": recommended_products,
             },
         )

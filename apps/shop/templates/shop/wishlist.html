@@ -12,11 +12,6 @@
     .out-of-stock {
       filter: grayscale(100%) opacity(50%); /* Dim and grayscale the image */
     }
-
-    tr.htmx-swapping td {
-      opacity: 0;
-      transition: opacity 1s ease-out;
-    }
     
     @media screen and (max-width: 409px) {
       .btn-margin-sm {
@@ -36,9 +31,9 @@
             <th scope="col">Actions</th>
           </tr>
         </thead>
-        <tbody hx-confirm="Are you sure you want to remove this item?" hx-target="closest tr" hx-swap="outerHTML swap:1s">
+        <tbody>
           {% for product in wishlist.products.all %}
-            <tr id="wishlist-item-{{ product.id }}">
+            <tr>
               <td>
                 <img src="{{ product.image_url }}" alt="A Product Image" class="wishlist-image {% if not product.is_available %} out-of-stock {% endif %}" />
               </td>
@@ -52,12 +47,8 @@
                 {% if product.is_available %}
                   <a href="{{ product.get_absolute_url }}" class="btn btn-info btn-sm btn-margin-sm">View</a>
                 {% endif %}
-                {% comment %} TODO: USE HTMX + SWEETALERT {% endcomment %}
-                <button 
-                class="btn btn-danger btn-sm"
-                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                hx-delete="{% url 'shop:remove_from_wishlist' product.id %}"
-                >Remove</button>
+
+                <button class="btn btn-danger btn-sm" data-url="{% url 'shop:remove_from_wishlist' product.id %}" onclick="confirmDelete(event, this)">Remove</button>
               </td>
             </tr>
           {% endfor %}
@@ -68,24 +59,57 @@
     {% endif %}
   </div>
   {% block js %}
-    {% comment %} <script>
-      function handleDelete(event, element) {
+    <script>
+      function confirmDelete(event, element) {
         event.preventDefault()
+        const url = element.dataset.url
+        const row = element.closest('tr')
+      
         Swal.fire({
-          title: 'Are you sure?',
-          text: 'Do you want to remove this item from your wishlist?',
+          title: 'Remove from Wishlist?',
+          text: 'This item will be removed from your wishlist',
           icon: 'warning',
           showCancelButton: true,
-          confirmButtonColor: '#d33',
-          cancelButtonColor: '#3085d6',
-          confirmButtonText: 'Yes, remove it!',
-          cancelButtonText: 'No, keep it'
+          confirmButtonColor: '#dc3545',
+          cancelButtonColor: '#6c757d',
+          confirmButtonText: 'Yes, remove it!'
         }).then((result) => {
           if (result.isConfirmed) {
-            htmx.trigger(element, 'confirmed')
+            // Add fade out animation
+            row.style.transition = 'opacity 1s ease-out'
+            row.style.opacity = '0'
+      
+            setTimeout(() => {
+              fetch(url, {
+                method: 'DELETE',
+                headers: {
+                  'X-CSRFToken': '{{ csrf_token }}' // Include CSRF token for server validation
+                }
+              })
+                .then((response) => {
+                  if (response.ok) {
+                    row.remove() // Remove the row on a successful DELETE request
+                  } else {
+                    throw new Error(`Server responded with status ${response.status}`)
+                  }
+                })
+                .catch((error) => {
+                  // Reset opacity in case of an error
+                  row.style.opacity = '1'
+      
+                  // Show error message using SweetAlert2
+                  Swal.fire({
+                    title: 'Error',
+                    text: 'Could not remove the item. Please try again later.',
+                    icon: 'error',
+                    confirmButtonColor: '#dc3545'
+                  })
+                  console.error('Error during DELETE request:', error)
+                })
+            }, 1000) // Delay to allow fade-out animation to complete
           }
         })
       }
-    </script> {% endcomment %}
+    </script>
   {% endblock %}
 {% endblock %}
