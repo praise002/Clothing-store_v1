@@ -71,7 +71,11 @@ def setup_attributes():
 
 def index_products(docs=None):
     """Index all the products"""
-    docs = docs or [d.dict() for d in Product.filter(in_stock__gt=0, is_available=True).objects.all()]
+    products = Product.objects.filter(
+        in_stock__gt=0, 
+        is_available=True
+    ).select_related('category')
+    docs = docs or [d.dict() for d in products]
     # docs = docs or [d.dict() for d in Product.objects.all()]
 
     logger.info("indexing...")

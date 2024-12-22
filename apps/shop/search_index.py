@@ -33,7 +33,7 @@ search_index = SearchIndex().get_index()
 
 # TODO: TEST, REMOVE LATER
 # Using the functions
-search = SearchIndex(index="app")
-print(search.get_index())
+# search = SearchIndex(index="app")
+# print(search.get_index())
 
 

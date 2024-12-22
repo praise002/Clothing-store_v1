@@ -1,19 +1,25 @@
-<div>
+<div class="search-container my-4">
   <label for="search" class="sr-only">Search</label>
-  <div>
-      <div>
-          <div>
-           ...
-          </div>
-          <input class=""
-            type="search"
-            name="query" placeholder="Search for homes"
-            @search="$event.prevent"
-            hx-post="{% url 'mybnb:search' %}"
-            hx-trigger="keyup changed delay:500ms, search"
-            hx-target="#search-results"/>
-          </div>
+  <div class="row">
+    <div class="col-md-8 mx-auto">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text">
+            <i class="fas fa-search"></i>
+          </span>
+        </div>
+        <input 
+          type="search"
+          id="search"
+          name="query" 
+          class="form-control form-control-lg"
+          placeholder="Search for products..."
+          @search="$event.prevent"
+          hx-post="{% url 'shop:search' %}"
+          hx-trigger="keyup changed delay:500ms, search"
+          hx-target="#search-results"
+        />
       </div>
-
+    </div>
   </div>
 </div>

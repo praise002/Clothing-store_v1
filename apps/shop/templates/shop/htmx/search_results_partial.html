@@ -1,0 +1,50 @@
+{% for product in products %}
+    <li class="list-group-item border-0">
+        <div class="card mb-3">
+            <div class="row no-gutters">
+                <!-- Product Image -->
+                <div class="col-md-4">
+                    <button type="button"
+                            class="btn btn-link p-0"
+                            hx-get="{% url 'shop:preview' product.id %}"
+                            hx-target="body"
+                            hx-swap="beforeend">
+                        <img src="{{ product.image_url }}" 
+                             class="card-img" 
+                             alt="{{ product.name }}"
+                             style="height: 200px; object-fit: contain;">
+                    </button>
+                </div>
+                
+                <!-- Product Details -->
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text">{{ product.description|truncatewords:30 }}</p>
+                        <p class="card-text">
+                            <strong>Price:</strong> ₦{{ product.price }}
+                        </p>
+                        <a href="{{ product.get_absolute_url }}" 
+                           class="btn btn-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if forloop.last and total > 19 %}
+            <div _="on intersection(intersecting)
+                    if intersecting remove me then call infiniteScroll()">
+            </div>
+        {% endif %}
+    </li>
+{% empty %}
+    <li class="list-group-item border-0">
+        <div class="alert alert-info">
+            No products found matching your search.
+        </div>
+    </li>
+{% endfor %}
+
+{% if request.htmx %}
+    {% include "shop/htmx/stats.html" %}
+{% endif %}

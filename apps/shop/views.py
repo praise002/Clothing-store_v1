@@ -8,7 +8,7 @@ from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 
-from apps.shop import search_index
+from apps.shop.search_index import search_index
 from apps.shop.business_logic import get_opt_params
 from apps.shop.forms import ReviewForm
 from apps.shop.recommender import Recommender
@@ -177,7 +177,7 @@ def search(request):
     context, query_dict = {}, {}
 
     # use template partial for htmx requests
-    template_name = "shop/search.html"
+    template_name = "shop/components/search.html"
     if request.htmx:
         template_name = "shop/htmx/search_results_partial.html"
     else:
@@ -192,9 +192,9 @@ def search(request):
     results = search_index.search(query=query, opt_params=opt_params)
     context.update(
         {
-            "products": results["hits"],  # Search results
-            "total": results["nbHits"],  # Total matches
-            "processing_time": results["processingTimeMs"],  # Search time
+            "products": results.get("hits", []),  # Search results
+            "total": results.get("estimatedTotalHits", 0),  # Total matches
+            "processing_time": results.get("processingTimeMs", 0),  # Search time
             "offset": opt_params.get("offset", 0),  # Pagination offset
         }
     )

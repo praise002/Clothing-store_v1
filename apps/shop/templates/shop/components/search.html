@@ -1,8 +1,9 @@
 {% extends 'common/base.html' %}
 
 {% block content %}
-  <div>
-    <form id="searchForm" class="form-inline my-lg-0 w-100" style="margin-bottom: 2em !important;" hx-post="{% url 'shop:search' %}" hx-target="#search-results">
+  <div class="container" style="margin-top: 8rem;" >
+    <form id="searchForm" hx-post="{% url 'shop:search' %}" hx-target="#search-results">
+      {% csrf_token %}
       {% include 'shop/components/filters.html' %}
       {% include 'shop/components/sort.html' %}
       {% include 'shop/components/offset.html' %}
@@ -17,7 +18,7 @@
   <div>
     <section>
       <ul id="search-results">
-        {% include 'shop/htmx/gallery.html' %}
+        {% include 'shop/htmx/search_results_partial.html' %}
       </ul>
     </section>
   </div>
@@ -39,7 +40,7 @@
       const context = {
         target:'#search-results', swap:'beforeend', values: data
       }
-      htmx.ajax('POST', '{% url 'mybnb:search' %}', context)
+      htmx.ajax('POST', '{% url 'shop:search' %}', context)
   }
 </script>
 {% endblock %}

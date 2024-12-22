@@ -39,7 +39,7 @@ class CartRemove(LoginRequiredMixin, View):
             return HttpResponse(status=200)  # or return HttpResponse('')
         else:
             return redirect("cart:cart_detail")
-
+# FIXME: cart and wishlist
 
 class CartDetail(LoginRequiredMixin, View):
     def get(self, request):

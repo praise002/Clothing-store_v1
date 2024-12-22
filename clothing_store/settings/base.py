@@ -38,6 +38,7 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.sites",
     "django.contrib.postgres",
+    "django.contrib.humanize",
 ]
 
 THIRD_PARTY_APPS = [

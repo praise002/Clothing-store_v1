@@ -244,7 +244,7 @@
         }
     
         if (type === 'mouseout') {
-          if (index <script selectedRating) {
+          if (index < selectedRating) {
             element.classList.remove('fa-regular', 'fa-star')
             element.classList.add('fa', 'fa-star')
           } else {
@@ -302,5 +302,5 @@
       })
     }
   </script>
-  {% endblock js %}
+  {% endblock %}
 {% endblock %}
