@@ -44,11 +44,10 @@
                     </form>
                   </td>
                   <td>
-                    {% comment %} <form action="{% url 'cart:cart_remove' product.id %}" method="post">
+                    <form action="{% url 'cart:cart_remove' product.id %}" method="post">
                       <button type="submit" class="btn btn-danger btn-sm">Remove</button>
                       {% csrf_token %}
-                    </form> {% endcomment %}
-                    <button type="submit" class="btn btn-danger btn-sm" data-url="{% url 'cart:cart_remove' product.id %}" onclick="confirmDelete(event, this)">Remove</button>
+                    </form> 
                   </td>
                   <td>₦{{ item.price }}</td>
                   <td>₦{{ item.total_price }}</td>
@@ -132,70 +131,5 @@
       </div>
     {% endif %}
   </div>
-
-  {% block js %}
-    <script>
-      function confirmDelete(event, element) {
-        event.preventDefault()
-        const url = element.dataset.url
-        const row = element.closest('tr')
-      
-        Swal.fire({
-          title: 'Remove from Cart?',
-          text: 'This item will be removed from your cart',
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#dc3545',
-          cancelButtonColor: '#6c757d',
-          confirmButtonText: 'Yes, remove it!'
-        }).then((result) => {
-          if (result.isConfirmed) {
-            // Add fade out animation
-            row.style.transition = 'opacity 1s ease-out'
-            row.style.opacity = '0'
-      
-            setTimeout(() => {
-              fetch(url, {
-                method: 'DELETE',
-                headers: {
-                  'X-CSRFToken': '{{ csrf_token }}' // Include CSRF token for server validation
-                }
-              })
-                .then((response) => {
-                  // if (!response.ok) {
-                    // throw new Error(`Server responded with status ${response.status}`);
-                // }
-                if (response.status === 204) {
-                  console.log(response.status)
-                  // Empty cart - redirect to cart detail
-                  // window.location.href = "{% url 'cart:cart_detail' %}";
-                } else if (response.status === 200) {
-                  console.log(response.status)
-                    // Successful deletion - remove row
-                    row.remove();
-                } else {
-                  console.log(response.status)
-                    throw new Error(`Server responded with status ${response.status}`);
-                }
-                })
-                .catch((error) => {
-                  // Reset opacity in case of an error
-                  row.style.opacity = '1'
-      
-                  // Show error message using SweetAlert2
-                  Swal.fire({
-                    title: 'Error',
-                    text: 'Could not remove the item. Please try again later.',
-                    icon: 'error',
-                    confirmButtonColor: '#dc3545'
-                  })
-                  console.error('Error during DELETE request:', error)
-                })
-            }, 1000) // Delay to allow fade-out animation to complete
-          }
-        })
-      }
-    </script>
-  {% endblock %}
 
 {% endblock %}

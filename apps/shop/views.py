@@ -170,7 +170,7 @@ def remove_from_wishlist(request, product_id):
         return HttpResponse(status=200)  # or return HttpResponse('')
     else:
         return redirect("shop:view_wishlist")
-
+# TODO: DO FOR CART
 
 @require_http_methods(["POST", "GET"])
 def search(request):

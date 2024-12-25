@@ -29,6 +29,7 @@
   function infiniteScroll(){
       const form = document.getElementById("searchForm")
       const formData = new FormData(form)
+      console.log(formData)
       
       formData.append('apply_offset', true);
       let data = {}
@@ -36,7 +37,7 @@
           data[key] = value;
       });
 
-      data.country = formData.getAll('country')
+      data.product = formData.getAll('product')
       const context = {
         target:'#search-results', swap:'beforeend', values: data
       }

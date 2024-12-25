@@ -31,15 +31,8 @@ class CartRemove(LoginRequiredMixin, View):
         product = get_object_or_404(Product, id=product_id)
         cart.remove(product)
 
-        # To support htmx and standard http request
-        if request.headers.get("HX-Request"):
-            if len(cart) == 0:
-                # Return 204 No Content for empty cart
-                return HttpResponse(status=204)
-            return HttpResponse(status=200)  # or return HttpResponse('')
-        else:
-            return redirect("cart:cart_detail")
-# FIXME: cart and wishlist
+        return redirect("cart:cart_detail")
+
 
 class CartDetail(LoginRequiredMixin, View):
     def get(self, request):

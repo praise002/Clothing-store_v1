@@ -59,7 +59,6 @@ class Product(BaseModel):
             "category": self.category.name if self.category else None,
             "price": float(self.price),
             "in_stock": self.in_stock,
-            "is_available": self.is_available,
             "featured": self.featured,
             "flash_deals": self.flash_deals,
             "image_url": self.image_url,
