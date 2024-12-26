@@ -8,7 +8,9 @@
     <div class="container">
       <div class="row">
         <form id="searchForm" class="form-inline my-lg-0 w-100" style="margin-bottom: 2em !important;" hx-get="{% url 'shop:products_list' %}" hx-trigger="submit" hx-target="#products-container" hx-push-url="true">
-          
+          {% if request.GET.page %}
+            <input type="hidden" name="page" value="{{ request.GET.page }}">
+          {% endif %}
           <input
             class="form-control w-75"
             type="search"
@@ -33,7 +35,7 @@
         </div>
 
         <!-- Products Section -->
-        <div id="products-container" class="col-md-12">
+        {% comment %} <div id="products-container" class="col-md-12">
           <div class="filters-content">
             <div class="row grid">
               {% for product in page_obj %}
@@ -65,7 +67,7 @@
                           </li>
                         {% endfor %}
                       </ul>
-                      {% comment %} <span>Reviews ({{ product.reviews.count }})</span> {% endcomment %}
+                      <!-- <span>Reviews ({{ product.reviews.count }})</span> -->
                       <span>Reviews ({{ product.num_of_reviews }})</span>
                     </div>
                   </div>
@@ -78,36 +80,79 @@
               {% endfor %}
             </div>
           </div>
-        </div>
-        <div class="col-md-12">
+        </div> {% endcomment %}
+        {% comment %} <div class="col-md-12">
           {% if page_obj.paginator.count > 0 %} <!-- Check if there are products -->
             <ul class="pages">
               {% if page_obj.has_previous %}
                 <li>
-                  <a href="?page={{ page_obj.previous_page_number }}{{ post_param }}"><i class="fa fa-angle-double-left"></i></a>
+                  <a href="?page={{ page_obj.previous_page_number }}&q={{ request.GET.q }}{{ post_param }}"
+                     hx-get="?page={{ page_obj.previous_page_number }}&q={{ request.GET.q }}{{ post_param }}"
+                     hx-target="#products-container"
+                     hx-push-url="true">
+                    <i class="fa fa-angle-double-left"></i>
+                  </a>
                 </li>
                 {% if page_obj.number != 2 %}
-                  <li><a href="?page=1{{ post_param }}">1</a></li>...
+                  <li>
+                    <a href="?page=1&q={{ request.GET.q }}{{ post_param }}"
+                       hx-get="?page=1&q={{ request.GET.q }}{{ post_param }}"
+                       hx-target="#products-container"
+                       hx-push-url="true">
+                      1
+                    </a>
+                  </li>...
                 {% endif %}
               {% endif %}
-
+        
               {% for num in page_obj.paginator.page_range %}
                 {% if page_obj.number == num %}
-                  <li class="active"><a href="?page={{ num }}{{ post_param }}">{{ num }}</a></li>
+                  <li class="active">
+                    <a href="?page={{ num }}&q={{ request.GET.q }}{{ post_param }}"
+                       hx-get="?page={{ num }}&q={{ request.GET.q }}{{ post_param }}"
+                       hx-target="#products-container"
+                       hx-push-url="true">
+                      {{ num }}
+                    </a>
+                  </li>
                 {% elif num > page_obj.number|add:'-2' and num < page_obj.number|add:'2' %}
-                  <li><a href="?page={{ num }}{{ post_param }}">{{ num }}</a></li>
+                  <li>
+                    <a href="?page={{ num }}&q={{ request.GET.q }}{{ post_param }}"
+                       hx-get="?page={{ num }}&q={{ request.GET.q }}{{ post_param }}"
+                       hx-target="#products-container"
+                       hx-push-url="true">
+                      {{ num }}
+                    </a>
+                  </li>
                 {% endif %}
               {% endfor %}
-
+        
               {% if page_obj.has_next %}
                 {% if page_obj.number != page_obj.paginator.num_pages|add:'-1' %}
-                  ...<li><a href="?page={{page_obj.paginator.num_pages}}{{post_param}}">{{page_obj.paginator.num_pages}}</a></li>
+                  ...<li>
+                    <a href="?page={{ page_obj.paginator.num_pages }}&q={{ request.GET.q }}{{ post_param }}"
+                       hx-get="?page={{ page_obj.paginator.num_pages }}&q={{ request.GET.q }}{{ post_param }}"
+                       hx-target="#products-container"
+                       hx-push-url="true">
+                      {{ page_obj.paginator.num_pages }}
+                    </a>
+                  </li>
                 {% endif %}
                 <li>
-                  <a href="?page={{page_obj.next_page_number}}{{post_param}}"><i class="fa fa-angle-double-right"></i></a>
+                  <a href="?page={{ page_obj.next_page_number }}&q={{ request.GET.q }}{{ post_param }}"
+                     hx-get="?page={{ page_obj.next_page_number }}&q={{ request.GET.q }}{{ post_param }}"
+                     hx-target="#products-container"
+                     hx-push-url="true">
+                    <i class="fa fa-angle-double-right"></i>
+                  </a>
                 </li>
-            {% endif %}
+              {% endif %}
+            </ul>
           {% endif %}
+        </div> {% endcomment %}
+        <!-- Products Section -->
+        <div id="products-container" class="col-md-12">
+          {% include 'shop/htmx/product_list_partial.html' %}
         </div>
       </div>
     </div>

@@ -4,12 +4,12 @@
       <div class="col-lg-4 col-md-4 all">
         <div class="product-item">
           <!-- Product Image -->
-          <button class="btn btn-link" hx-get="{{ product.get_absolute_url }}" hx-target="#main" hx-swap="innerHTML" alt="An image of {{ product.name }}" />
+          <button class="btn btn-link" hx-get="{{ product.get_absolute_url }}" hx-target="#main" hx-swap="innerHTML" hx-push-url="true" alt="An image of {{ product.name }}" />
             <img style="height: 10em; object-fit: contain;" src="{{ product.image_url }}" alt="An image of {{ product.name }}">
           </button>
           <div class="down-content">
             <!-- Product Details -->
-            <button class="btn btn-link" hx-get="{{ product.get_absolute_url }}" hx-target="#main" hx-swap="innerHTML"><h4>{{ product.name }}</h4></button>
+            <button class="btn btn-link" style="text-decoration: none" hx-get="{{ product.get_absolute_url }}" hx-target="#main" hx-swap="innerHTML" hx-push-url="true"><h4>{{ product.name }}</h4></button>
             <h6>₦{{ product.price }}</h6>
             <!-- Product Rating -->
             <ul>
@@ -41,4 +41,74 @@
       </div>
     {% endfor %}
   </div>
+</div>
+
+<div class="col-md-12">
+  {% if page_obj.paginator.count > 0 %} <!-- Check if there are products -->
+    <ul class="pages">
+      {% if page_obj.has_previous %}
+        <li>
+          <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{{ post_param }}"
+             hx-get="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{{ post_param }}"
+             hx-target="#products-container"
+             hx-push-url="true">
+            <i class="fa fa-angle-double-left"></i>
+          </a>
+        </li>
+        {% if page_obj.number != 2 %}
+          <li>
+            <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{{ post_param }}"
+               hx-get="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{{ post_param }}"
+               hx-target="#products-container"
+               hx-push-url="true">
+              1
+            </a>
+          </li>...
+        {% endif %}
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <li class="active">
+            <a href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{{ post_param }}"
+               hx-get="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{{ post_param }}"
+               hx-target="#products-container"
+               hx-push-url="true">
+              {{ num }}
+            </a>
+          </li>
+        {% elif num > page_obj.number|add:'-2' and num < page_obj.number|add:'2' %}
+          <li>
+            <a href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{{ post_param }}"
+               hx-get="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{{ post_param }}"
+               hx-target="#products-container"
+               hx-push-url="true">
+              {{ num }}
+            </a>
+          </li>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        {% if page_obj.number != page_obj.paginator.num_pages|add:'-1' %}
+          ...<li>
+            <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{{ post_param }}"
+               hx-get="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{{ post_param }}"
+               hx-target="#products-container"
+               hx-push-url="true">
+              {{ page_obj.paginator.num_pages }}
+            </a>
+          </li>
+        {% endif %}
+        <li>
+          <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{{ post_param }}"
+             hx-get="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{{ post_param }}"
+             hx-target="#products-container"
+             hx-push-url="true">
+            <i class="fa fa-angle-double-right"></i>
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  {% endif %}
 </div>
