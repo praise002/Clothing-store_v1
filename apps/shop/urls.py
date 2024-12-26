@@ -29,6 +29,6 @@ urlpatterns = [
         name="remove_from_wishlist",
     ),
     
-    path("search/", views.search, name="search"),
+    # path("search/", views.search, name="search"),
     path("preview_product/<str:doc_id>", views.preview_product, name="preview"),
 ]

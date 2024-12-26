@@ -62,6 +62,8 @@ class Product(BaseModel):
             "featured": self.featured,
             "flash_deals": self.flash_deals,
             "image_url": self.image_url,
+            "num_of_reviews": self.num_of_reviews,  
+            "avg_rating": self.avg_rating, 
         }
 
     def get_cropped_image_url(self, width=250, height=250):

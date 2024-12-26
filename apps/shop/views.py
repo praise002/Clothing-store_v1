@@ -40,8 +40,21 @@ class ProductListView(ListView):
         products = Product.objects.filter(
             in_stock__gt=0, is_available=True
         ).prefetch_related("reviews")
+
+        # Handle search query
+        query = self.request.GET.get("q")
+        print(query)  # TODO: REMOVE LATER
+        if query:
+            results = search_index.search(query=query)
+            return results.get("hits", [])  # returns matching result or empty list
+
         products = sort_products(self.request, products)
         return products
+
+    def get_template_names(self):
+        if self.request.htmx:
+            return ["shop/htmx/product_list_partial.html"]
+        return [self.template_name]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -70,18 +83,21 @@ class ProductDetailView(View):
 
         r = Recommender()
         recommended_products = r.suggest_products_for([product], 4)
-
-        # check if the product has been delivered
-        order_item = product.order_items.filter(
-            order__customer=request.user.profile, order__shipping_status="D"
-        ).values_list(
-            "product_id", flat=True
-        )  # List of product IDs
-
-        # Check if user has already reviewed
+        
+        order_item = None
         has_reviewed = False
+        
+        # check if the product has been delivered
+        if request.user.is_authenticated:
+            order_item = product.order_items.filter(
+                order__customer=request.user.profile, order__shipping_status="D"
+            ).values_list(
+                "product_id", flat=True
+            )  # List of product IDs
 
-        has_reviewed = product.reviews.filter(customer=request.user.profile).exists()
+            # Check if user has already reviewed
+
+            has_reviewed = product.reviews.filter(customer=request.user.profile).exists()
 
         context = {
             "product": product,
@@ -91,6 +107,12 @@ class ProductDetailView(View):
             "order_item": order_item,
             "has_reviewed": has_reviewed,
         }
+
+        # Check if the request is HTMX
+        if request.htmx:
+            return render(request, "shop/htmx/product_detail.html", context)
+
+        # For non-HTMX requests, render the full page
         return render(request, "shop/product_detail.html", context)
 
     def post(self, request, *args, **kwargs):
@@ -164,13 +186,16 @@ def remove_from_wishlist(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     wishlist = get_object_or_404(Wishlist, profile=request.user.profile)
     wishlist.products.remove(product)
-    
+
     # To support htmx and standard http request
     if request.headers.get("HX-Request"):
         return HttpResponse(status=200)  # or return HttpResponse('')
     else:
         return redirect("shop:view_wishlist")
+
+
 # TODO: DO FOR CART
+
 
 @require_http_methods(["POST", "GET"])
 def search(request):
@@ -212,8 +237,8 @@ def preview_product(request, doc_id):
 
 
 # TODO: FOR TEST, REMOVE LATER
-products = Product.objects.get_filter_attributes()
-print(products)
-print(Product.objects.get_flash_deals())
-print(Product.objects.get_featured())
-print(Product.objects.get_index_objects())
+# products = Product.objects.get_filter_attributes()
+# print(products)
+# print(Product.objects.get_flash_deals())
+# print(Product.objects.get_featured())
+# print(Product.objects.get_index_objects())

@@ -3,13 +3,16 @@
   <div class="container">
     <div class="row">
       {% if page_obj %}
-        <form class="form-inline my-lg-0 w-100" style="margin-bottom: 2em !important;" action="" method="get">
+      <form id="searchForm" class="form-inline my-lg-0 w-100" style="margin-bottom: 2em !important;" hx-get="{% url 'shop:products_list' %}"
+          >
           <input
             class="form-control w-75"
             type="search"
+            name="q"
             placeholder="Search for products..."
             aria-label="Search"
-            name="q"
+            hx-trigger="submit"
+            hx-target="#products-container"
           />
           <button class="btn btn-outline-dark ml-2" type="submit">Search</button>
         </form>
@@ -27,7 +30,7 @@
       </div>
 
       <!-- Products Section -->
-      <div class="col-md-12">
+      <div id="products-container" class="col-md-12">
         <div class="filters-content">
           <div class="row grid">
             {% for product in page_obj %}

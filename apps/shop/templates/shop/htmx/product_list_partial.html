@@ -1,0 +1,44 @@
+<div class="filters-content">
+  <div class="row grid">
+    {% for product in page_obj %}
+      <div class="col-lg-4 col-md-4 all">
+        <div class="product-item">
+          <!-- Product Image -->
+          <button class="btn btn-link" hx-get="{{ product.get_absolute_url }}" hx-target="#main" hx-swap="innerHTML" alt="An image of {{ product.name }}" />
+            <img style="height: 10em; object-fit: contain;" src="{{ product.image_url }}" alt="An image of {{ product.name }}">
+          </button>
+          <div class="down-content">
+            <!-- Product Details -->
+            <button class="btn btn-link" hx-get="{{ product.get_absolute_url }}" hx-target="#main" hx-swap="innerHTML"><h4>{{ product.name }}</h4></button>
+            <h6>₦{{ product.price }}</h6>
+            <!-- Product Rating -->
+            <ul>
+              {% for i in rating_range %}
+                <li>
+                  <i class="
+                    {% if forloop.counter > product.avg_rating %}
+                      
+                    fa-regular fa-star
+
+                    {% else %}
+                      
+                    fa fa-star
+
+                    {% endif %}">
+
+                  </i>
+                </li>
+              {% endfor %}
+            </ul>
+            <span>Reviews ({{ product.num_of_reviews }})</span>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <!-- No Products Message -->
+      <div class="container-fluid">
+        <p class="text-center font-weight-bold text-primary">No products found.</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
