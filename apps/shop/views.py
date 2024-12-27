@@ -1,15 +1,14 @@
+from django.http import Http404, HttpResponse
 from django.shortcuts import redirect, render, get_object_or_404
 from django.views import View
 from django.views.generic import ListView
 from django.db.models.query import QuerySet
-from django.contrib import messages
-from django.http import Http404, HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 
 from apps.shop.search_index import search_index
-from apps.shop.business_logic import get_opt_params
 from apps.shop.forms import ReviewForm
 from apps.shop.recommender import Recommender
 from apps.shop.utils import sort_products, sort_filter_value
@@ -43,7 +42,7 @@ class ProductListView(ListView):
 
         # Handle search query
         query = self.request.GET.get("q")
-        print(query)  # TODO: REMOVE LATER
+        
         if query:
             results = search_index.search(query=query)
             return results.get("hits", [])  # returns matching result or empty list
@@ -197,8 +196,8 @@ def remove_from_wishlist(request, product_id):
 # TODO: DO FOR CART
 
 # TODO: FOR TEST, REMOVE LATER
-products = Product.objects.get_filter_attributes()
-print(products)
-print(Product.objects.get_flash_deals())
-print(Product.objects.get_featured())
+# products = Product.objects.get_filter_attributes()
+# print(products)
+# print(Product.objects.get_flash_deals())
+# print(Product.objects.get_featured())
 # print(Product.objects.get_index_objects())

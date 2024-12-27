@@ -101,7 +101,7 @@ class Product(BaseModel):
         return self.image.url
 
     # @property
-    # def image_url(self):
+    # def image_url(self): #FIXME
     #     try:
     #         url = self.image.url
     #     except:

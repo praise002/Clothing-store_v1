@@ -2,7 +2,7 @@ import meilisearch
 from decouple import config
 
 MEILISEARCH_URL = config("MEILISEARCH_URL")
-MEILISEARCH_API_TOKEN = config("MEILISEARCH_API_TOKEN")     
+MEILISEARCH_API_TOKEN = config("MEILISEARCH_MASTER_KEY")     
 
 class SearchIndex:
     index = None
