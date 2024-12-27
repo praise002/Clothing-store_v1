@@ -207,7 +207,9 @@
       </div>
     {% endif %}
   </div>
-  {% block js %} 
+{% endblock %}
+
+{% block js %} 
   <script>
     const stars = document.querySelectorAll('.star i')
     const rating = document.querySelector('#star-rating')
@@ -304,4 +306,3 @@
     }
   </script>
   {% endblock %}
-{% endblock %}

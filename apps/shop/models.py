@@ -65,6 +65,7 @@ class Product(BaseModel):
             "image_url": self.image_url,
             "num_of_reviews": self.num_of_reviews,  
             "avg_rating": self.avg_rating, 
+            "get_absolute_url": self.get_absolute_url,  
         }
 
     def get_cropped_image_url(self, width=250, height=250):
@@ -95,17 +96,17 @@ class Product(BaseModel):
     def get_absolute_url(self):
         return reverse("shop:product_detail", args=[str(self.id), str(self.slug)])
 
-    # @property
-    # def image_url(self):
-    #     return self.image.url
-
     @property
     def image_url(self):
-        try:
-            url = self.image.url
-        except:
-            url = 'https://res.cloudinary.com/dq0ow9lxw/image/upload/v1732236163/fallback_ssjbcw.png'
-        return url
+        return self.image.url
+
+    # @property
+    # def image_url(self):
+    #     try:
+    #         url = self.image.url
+    #     except:
+    #         url = 'https://res.cloudinary.com/dq0ow9lxw/image/upload/v1732236163/fallback_ssjbcw.png'
+    #     return url
 
     class Meta:
         ordering = ["-created"]

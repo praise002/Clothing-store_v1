@@ -107,13 +107,13 @@ class ProductDetailView(View):
             "order_item": order_item,
             "has_reviewed": has_reviewed,
         }
-
-        # Check if the request is HTMX
+        
+        template_name = "shop/product_detail.html"
+        # Use a single template for both HTMX and non-HTMX requests
         if request.htmx:
-            return render(request, "shop/htmx/product_detail.html", context)
+            return render(request, template_name, context)
 
-        # For non-HTMX requests, render the full page
-        return render(request, "shop/product_detail.html", context)
+        return render(request, template_name, context)
 
     def post(self, request, *args, **kwargs):
         product = get_object_or_404(Product, id=kwargs["id"])
@@ -196,49 +196,9 @@ def remove_from_wishlist(request, product_id):
 
 # TODO: DO FOR CART
 
-
-@require_http_methods(["POST", "GET"])
-def search(request):
-    context, query_dict = {}, {}
-
-    # use template partial for htmx requests
-    template_name = "shop/components/search.html"
-    if request.htmx:
-        template_name = "shop/htmx/search_results_partial.html"
-    else:
-        context.update(Product.objects.get_filter_attributes())
-
-    # fetch and format search query parameters
-    query_dict = request.GET if request.method == "GET" else request.POST
-    opt_params = get_opt_params(query_dict)
-    query = query_dict.get("query", None)
-
-    # fetch results from the index and add them to the context
-    results = search_index.search(query=query, opt_params=opt_params)
-    context.update(
-        {
-            "products": results.get("hits", []),  # Search results
-            "total": results.get("estimatedTotalHits", 0),  # Total matches
-            "processing_time": results.get("processingTimeMs", 0),  # Search time
-            "offset": opt_params.get("offset", 0),  # Pagination offset
-        }
-    )
-
-    return render(request, template_name, context)
-
-
-def preview_product(request, doc_id):
-    # Get product details from Meilisearch index using document ID
-    product = search_index.get_document(doc_id)
-
-    # Use HTMX partial template for preview
-    template_name = "shop/htmx/preview.html"
-    return render(request, template_name, {"product": product})
-
-
 # TODO: FOR TEST, REMOVE LATER
-# products = Product.objects.get_filter_attributes()
-# print(products)
-# print(Product.objects.get_flash_deals())
-# print(Product.objects.get_featured())
+products = Product.objects.get_filter_attributes()
+print(products)
+print(Product.objects.get_flash_deals())
+print(Product.objects.get_featured())
 # print(Product.objects.get_index_objects())
