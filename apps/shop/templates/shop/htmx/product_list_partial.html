@@ -4,9 +4,9 @@
       <div class="col-lg-4 col-md-4 all">
         <div class="product-item">
           <!-- Product Image -->
-          <button class="btn btn-link" hx-get="{{ product.get_absolute_url }}" hx-target="#main" hx-swap="innerHTML" hx-push-url="true" alt="An image of {{ product.name }}" />
+          <a style="cursor: pointer" hx-get="{{ product.get_absolute_url }}" hx-target="#main" hx-swap="innerHTML" hx-push-url="true" alt="An image of {{ product.name }}" />
             <img style="height: 10em; object-fit: contain;" src="{{ product.image_url }}" alt="An image of {{ product.name }}">
-          </button>
+          </a>
           <div class="down-content">
             <!-- Product Details -->
             <button class="btn btn-link" style="text-decoration: none" hx-get="{{ product.get_absolute_url }}" hx-target="#main" hx-swap="innerHTML" hx-push-url="true"><h4>{{ product.name }}</h4></button>

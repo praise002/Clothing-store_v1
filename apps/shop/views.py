@@ -107,12 +107,10 @@ class ProductDetailView(View):
             "has_reviewed": has_reviewed,
         }
         
-        template_name = "shop/product_detail.html"
-        # Use a single template for both HTMX and non-HTMX requests
         if request.htmx:
-            return render(request, template_name, context)
+            return render(request, "shop/htmx/product_detail_partial.html", context)
 
-        return render(request, template_name, context)
+        return render(request, "shop/product_detail.html", context)
 
     def post(self, request, *args, **kwargs):
         product = get_object_or_404(Product, id=kwargs["id"])

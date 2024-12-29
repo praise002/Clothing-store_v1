@@ -48,10 +48,10 @@ class Product(BaseModel):
     featured = models.BooleanField(default=False)
     flash_deals = models.BooleanField(default=False)
     image = CloudinaryField("image", folder="products/")
-    
+
     objects = ProductManager()
-    
-    def dict(self): 
+
+    def dict(self):
         return {
             "id": str(self.id),
             "slug": self.slug,
@@ -62,10 +62,10 @@ class Product(BaseModel):
             "in_stock": self.in_stock,
             "featured": self.featured,
             "flash_deals": self.flash_deals,
-            "image_url": self.image_url,
-            "num_of_reviews": self.num_of_reviews,  
-            "avg_rating": self.avg_rating, 
-            "get_absolute_url": self.get_absolute_url,  
+            "image_url": self.image_url,  # TODO: FIND A WAY AROUND IT
+            "num_of_reviews": self.num_of_reviews,
+            "avg_rating": self.avg_rating,
+            "get_absolute_url": self.get_absolute_url,
         }
 
     def get_cropped_image_url(self, width=250, height=250):
