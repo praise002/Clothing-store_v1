@@ -52,7 +52,7 @@ class ProductListView(ListView):
 
     def get_template_names(self):
         if self.request.htmx:
-            return ["shop/htmx/product_list_partial.html"]
+            return ["shop/partials/product_list_partial.html"]
         return [self.template_name]
 
     def get_context_data(self, **kwargs):
@@ -108,7 +108,7 @@ class ProductDetailView(View):
         }
         
         if request.htmx:
-            return render(request, "shop/htmx/product_detail_partial.html", context)
+            return render(request, "shop/partials/product_detail_partial.html", context)
 
         return render(request, "shop/product_detail.html", context)
 
@@ -184,11 +184,18 @@ def remove_from_wishlist(request, product_id):
     wishlist = get_object_or_404(Wishlist, profile=request.user.profile)
     wishlist.products.remove(product)
 
-    # To support htmx and standard http request
-    if request.headers.get("HX-Request"):
-        return HttpResponse(status=200)  # or return HttpResponse('')
+    # Common logic: Check if the wishlist is empty
+    if not wishlist.products.exists():
+        template_name = "shop/partials/empty_wishlist.html"
+    else:
+        template_name = "shop/partials/wishlist_table.html"
+
+    # Handle HTMX and non-HTMX responses
+    if request.htmx:
+        return render(request, template_name, {"wishlist": wishlist}, status=200)
     else:
         return redirect("shop:view_wishlist")
+
 
 
 # TODO: DO FOR CART

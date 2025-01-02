@@ -95,7 +95,7 @@ class LoginForm(forms.Form):
 
     password = forms.CharField(
         widget=forms.PasswordInput(
-            attrs={"placeholder": "••••••••", "autocomplete": "new-password"}
+            attrs={"placeholder": "••••••••"}
         ),
     )
 

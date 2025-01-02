@@ -12,6 +12,11 @@
     .out-of-stock {
       filter: grayscale(100%) opacity(50%); /* Dim and grayscale the image */
     }
+
+    .fade-out {
+      opacity: 0;
+      transition: opacity 1s ease-out;
+    }
     
     @media screen and (max-width: 409px) {
       .btn-margin-sm {
@@ -20,96 +25,43 @@
     }
   </style>
 
-  <div class="container" style="margin-top: 6em;">
-    <h2 class="mb-1">Your Wishlist</h2>
-    {% if wishlist.products.exists %}
-      <table class="table table-bordered table-striped">
-        <thead class="thead-dark">
-          <tr>
-            <th scope="col">Image</th>
-            <th scope="col">Product</th>
-            <th scope="col">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for product in wishlist.products.all %}
-            <tr>
-              <td>
-                <img src="{{ product.image_url }}" alt="A Product Image" class="wishlist-image {% if not product.is_available %} out-of-stock {% endif %}" />
-              </td>
-              <td>
-                {{ product.name }}
-                {% if not product.is_available %}
-                  <span class="badge badge-warning ml-2">Out of Stock</span>
-                {% endif %}
-              </td>
-              <td>
-                {% if product.is_available %}
-                  <a href="{{ product.get_absolute_url }}" class="btn btn-info btn-sm btn-margin-sm">View</a>
-                {% endif %}
-
-                <button class="btn btn-danger btn-sm" data-url="{% url 'shop:remove_from_wishlist' product.id %}" onclick="confirmDelete(event, this)">Remove</button>
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+  <div id="wishlist-container" class="container" style="margin-top: 6em;">
+    <div id="wishlist-content">
+      {% if wishlist.products.exists %}
+        {% include "shop/partials/wishlist_table.html" %}
     {% else %}
       <p>Your wishlist is empty!</p>
+      <a href="{% url 'shop:products_list' %}" class="btn btn-primary">Add to wishlist</a>
     {% endif %}
+    </div>
+    
   </div>
   {% block js %}
     <script>
-      function confirmDelete(event, element) {
-        event.preventDefault()
-        const url = element.dataset.url
-        const row = element.closest('tr')
-      
-        Swal.fire({
-          title: 'Remove from Wishlist?',
-          text: 'This item will be removed from your wishlist',
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#dc3545',
-          cancelButtonColor: '#6c757d',
-          confirmButtonText: 'Yes, remove it!'
-        }).then((result) => {
-          if (result.isConfirmed) {
-            // Add fade out animation
-            row.style.transition = 'opacity 1s ease-out'
-            row.style.opacity = '0'
-      
-            setTimeout(() => {
-              fetch(url, {
-                method: 'DELETE',
-                headers: {
-                  'X-CSRFToken': '{{ csrf_token }}' // Include CSRF token for server validation
-                }
-              })
-                .then((response) => {
-                  if (response.ok) {
-                    row.remove() // Remove the row on a successful DELETE request
-                  } else {
-                    throw new Error(`Server responded with status ${response.status}`)
-                  }
-                })
-                .catch((error) => {
-                  // Reset opacity in case of an error
-                  row.style.opacity = '1'
-      
-                  // Show error message using SweetAlert2
-                  Swal.fire({
-                    title: 'Error',
-                    text: 'Could not remove the item. Please try again later.',
-                    icon: 'error',
-                    confirmButtonColor: '#dc3545'
-                  })
-                  console.error('Error during DELETE request:', error)
-                })
-            }, 1000) // Delay to allow fade-out animation to complete
-          }
-        })
-      }
+      document.body.addEventListener('htmx:confirm', function(evt) {
+        if (evt.target.getAttribute('confirm-with-sweet-alert') === 'true') {
+          evt.preventDefault(); // Prevent the request from being sent immediately
+
+          Swal.fire({
+            title: 'Remove from Wishlist?',
+            text: 'This item will be removed from your wishlist',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, remove it!'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              console.log(result)
+              const row = evt.target.closest('tr'); // Get the closest table row
+              row.classList.add('fade-out'); // Add the fade-out class
+
+              evt.detail.issueRequest(); // Proceed with the HTMX request
+            }
+          });
+        }
+      });
+
     </script>
   {% endblock %}
 {% endblock %}

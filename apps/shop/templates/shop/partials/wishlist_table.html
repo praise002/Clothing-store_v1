@@ -1,0 +1,38 @@
+<h2 class="mb-1">Your Wishlist</h2>
+<table class="table table-bordered table-striped">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">Image</th>
+      <th scope="col">Product</th>
+      <th scope="col">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for product in wishlist.products.all %}
+      <tr>
+        <td>
+          <img src="{{ product.image_url }}" alt="A Product Image" class="wishlist-image {% if not product.is_available %} out-of-stock {% endif %}" />
+        </td>
+        <td>
+          {{ product.name }}
+          {% if not product.is_available %}
+            <span class="badge badge-warning ml-2">Out of Stock</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if product.is_available %}
+            <a href="{{ product.get_absolute_url }}" class="btn btn-info btn-sm btn-margin-sm">View</a>
+          {% endif %}
+
+          <button 
+            class="btn btn-danger btn-sm remove-btn" 
+            hx-delete="{% url 'shop:remove_from_wishlist' product.id %}" 
+            hx-target="#wishlist-content" 
+            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
+            confirm-with-sweet-alert="true"
+          >Remove</button>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
