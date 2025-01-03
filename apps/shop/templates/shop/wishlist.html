@@ -12,7 +12,7 @@
     .out-of-stock {
       filter: grayscale(100%) opacity(50%); /* Dim and grayscale the image */
     }
-
+    
     .fade-out {
       opacity: 0;
       transition: opacity 1s ease-out;
@@ -28,16 +28,17 @@
   <div id="wishlist-container" class="container" style="margin-top: 6em;">
     <div id="wishlist-content">
       {% if wishlist.products.exists %}
-        {% include "shop/partials/wishlist_table.html" %}
-    {% else %}
-      <p>Your wishlist is empty!</p>
-      <a href="{% url 'shop:products_list' %}" class="btn btn-primary">Add to wishlist</a>
-    {% endif %}
+        {% include 'shop/partials/wishlist_table.html' %}
+      {% else %}
+        <p>Your wishlist is empty!</p>
+        <a href="{% url 'shop:products_list' %}" class="btn btn-primary">Add to wishlist</a>
+      {% endif %}
     </div>
-    
   </div>
-  {% block js %}
-    <script>
+{% endblock %}
+
+{% block js %}
+  <script>
       document.body.addEventListener('htmx:confirm', function(evt) {
         if (evt.target.getAttribute('confirm-with-sweet-alert') === 'true') {
           evt.preventDefault(); // Prevent the request from being sent immediately
@@ -60,8 +61,44 @@
             }
           });
         }
+      }); 
+
+      {% comment %} htmx.logger = function(elt, event, data) {
+        if(console) {
+            console.log(event, elt, data);
+        }
+      } {% endcomment %}
+
+      // Error handling with SweetAlert2
+      htmx.on('htmx:sendError', function(evt) {
+        console.log("htmx:sendError triggered", evt.detail.elt); // TODO: REMOVE LATER
+        console.log("htmx failed", evt.detail) // TODO: REMOVE LATER
+
+        // const errorMessage = evt.detail.xhr.responseText || "An error occurred. Please try again later.";
+        const errorMessage = "An error occurred. Please try again later.";
+
+        Swal.fire({
+          title: 'Error',
+          text: errorMessage,
+          icon: 'error',
+          confirmButtonColor: '#dc3545'
+        });
       });
 
+      htmx.on('htmx:responseError', function(evt) {
+        console.log("htmx:responseError triggered", evt.detail.elt); // TODO: REMOVE LATER
+        console.log("htmx failed", evt.detail) // TODO: REMOVE LATER
+
+        // const errorMessage = evt.detail.xhr.responseText || "An error occurred. Please try again later.";
+        const errorMessage = "An error occurred. Please try again later.";
+
+        Swal.fire({
+          title: 'Error',
+          text: errorMessage,
+          icon: 'error',
+          confirmButtonColor: '#dc3545'
+        });
+      });
+    
     </script>
-  {% endblock %}
 {% endblock %}

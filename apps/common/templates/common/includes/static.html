@@ -19,7 +19,8 @@
 <script defer src="{% static 'assets/js/alpine.min.js' %}"></script>
 <script defer src="{% static 'assets/js/hyperscript.min.js' %}"></script>
 
-<script defer src="{% static 'assets/js/htmx.min.js' %}"></script>
+{% comment %} <script defer src="{% static 'assets/js/htmx.min.js' %}"></script> {% endcomment %}
+<script src="https://unpkg.com/htmx.org@1.6.1"></script>
 
 <!-- Bootstrap core JavaScript -->
 <script defer src="{% static 'vendor/jquery/jquery.min.js' %}"></script>

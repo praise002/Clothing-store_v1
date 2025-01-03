@@ -30,9 +30,11 @@
             hx-target="#wishlist-content" 
             hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
             confirm-with-sweet-alert="true"
+            {% comment %} hx-on::send-error="alert('error')" {% endcomment %}
           >Remove</button>
         </td>
       </tr>
     {% endfor %}
   </tbody>
 </table>
+
