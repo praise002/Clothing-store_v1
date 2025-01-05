@@ -1,5 +1,5 @@
 {% extends 'common/base.html' %}
-{% load cloudinary_static %}
+{% comment %} {% load cloudinary_static %} {% endcomment %}
 
 {% block title %}
   Your shopping cart
@@ -7,110 +7,9 @@
 
 {% block content %}
   <div class="container mt-5">
-    {% if cart|length == 0 %}
-      <!-- If the cart is empty, show the "Start Shopping" button -->
-      <h6 class="mb-2" style="margin-top: 6rem;">Your cart is empty. Start shopping now!</h6>
-      <a href="{% url 'shop:products_list' %}" class="btn btn-primary">Start Shopping</a>
-    {% else %}
-      <h2 style="margin-top: 7rem; margin-bottom: 1rem;" class="text-center fw-bold border-bottom pb-3">Shopping Cart Summary</h2>
-
-      <!-- If the cart has items, show the table -->
-      <div class="table-responsive">
-        <table class="table table-bordered table-striped">
-          <thead>
-            <tr>
-              <th>Image</th>
-              <th>Product</th>
-              <th>Quantity</th>
-              <th>Remove</th>
-              <th>Unit Price</th>
-              <th>Price</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for item in cart %}
-              {% with product=item.product %}
-                <tr>
-                  <td>
-                    <a href="{{ product.get_absolute_url }}"><img src="{{ product.image_url }}" alt="{{ product.name }}" style="width: 4rem; height: auto;" /></a>
-                  </td>
-                  <td>{{ product.name }}</td>
-                  <td>
-                    <form class="d-flex align-items-center" action="{% url 'cart:cart_add' product.id %}" method="post">
-                      {{ item.update_quantity_form.quantity }}
-                      {{ item.update_quantity_form.override }}
-                      <button type="submit" class="btn btn-primary btn-sm ml-1">Update</button>
-                      {% csrf_token %}
-                    </form>
-                  </td>
-                  <td>
-                    <form action="{% url 'cart:cart_remove' product.id %}" method="post">
-                      <button type="submit" class="btn btn-danger btn-sm">Remove</button>
-                      {% csrf_token %}
-                    </form> 
-                  </td>
-                  <td>₦{{ item.price }}</td>
-                  <td>₦{{ item.total_price }}</td>
-                </tr>
-              {% endwith %}
-            {% endfor %}
-
-            {% if cart.coupon %}
-              <tr class="">
-                <td>
-                  <strong>Subtotal</strong>
-                </td>
-                <td colspan="4"></td>
-                <td class="">
-                  <strong>₦{{ cart.get_total_price|floatformat:2 }}</strong>
-                </td>
-              </tr>
-              <tr>
-                <td>"{{ cart.coupon.code }}" coupon ({{ cart.coupon.discount }}% off)</td>
-                <td colspan="4"></td>
-                <td class="">- ₦{{ cart.get_discount|floatformat:2 }}</td>
-              </tr>
-            {% endif %}
-            <tr>
-              <td>
-                <strong>Total</strong>
-              </td>
-              <td colspan="4"></td>
-              <td>
-                <strong>₦{{ cart.get_total_price_after_discount|floatformat:2 }}</strong>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-      <p class="ml-3 font-weight-bold">Apply a coupon:</p>
-      {% comment %}TODO: CLEAR INPUT AFTER ERROR{% endcomment %}
-      {% if coupon_apply_form.non_field_errors %}
-        {% comment %} <span class="alert alert-danger d-inline-block ml-3" role="alert"> {% endcomment %}
-        <span class="text-danger d-inline-block ml-3">
-          {% for error in coupon_apply_form.non_field_errors %}
-            {{ error }}
-          {% endfor %}
-        </span>
-      {% endif %}
-      <form novalidate class="form-inline" action="{% url 'coupons:apply' %}" method="post">
-        {% for field in coupon_apply_form %}
-          <div class="form-group mx-sm-3 mb-2">
-            <label for="{{ field.id_for_label }}" class="sr-only">{{ field.label }}</label>
-            {{ field.errors }}
-            {{ field }}
-          </div>
-        {% endfor %}
-
-        <button type="submit" class="btn btn-primary mb-2">Apply</button>
-        {% csrf_token %}
-      </form>
-
-      <div class="d-flex justify-content-between mt-4">
-        <a href="{% url 'shop:products_list' %}" class="btn btn-primary">Continue Shopping</a>
-        <a href="{% url 'orders:order_create' %}" class="btn btn-success">Checkout</a>
-      </div>
-    {% endif %}
+    <div id="cart-content">
+      {% include 'cart/partials/cart_detail.html' %}
+    </div>
 
     {% if recommended_products %}
       <h3 class="my-5">People who bought this also bought</h3>
@@ -132,4 +31,52 @@
     {% endif %}
   </div>
 
+{% endblock %}
+
+{% block js %}
+  <script>
+    // Smooth transition and confirmation
+    document.body.addEventListener('htmx:confirm', function(evt) {
+      if (evt.target.getAttribute('confirm-with-sweet-alert') === 'true') {
+        evt.preventDefault(); // Prevent the request from being sent immediately
+
+        Swal.fire({
+          title: 'Remove from Cart?',
+          text: 'This item will be removed from your cart',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#dc3545',
+          cancelButtonColor: '#6c757d',
+          confirmButtonText: 'Yes, remove it!'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            evt.detail.issueRequest(); // Proceed with the HTMX request
+          }
+        });
+      }
+    });
+
+    // Error handling with SweetAlert2
+    htmx.on('htmx:responseError', function(evt) {
+      const errorMessage = "An error occurred. Please try again later.";
+
+      Swal.fire({
+        title: 'Error',
+        text: errorMessage,
+        icon: 'error',
+        confirmButtonColor: '#dc3545'
+      });
+    });
+
+    htmx.on('htmx:responseError', function(evt) {
+      const errorMessage = "An error occurred. Please try again later.";
+
+      Swal.fire({
+        title: 'Error',
+        text: errorMessage,
+        icon: 'error',
+        confirmButtonColor: '#dc3545'
+      });
+    });
+  </script>
 {% endblock %}

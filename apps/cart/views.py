@@ -30,8 +30,34 @@ class CartRemove(LoginRequiredMixin, View):
         cart = Cart(request)
         product = get_object_or_404(Product, id=product_id)
         cart.remove(product)
+        
+        # Prepare the context for the partial template
+        for item in cart:
+            item["update_quantity_form"] = CartAddProductForm(
+                initial={"quantity": item["quantity"], "override": True}
+            )
+            
+        coupon_apply_form = CouponApplyForm()
 
-        return redirect("cart:cart_detail")
+        r = Recommender()
+        cart_products = [item["product"] for item in cart]
+        if cart_products:
+            recommended_products = r.suggest_products_for(cart_products, max_results=4)
+        else:
+            recommended_products = []
+
+        if request.htmx:
+            return render(
+                request, "cart/partials/cart_detail.html", 
+                {
+                    "cart": cart,
+                    "coupon_apply_form": coupon_apply_form,
+                    "recommended_products": recommended_products,
+                }, 
+                status=200
+            )
+        else:
+            return redirect("cart:cart_detail")
 
 
 class CartDetail(LoginRequiredMixin, View):
