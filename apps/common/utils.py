@@ -5,7 +5,6 @@ class TestUtil:
         user_dict = {
             "first_name": "Test",
             "last_name": "Name",
-            "username": "test-name",
             "email": "test@example.com",
             "password": "testpassword",
         }
