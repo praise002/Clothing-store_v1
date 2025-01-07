@@ -19,8 +19,9 @@ class AboutView(View):
 class ContactView(View):
     def get(self, request):
         sitedetail, _ = SiteDetail.objects.get_or_create()
+        teammembers = TeamMember.objects.all()
         form = MessageForm()
-        context = {"sitedetail": sitedetail, "form": form}
+        context = {"sitedetail": sitedetail, "teammembers": teammembers, "form": form}
         return render(request, "general/contact.html", context)
 
     def post(self, request):

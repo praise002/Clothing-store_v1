@@ -1,36 +1,38 @@
 {% load static %}
-<link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+
+<!-- Favicon -->
+<link rel="shortcut icon" href="{% static 'media/favicon.ico' %}" type="image/x-icon" />
+
+<!-- Bootstrap CSS -->
+<link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" />
+
 <!-- Additional CSS Files -->
-
-<link rel="stylesheet" href="{% static 'assets/css/fontawesome.css' %}">
+<link rel="stylesheet" href="{% static 'assets/css/fontawesome.css' %}" />
 <link rel="stylesheet" href="{% static 'assets/css/style.css' %}" />
-<link rel="stylesheet" href="{% static 'assets/css/owl.css' %}">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="{% static 'assets/css/owl.css' %}" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 
- <!--Sweet alert-->
- <link
- rel="stylesheet"
- href="https://cdn.jsdelivr.net/npm/sweetalert2@10.10.1/dist/sweetalert2.min.css"
- />
- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.10.1/dist/sweetalert2.all.min.js"></script>
- <script src="{% static 'assets/js/toast.js' %}"></script>
+<!-- Sweet alert2 CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10.10.1/dist/sweetalert2.min.css" />
 
-<!-- In production save these to your static files -->
-<script defer src="{% static 'assets/js/alpine.min.js' %}"></script>
-<script defer src="{% static 'assets/js/hyperscript.min.js' %}"></script>
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.10.1/dist/sweetalert2.all.min.js"></script>
 
+<!-- HTMX -->
 <script defer src="{% static 'assets/js/htmx.min.js' %}"></script>
-<script src="https://unpkg.com/htmx.org@1.6.1"></script>
+<script defer src="https://unpkg.com/htmx.org@1.6.1"></script>
 
 <!-- Bootstrap core JavaScript -->
-<script defer src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+{% comment %} <script defer src="{% static 'vendor/jquery/jquery.min.js' %}"></script> {% endcomment %}
+<script defer src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script defer src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 
 <!-- Additional Scripts -->
 <script defer src="{% static 'assets/js/custom.js' %}"></script>
 <script defer src="{% static 'assets/js/owl.js' %}"></script>
 <script defer src="{% static 'assets/js/slick.js' %}"></script>
-<script defer src="{% static 'assets/js/isotope.js' %}"></script>
+{% comment %} <script defer src="{% static 'assets/js/isotope.js' %}"></script> {% endcomment %}
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha512-Zq2BOxyhvnRFXu0+WE6ojpZLOU2jdnqbrM1hmVdGzyeCa1DgM3X5Q4A/Is9xA1IkbUeDd7755dNNI/PzSf2Pew==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script defer src="{% static 'assets/js/accordions.js' %}"></script>
-
+<script src="{% static 'assets/js/toast.js' %}"></script>
 {% comment %} <script async src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.6.5/sweetalert2.all.min.js"></script> {% endcomment %}
