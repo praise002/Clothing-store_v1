@@ -145,7 +145,35 @@ class TestAccounts(TestCase):
             Otp.objects.get(user=other_user)
 
         # --- Test POST Request with No OTP Record ---
+        session = self.client.session  
+        session["verification_email"] = new_user.email  
+        session.save()
+        Otp.objects.filter(user=new_user).delete()  # Ensure no OTP exists
+        response = self.client.post(reverse('accounts:verify_email'), {'otp': '123456'})
+
+        # Verify that the user's email is not verified
+        new_user.refresh_from_db()
+        self.assertFalse(new_user.is_email_verified)
+
         # --- Test POST Request with No Email in Session ---
+        session = self.client.session  
+        session["verification_email"] = None
+        session.save()
+        
+        response = self.client.post(reverse('accounts:verify_email'), {'otp': '123456'})
+        
+        # Check for sweetify error message in session
+        session_sweetify = json.loads(self.client.session.get('sweetify'))
+        self.assertEqual(session_sweetify.get('title'), "Not allowed.")
+
+        # Verify redirection to the login page
+        self.assertRedirects(
+            response,
+            self.login_url,
+            status_code=302,
+            target_status_code=200,
+            fetch_redirect_response=True,
+        )
 
     @patch("apps.accounts.senders.SendEmail.verification")
     def test_resend_verification_email(self, mock_verification):
