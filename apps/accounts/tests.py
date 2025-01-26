@@ -1,5 +1,5 @@
 from django.conf import settings
-from apps.accounts.forms import OtpForm, RegistrationForm, LoginForm
+from apps.accounts.forms import CustomSetPasswordForm, OtpForm, PasswordResetRequestForm, RegistrationForm, LoginForm
 from apps.accounts.models import Otp, User
 from apps.common.utils import TestUtil
 from django.test import TestCase, Client
@@ -29,10 +29,16 @@ invalid_data = {
 
 class TestAccounts(TestCase):
     register_url = reverse("accounts:register")
+    verify_email_url = reverse("accounts:verify_email")
     login_url = reverse("accounts:login")
     logout_url = reverse("accounts:logout")
     logout_all_url = reverse("accounts:logout_all_devices")
     resend_verification_email_url = reverse("accounts:resend_verification_email")
+    password_reset_request_url = reverse("accounts:reset_password_request")
+    password_reset_verify_otp_url = reverse("accounts:reset_password_verify_otp")
+    password_reset_form_url = reverse("accounts:reset_password_form")
+    password_reset_resend_otp_url = reverse("accounts:reset_password_resend_otp")
+    
 
     def setUp(self):
         """Set up the test client and initial data."""
@@ -40,6 +46,7 @@ class TestAccounts(TestCase):
         self.new_user = TestUtil.new_user()
         self.other_user = TestUtil.other_user()
         self.verified_user = TestUtil.verified_user()
+        self.inactive_user = TestUtil.inactive_user()
         self.valid_data = valid_data
         self.invalid_data = invalid_data
 
@@ -82,7 +89,7 @@ class TestAccounts(TestCase):
         session.save() 
         
         # --- Test GET Request ---
-        response = self.client.get(reverse("accounts:verify_email"))
+        response = self.client.get(self.verify_email_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "accounts/email_verification_otp_form.html")
         self.assertIsInstance(response.context["form"], OtpForm)
@@ -97,7 +104,7 @@ class TestAccounts(TestCase):
         )
         # Verify that the OTP is expired
         self.assertFalse(otp_record.is_valid)
-        response = self.client.post(reverse("accounts:verify_email"), {"otp": "123456"})
+        response = self.client.post(self.verify_email_url, {"otp": "123456"})
 
         # Verify that the user's email is not verified
         new_user.refresh_from_db()
@@ -107,7 +114,7 @@ class TestAccounts(TestCase):
         self.assertTrue(Otp.objects.filter(user=new_user).exists())
         
         # Verify that the OTP is invalid
-        response = self.client.post(reverse("accounts:verify_email"), {"otp": "invalid_otp"})
+        response = self.client.post(self.verify_email_url, {"otp": "invalid_otp"})
         self.assertTrue(response.context["form"], True)
 
         # --- Test POST Request with Valid OTP ---
@@ -119,7 +126,7 @@ class TestAccounts(TestCase):
         # Verify that the OTP is valid
         self.assertTrue(otp_record_recent.is_valid)
         
-        response = self.client.post(reverse("accounts:verify_email"), {"otp": "654321"})
+        response = self.client.post(self.verify_email_url, {"otp": "654321"})
         
         # Check for sweetify success in session
         session_sweetify = json.loads(self.client.session.get('sweetify'))
@@ -149,7 +156,7 @@ class TestAccounts(TestCase):
         session["verification_email"] = new_user.email  
         session.save()
         Otp.objects.filter(user=new_user).delete()  # Ensure no OTP exists
-        response = self.client.post(reverse('accounts:verify_email'), {'otp': '123456'})
+        response = self.client.post(self.verify_email_url, {'otp': '123456'})
 
         # Verify that the user's email is not verified
         new_user.refresh_from_db()
@@ -157,10 +164,10 @@ class TestAccounts(TestCase):
 
         # --- Test POST Request with No Email in Session ---
         session = self.client.session  
-        session["verification_email"] = None
+        del session["verification_email"]
         session.save()
         
-        response = self.client.post(reverse('accounts:verify_email'), {'otp': '123456'})
+        response = self.client.post(self.verify_email_url, {'otp': '123456'})
         
         # Check for sweetify error message in session
         session_sweetify = json.loads(self.client.session.get('sweetify'))
@@ -175,36 +182,32 @@ class TestAccounts(TestCase):
             fetch_redirect_response=True,
         )
 
-    @patch("apps.accounts.senders.SendEmail.verification")
-    def test_resend_verification_email(self, mock_verification):
-        new_user = self.new_user
+    @patch("apps.accounts.otp_utils.OTPService.send_otp_email")
+    def test_resend_verification_email(self, mock_send_otp_email):
+        # --- Test GET Request with Valid Email in Session ---
+        unverified_user = self.new_user
+        session = self.client.session
+        session["verification_email"] = unverified_user.email
+        session.save()
 
-        # Verify that an unverified user can get a new email
-        session = self.client.session  # Get the session
-        session["verification_email"] = new_user.email  # Set the session variable
-        session.save()  # Explicitly save the session
-
-        # Then, attempt to resend the activation email
-        response = self.client.get(
-            self.resend_verification_email_url,
+        response = self.client.get(self.resend_verification_email_url)
+        
+        self.assertRedirects(
+            response,
+            self.verify_email_url,
+            status_code=302,
+            target_status_code=200,
+            fetch_redirect_response=True,
         )
-        self.assertTemplateUsed(response, "accounts/email_verification_sent.html")
+        mock_send_otp_email.assert_called_once()
+        
+        # --- Test GET Request with No Email in Session ---
+        session = self.client.session
+        session["verification_email"] = None
+        session.save()
 
-        # Verify the mock function was called with the correct arguments
-        mock_verification.assert_called_once_with(response.wsgi_request, new_user)
-
-        # Verify that a verified user cannot get a new email
-        new_user.is_email_verified = True
-        new_user.save()
-
-        response = self.client.get(
-            self.resend_verification_email_url,
-        )
-        session_sweetify = json.loads(self.client.session.get("sweetify"))
-        self.assertEqual(
-            session_sweetify.get("title"), "Email address already verified!"
-        )
-
+        response = self.client.get(self.resend_verification_email_url)
+        
         self.assertRedirects(
             response,
             self.login_url,
@@ -212,18 +215,15 @@ class TestAccounts(TestCase):
             target_status_code=200,
             fetch_redirect_response=True,
         )
+        
+        # --- Test GET Request with Already Verified Email ---
+        verified_user = self.verified_user
+        session = self.client.session
+        session["verification_email"] = verified_user.email
+        session.save()
 
-        # Verify that an error is raised when attempting to resend the activation email for a user that doesn't exist
-        with self.assertRaises(User.DoesNotExist):
-            User.objects.get(email="invalid_email@example.com")
-
-        response = self.client.get(
-            self.resend_verification_email_url,
-        )
-
-        session_sweetify = json.loads(self.client.session.get("sweetify"))
-        self.assertEqual(session_sweetify.get("title"), "Not allowed")
-
+        response = self.client.get(self.resend_verification_email_url)
+        
         self.assertRedirects(
             response,
             self.login_url,
@@ -231,56 +231,209 @@ class TestAccounts(TestCase):
             target_status_code=200,
             fetch_redirect_response=True,
         )
+        
+    @patch("apps.accounts.otp_utils.OTPService.send_password_reset_otp")
+    def test_password_reset_request(self, mock_send_otp):
+        # --- Test GET Request ---
+        response = self.client.get(self.password_reset_request_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "accounts/password_reset_form.html")
+        self.assertIsInstance(response.context["form"], PasswordResetRequestForm)
+        
+        # --- Test POST Request with Valid Email ---
+        verified_user = self.verified_user
+        response = self.client.post(
+            self.password_reset_request_url,
+            {"email": verified_user.email},
+        )
+        self.assertRedirects(
+            response,
+            self.password_reset_verify_otp_url,
+            status_code=302,
+            target_status_code=200,
+            fetch_redirect_response=True,
+        )
+        mock_send_otp.assert_called_once()
+        
+        # --- Test POST Request with Invalid Email ---
+        response = self.client.post(
+            self.password_reset_request_url,
+            {"email": "invalid@example.com"},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(
+            response,
+            self.password_reset_request_url,
+            status_code=302,
+            target_status_code=200,
+            fetch_redirect_response=True,
+        )
+        
+    def test_otp_verification(self):
+        # --- Test GET Request ---
+        response = self.client.get(self.password_reset_verify_otp_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "accounts/password_reset_otp_form.html")
+        self.assertIsInstance(response.context["form"], OtpForm)
+        
+        # --- Test POST Request with Valid OTP ---
+        verified_user = self.verified_user
+        otp_record = Otp.objects.create(user=verified_user, otp="123456")
+        session = self.client.session
+        session["reset_email"] = verified_user.email
+        session.save()
 
+        response = self.client.post(
+            self.password_reset_verify_otp_url, {"otp": "123456"}
+        )
+        
+        self.assertRedirects(
+            response,
+            self.password_reset_form_url,
+            status_code=302,
+            target_status_code=200,
+            fetch_redirect_response=True,
+        )
+        
+        # --- Test POST Request with Invalid OTP ---
+        response = self.client.post(
+            self.password_reset_verify_otp_url, {"otp": "654321"}
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "accounts/password_reset_otp_form.html")
+        self.assertIsNotNone(response.context.get("form").errors)
+        
+         # --- Test POST Request with Expired OTP ---
+        otp_record.created_at = timezone.now() - timedelta(minutes=settings.EMAIL_OTP_EXPIRE_MINUTES + 5)
+        otp_record.save()
+        response = self.client.post(
+            self.password_reset_verify_otp_url, {"otp": "123456"}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "accounts/password_reset_otp_form.html")
+        self.assertIsNotNone(response.context.get("form").errors)
+
+    @patch("apps.accounts.otp_utils.OTPService.send_password_reset_otp")
+    def test_resend_otp_request(self, mock_send_otp):
+        # --- Test GET Request with Valid Email in Session ---
+        verified_user = self.verified_user
+        session = self.client.session
+        session["reset_email"] = verified_user.email
+        session.save()
+
+        response = self.client.get(self.password_reset_resend_otp_url)
+        self.assertRedirects(
+            response,
+            self.password_reset_verify_otp_url,
+            status_code=302,
+            target_status_code=200,
+            fetch_redirect_response=True,
+        )
+        mock_send_otp.assert_called_once()
+        
+        # --- Test GET Request with No Email in Session ---
+        session = self.client.session
+        del session["reset_email"]
+        session.save()
+
+        response = self.client.get(self.password_reset_resend_otp_url)
+        
+        self.assertRedirects(
+            response,
+            self.password_reset_request_url,
+            status_code=302,
+            target_status_code=200,
+            fetch_redirect_response=True,
+        )
+        
+    def test_password_reset(self):
+        # --- Test GET Request ---
+        response = self.client.get(reverse("accounts:reset_password_form"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "accounts/password_reset_confirm.html")
+        self.assertIsInstance(response.context["form"], CustomSetPasswordForm)
+
+        # --- Test POST Request with Valid Data ---
+        verified_user = self.verified_user
+        session = self.client.session
+        session["reset_email"] = verified_user.email
+        session.save()
+
+        response = self.client.post(
+            reverse("accounts:reset_password_form"),
+            {"new_password1": "newpassword123", "new_password2": "newpassword123"},
+        )
+        self.assertRedirects(
+            response,
+            reverse("accounts:reset_password_complete"),
+            status_code=302,
+            target_status_code=200,
+            fetch_redirect_response=True,
+        )
+        
+        # --- Test POST Request with Invalid Data ---
+        response = self.client.post(
+            reverse("accounts:reset_password_form"),
+            {"new_password1": "newpassword123", "new_password2": "mismatch"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "accounts/password_reset_confirm.html")
+        self.assertIsNotNone(response.context.get("form").errors)
+        
     def test_login(self):
         # GET #
         response = self.client.get(self.login_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "accounts/login.html")
         self.assertIsInstance(response.context["form"], LoginForm)
-
-        # POST
-        new_user = self.new_user
-
-        # Test for invalid credentials
+        
+        # --- Test POST Request with Invalid Credentials ---
         response = self.client.post(
             self.login_url,
-            {"email": "invalid@email.com", "password": "invalidpassword"},
+            {"email": "invalid@example.com", "password": "wrongpassword"},
         )
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "accounts/login.html")
+        self.assertIsNotNone(response.context.get("form").errors)
+        
+        # --- Test POST Request with Unverified Email ---
+        unverified_user = self.new_user
+        response = self.client.post(
+            self.login_url,
+            {"email": unverified_user.email, "password": "testpassword"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "accounts/email_verification_otp_form.html")
+        self.assertEqual(self.client.session["verification_email"], unverified_user.email)
+        
+        # --- Test POST Request with Inactive User ---
+        response = self.client.post(
+            self.login_url,
+            {"email": self.inactive_user.email, "password": "testpassword"},
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "accounts/login.html")
+        self.assertIsNotNone(response.context.get("form").errors)
 
-        # Check for sweetify error in session
-        session_sweetify = json.loads(self.client.session.get("sweetify"))
-        self.assertEqual(session_sweetify["title"], "Invalid Credentials")
-
+        # --- Test POST Request with Valid Credentials ---
+        # Create a verified user
+        verified_user = self.verified_user
+        response = self.client.post(
+            self.login_url,
+            {"email": verified_user.email, "password": "testpassword"},
+        )
+        
         self.assertRedirects(
             response,
-            self.login_url,
+            reverse("shop:home"),
             status_code=302,
             target_status_code=200,
             fetch_redirect_response=True,
         )
-
-        # Test for unverified credentials (email)
-        response = self.client.post(
-            self.login_url,
-            {"email": new_user.email, "password": "testpassword"},
-        )
-        self.assertTemplateUsed(response, "accounts/email_verification_sent.html")
-
-        # Test for valid credentials and verified email address
-        new_user.is_email_verified = True
-        new_user.save()
-        response = self.client.post(
-            self.login_url,
-            {"email": new_user.email, "password": "testpassword"},
-        )
-        self.assertRedirects(
-            response,
-            reverse("projects:projects_list"),
-            status_code=302,
-            target_status_code=200,
-            fetch_redirect_response=True,
-        )
+        
 
     def test_logout(self):
         verified_user = self.verified_user
@@ -310,3 +463,4 @@ class TestAccounts(TestCase):
         )
         session = self.client.session
         self.assertFalse(session.keys(), "Session was not flushed as expected.")
+        self.assertEqual(len(session.items()), 0) 

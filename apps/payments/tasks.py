@@ -1,5 +1,4 @@
 from io import BytesIO
-from django.conf import settings
 import weasyprint
 from celery import shared_task
 from django.contrib.staticfiles import finders

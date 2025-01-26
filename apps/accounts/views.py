@@ -29,6 +29,7 @@ import sweetify
 
 
 class RegisterView(LogoutRequiredMixin, View):
+    """Handles user registration."""
     def get(self, request):
         form = RegistrationForm()
         return render(request, "accounts/signup.html", {"form": form})
@@ -46,6 +47,7 @@ class RegisterView(LogoutRequiredMixin, View):
 
 
 class LoginView(LogoutRequiredMixin, View):
+    """Handles user login."""
     form_class = LoginForm
     
     def get(self, request):
@@ -95,6 +97,7 @@ class LoginView(LogoutRequiredMixin, View):
 
 
 class VerifyEmail(LogoutRequiredMixin, View):
+    """Handles email verification using OTP."""
     form_class = OtpForm
     
     def post(self, request, *args, **kwargs):
@@ -136,7 +139,7 @@ class VerifyEmail(LogoutRequiredMixin, View):
                     OTPService.welcome(request, user_obj)
 
                     # Clear the email from the session
-                    request.session["verification_email"] = None
+                    del request.session["verification_email"]
 
                     return redirect(reverse("accounts:login"))
                 else:
@@ -152,6 +155,7 @@ class VerifyEmail(LogoutRequiredMixin, View):
 
 
 class ResendVerificationEmail(LogoutRequiredMixin, View):
+    """Handles resending the verification email."""
     def get(self, request):
         email = request.session.get("verification_email")
 
@@ -163,14 +167,16 @@ class ResendVerificationEmail(LogoutRequiredMixin, View):
 
         if user.is_email_verified:
             sweetify.info(request, "Email address already verified!")
-            request.session["verification_email"] = None
+            del request.session["verification_email"]
             return redirect(reverse("accounts:login"))
 
         OTPService.send_otp_email(request, user)
         sweetify.success(request, "Email Sent")
+        return redirect(reverse("accounts:verify_email"))
 
 
 class PasswordResetRequestView(LogoutRequiredMixin, View):
+    """Handles password reset requests."""
     form_class = PasswordResetRequestForm
     
     def get(self, request):
@@ -203,6 +209,7 @@ class PasswordResetRequestView(LogoutRequiredMixin, View):
 
 
 class OTPVerificationView(LogoutRequiredMixin, View):
+    """Handles OTP verification for password reset."""
     # if otp is less than min or gt than max the input doesn't submit or respond
     form_class = OtpForm
 
@@ -245,6 +252,7 @@ class OTPVerificationView(LogoutRequiredMixin, View):
         return render(request, "accounts/password_reset_otp_form.html", {"form": form})
 
 class ResendOTPRequestView(LogoutRequiredMixin, View):
+    """Handles resending the OTP for password reset."""
     def get(self, request):
         email = request.session.get("reset_email")
         
@@ -264,6 +272,7 @@ class ResendOTPRequestView(LogoutRequiredMixin, View):
         
 
 class PasswordResetView(View):
+    """Handles password reset."""
     form_class = CustomSetPasswordForm
 
     def get(self, request, *args, **kwargs):
@@ -291,13 +300,10 @@ class PasswordResetView(View):
             user.set_password(new_password)
             user.save()
 
-            # Update session to keep user logged in
-            update_session_auth_hash(request, user)
-            
             OTPService.password_reset_success(request, user)
 
             # Clear session data
-            request.session.pop("reset_email", None)
+            del request.session["reset_email"]
 
             return redirect(reverse_lazy("accounts:reset_password_complete"))
 
@@ -305,20 +311,24 @@ class PasswordResetView(View):
 
 
 class CustomPasswordResetCompleteView(LogoutRequiredMixin, PasswordResetCompleteView):
+    """Handles the password reset complete page."""
     template_name = "accounts/password_reset_complete.html"
 
 
 class CustomPasswordChangeView(PasswordChangeView):
+    """Handles password change."""
     form_class = CustomChangePasswordForm
 
 
 class LogoutView(LoginRequiredMixin, View):
+    """Handles user logout."""
     def post(self, request, *args, **kwargs):
         logout(request)
         return redirect("accounts:login")
 
 
 class LogoutAllDevices(LoginRequiredMixin, View):
+    """Handles logging out from all devices."""
     def post(self, request):
         logout(request)
         request.session.flush()  # Clear all session data

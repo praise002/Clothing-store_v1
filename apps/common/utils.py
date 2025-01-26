@@ -32,3 +32,15 @@ class TestUtil:
         }
         user = User.objects.create_user(**user_dict)
         return user
+    
+    def inactive_user():
+        user_dict = {
+            "first_name": "Test",
+            "last_name": "Inactive",
+            "email": "testotherinactive@example.com",
+            "is_email_verified": True,
+            "password": "testpassword",
+            "user_active": False,
+        }
+        user = User.objects.create_user(**user_dict)
+        return user
