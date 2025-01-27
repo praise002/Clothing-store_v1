@@ -81,6 +81,7 @@
                   <fieldset>
                     {% for field in form %}
                       {{ field }}
+                      {{ field.errors }}
                     {% endfor %}
                   </fieldset>
                 </div>

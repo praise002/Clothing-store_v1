@@ -1066,6 +1066,14 @@ footer .inner-content p a {
     align-items: center;
 }
 
+.errorlist {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    list-style: none;
+    padding: 0;
+}
+
 @media (max-width: 993px) {
     .cart-badge {
         display: none;

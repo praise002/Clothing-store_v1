@@ -37,4 +37,5 @@ class ContactView(View):
             )
             return redirect("general:contact")
         context = {"sitedetail": sitedetail, "form": form}
+        
         return render(request, "general/contact.html", context)

@@ -1,10 +1,9 @@
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect, render
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
 from django.views import View
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.urls import reverse_lazy
-from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.views import (
     PasswordResetCompleteView,
     PasswordChangeView,
@@ -249,6 +248,7 @@ class OTPVerificationView(LogoutRequiredMixin, View):
                 return render(request, "accounts/password_reset_otp_form.html", {"form": form})
 
         # Re-render form with errors if OTP is invalid or any other error occurs
+        # sweetify.error(request, "Invalid input")
         return render(request, "accounts/password_reset_otp_form.html", {"form": form})
 
 class ResendOTPRequestView(LogoutRequiredMixin, View):

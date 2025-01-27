@@ -30,7 +30,7 @@ if DEBUG:
     }
 
 # settings_test.py - TODO: REMOVE LATER
-DEBUG_TOOLBAR_CONFIG = {
-    'SHOW_TOOLBAR_CALLBACK': lambda request: False,
-}
+# DEBUG_TOOLBAR_CONFIG = {
+#     'SHOW_TOOLBAR_CALLBACK': lambda request: False,
+# }
 
