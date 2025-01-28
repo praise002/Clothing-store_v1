@@ -72,7 +72,8 @@
             <h2>Our Team Members</h2>
           </div>
         </div>
-        {% for member in teammembers %}
+        {% if temmembers %}
+          {% for member in teammembers %}
           <div class="col-md-4">
             <div class="team-member">
               <div class="thumb-container">
@@ -103,7 +104,8 @@
               </div>
             </div>
           </div>
-        {% endfor %}
+          {% endfor %}
+        {% endif %}
       </div>
     </div>
   </div>

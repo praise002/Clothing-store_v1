@@ -21,7 +21,11 @@
               {% csrf_token %}
 
               <div class="form-group">
-                {{ form.otp }}
+                {% for field in form %}
+                  {{ field.otp }}
+                  {{ field.errors }}
+                {% endfor %}
+                
               </div>
 
               <p>To receive a new otp <a href="{% url "accounts:resend_verification_email" %}">Click Here!</a></p>

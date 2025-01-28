@@ -17,21 +17,25 @@
 </div>
 
 <div class="container mt-4">
-    <table class="table">
-    <thead>
-        <tr>
-        <th scope="col">#</th>
-        <th scope="col">Name</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for category in categories %}
+    {% if categories %}
+      <table class="table">
+        <thead>
             <tr>
-                <th scope="row"><a href="{{ category.get_absolute_url }}">{{ forloop.counter }}<a/></th>
-                <td><a href="{{ category.get_absolute_url }}">{{ category.name }}</a></td>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
             </tr>
-        {% endfor %}
-    </tbody>
-    </table>
+        </thead>
+        <tbody>
+            {% for category in categories %}
+                <tr>
+                    <th scope="row"><a href="{{ category.get_absolute_url }}">{{ forloop.counter }}<a/></th>
+                    <td><a href="{{ category.get_absolute_url }}">{{ category.name }}</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+        Category is empty.
+    {% endif %}
 </div>
 {% endblock %}

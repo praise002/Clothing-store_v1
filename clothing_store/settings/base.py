@@ -106,6 +106,7 @@ TEMPLATES = [
                 "apps.common.context_processors.utils",
                 "apps.common.context_processors.cart",
             ],
+            "builtins": ["apps.common.templatetags.customtags"],
         },
     },
 ]

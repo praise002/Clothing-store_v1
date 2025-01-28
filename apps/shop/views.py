@@ -8,6 +8,7 @@ from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 
+from apps.common.validators import validate_uuid
 from apps.shop.search_index import search_index
 from apps.shop.forms import ReviewForm
 from apps.shop.recommender import Recommender
@@ -20,7 +21,7 @@ from apps.cart.forms import CartAddProductForm
 
 class HomeView(View):
     def get(self, request):
-        products = Product.objects.filter(in_stock__gt=0, is_available=True).all()[:6]
+        products = Product.objects.available()[:6]
         categories = Category.objects.all()
         context = {
             "products": products,
@@ -36,13 +37,11 @@ class ProductListView(ListView):
     context_object_name = "products"
 
     def get_queryset(self) -> QuerySet[Product]:
-        products = Product.objects.filter(
-            in_stock__gt=0, is_available=True
-        ).prefetch_related("reviews")
+        products = Product.objects.available().prefetch_related("reviews")
 
         # Handle search query
         query = self.request.GET.get("q")
-        
+
         if query:
             results = search_index.search(query=query)
             return results.get("hits", [])  # returns matching result or empty list
@@ -63,7 +62,10 @@ class ProductListView(ListView):
 
 class ProductDetailView(View):
     def get(self, request, *args, **kwargs):
-        try:
+        if not validate_uuid(kwargs.get("id")):
+                raise Http404("Invalid product id")
+            
+        try: 
             product = (
                 Product.objects.select_related("category")
                 .prefetch_related("reviews", "reviews__customer")
@@ -82,10 +84,10 @@ class ProductDetailView(View):
 
         r = Recommender()
         recommended_products = r.suggest_products_for([product], 4)
-        
+
         order_item = None
         has_reviewed = False
-        
+
         # check if the product has been delivered
         if request.user.is_authenticated:
             order_item = product.order_items.filter(
@@ -96,7 +98,9 @@ class ProductDetailView(View):
 
             # Check if user has already reviewed
 
-            has_reviewed = product.reviews.filter(customer=request.user.profile).exists()
+            has_reviewed = product.reviews.filter(
+                customer=request.user.profile
+            ).exists()
 
         context = {
             "product": product,
@@ -106,7 +110,7 @@ class ProductDetailView(View):
             "order_item": order_item,
             "has_reviewed": has_reviewed,
         }
-        
+
         if request.htmx:
             return render(request, "shop/partials/product_detail_partial.html", context)
 
@@ -146,9 +150,11 @@ class CategoriesView(ListView):
 class CategoryProductsView(View):
     def get(self, request, *args, **kwargs):
         category = get_object_or_404(Category, slug=kwargs["slug"])
-        products = Product.objects.filter(
-            category=category, in_stock__gt=0, is_available=True
-        ).prefetch_related("reviews")
+        products = (
+            Product.objects.available()
+            .filter(category=category)
+            .prefetch_related("reviews")
+        )
         products = sort_products(self.request, products)
 
         # Pagination config
@@ -195,7 +201,6 @@ def remove_from_wishlist(request, product_id):
         return render(request, template_name, {"wishlist": wishlist}, status=200)
     else:
         return redirect("shop:view_wishlist")
-
 
 
 # TODO: DO FOR CART
