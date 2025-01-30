@@ -96,7 +96,7 @@
       {% endfor %}
     </span>
   {% endif %}
-  <form novalidate class="form-inline" action="{% url 'coupons:apply' %}" method="post">
+  <form class="form-inline" action="{% url 'coupons:apply' %}" method="post">
     {% for field in coupon_apply_form %}
       <div class="form-group mx-sm-3 mb-2">
         <label for="{{ field.id_for_label }}" class="sr-only">{{ field.label }}</label>

@@ -26,7 +26,6 @@ class CouponApply(LoginRequiredMixin, View):
                 )
                 request.session["coupon_id"] = coupon.id
             except Coupon.DoesNotExist:
-                request.session["coupon_id"] = None
                 # raise ValidationError("Invalid or expired coupon.")
                 form.add_error(None, "Invalid or expired coupon.")
                 return render(
@@ -41,6 +40,7 @@ class CouponApply(LoginRequiredMixin, View):
             if CouponUsage.objects.filter(
                 profile=request.user.profile, coupon=coupon
             ).exists():
+                del request.session["coupon_id"]
                 # raise ValidationError("You have already used this coupon.")
                 form.add_error(None, "You have already used this coupon.")
                 return render(
@@ -52,3 +52,10 @@ class CouponApply(LoginRequiredMixin, View):
                 )
 
             return redirect("cart:cart_detail")
+
+        # Handle invalid form submission
+        return render(
+            request,
+            "cart/cart_detail.html",
+            {"cart": cart, "coupon_apply_form": form},
+        )

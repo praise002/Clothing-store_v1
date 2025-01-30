@@ -72,7 +72,7 @@ def payment_process(request):
             # redirect to Paystack payment form
             try:
                 redirect_url = response["data"]["authorization_url"]
-                return redirect(redirect_url, code=303)
+                return redirect(redirect_url)
             except:
                 pass
         else:

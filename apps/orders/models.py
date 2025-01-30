@@ -37,7 +37,7 @@ class Order(BaseModel):
     paid = models.BooleanField(default=False)
     shipping_status = models.CharField(
         max_length=1, choices=SHIPPING_STATUS_CHOICES, blank=True
-    )
+    ) # i will put it to pending if payment was successful
     placed_at = models.DateTimeField(auto_now_add=True)
     payment_ref = models.CharField(max_length=15, blank=True)
     coupon = models.ForeignKey(

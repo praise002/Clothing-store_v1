@@ -89,6 +89,8 @@
                     {% endfor %}
                 </ul>
                 <a href="{% url 'shop:categories' %}" class="filled-button">See More</a>
+            {% else %}
+                No products available.
             {% endif %}
         </div>
         </div>

@@ -29,7 +29,7 @@ if DEBUG:
         ),
     }
 
-# settings_test.py - TODO: REMOVE LATER
+# settings_test.py - TODO: REMOVE LATER used when writing test to avoid debug info in terminal
 # DEBUG_TOOLBAR_CONFIG = {
 #     'SHOW_TOOLBAR_CALLBACK': lambda request: False,
 # }

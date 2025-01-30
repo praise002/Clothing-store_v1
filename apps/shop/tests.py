@@ -2,7 +2,7 @@ from django.test import TestCase
 
 from django.urls import reverse
 from apps.common.utils import TestUtil
-from apps.shop.models import Product, Category, Wishlist
+from apps.shop.models import Wishlist
 
 
 class HomeViewTest(TestCase):
@@ -99,6 +99,7 @@ class CategoriesViewTest(TestCase):
 
     def test_categories_get(self):
         response = self.client.get(reverse("shop:categories"))
+        # print(response.context['categories'])
         self.assertEqual(response.status_code, 200)
         self.assertIn(self.category, response.context["categories"])
         

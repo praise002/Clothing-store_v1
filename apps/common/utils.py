@@ -34,6 +34,19 @@ class TestUtil:
         user = User.objects.create_user(**user_dict)
         return user
     
+    def admin_user():
+        user_dict = {
+            "first_name": "Test",
+            "last_name": "Other",
+            "email": "testotheruser@example.com",
+            "is_email_verified": True,
+            "is_staff": True,
+            "is_superuser": True,
+            "password": "testpassword",
+        }
+        user = User.objects.create_user(**user_dict)
+        return user
+    
     def inactive_user():
         user_dict = {
             "first_name": "Test",
@@ -70,3 +83,5 @@ class TestUtil:
             image="/media/photos/2024/09/01/test_image.jpg",
             category=category,
         )
+        
+        
