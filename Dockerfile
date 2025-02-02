@@ -7,9 +7,11 @@ ENV PYTHONUNBUFFERED=1
 
 # Install dependencies
 RUN apt-get update \
-    && apt-get install -y gcc libpq-dev netcat \
+    && apt-get install -y gcc libpq-dev netcat libglib2.0-0 \
+    && apt-get install -y libpango-1.0-0 libcairo2 libgdk-pixbuf2.0-0 libffi-dev libpango1.0-dev libcairo2-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* 
+
 
 # Set the working directory in the container
 WORKDIR /app

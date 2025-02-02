@@ -15,12 +15,12 @@ services:
     image: redis:7.0.4
     restart: always
     volumes:
-      - ./data/cache:/data
+      - ./data/redis:/data
 
   web:
     build: .
     command: ["./wait-for-it.sh", "db:5432", "--",
-              "gunicorn", "--bind", "0.0.0.0:8000", 
+              "gunicorn", "--bind", "0.0.0.0:9000", 
               "clothing_store.wsgi:application"]
     restart: always
     volumes:

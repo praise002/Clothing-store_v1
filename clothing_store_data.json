@@ -1,0 +1,402 @@
+[
+{
+  "model": "sites.site",
+  "pk": 1,
+  "fields": {
+    "domain": "example.com",
+    "name": "example.com"
+  }
+},
+
+{
+  "model": "general.social",
+  "pk": 1,
+  "fields": {
+    "fb": "https://example.com",
+    "tw": "https://example.com",
+    "ln": "https://example.com",
+    "ig": "https://www.linkedin.com/in/praise-ifeoluwa-idowu-back-end-developer-django/",
+    "name": "Home"
+  }
+},
+{
+  "model": "general.social",
+  "pk": 2,
+  "fields": {
+    "fb": "https://example.com",
+    "tw": "https://example.com",
+    "ln": "https://example.com",
+    "ig": "https://www.linkedin.com/in/praise-ifeoluwa-idowu-back-end-developer-django/",
+    "name": "Emily"
+  }
+},
+{
+  "model": "general.social",
+  "pk": 3,
+  "fields": {
+    "fb": "https://example.com",
+    "tw": "https://example.com",
+    "ln": "https://example.com",
+    "ig": "https://www.linkedin.com/in/praise-ifeoluwa-idowu-back-end-developer-django/",
+    "name": "Thompson"
+  }
+},
+{
+  "model": "general.social",
+  "pk": 4,
+  "fields": {
+    "fb": "https://example.com",
+    "tw": "https://example.com",
+    "ln": "https://example.com",
+    "ig": "https://www.linkedin.com/in/praise-ifeoluwa-idowu-back-end-developer-django/",
+    "name": "Sophia"
+  }
+},
+{
+  "model": "general.social",
+  "pk": 5,
+  "fields": {
+    "fb": "https://example.com",
+    "tw": "https://example.com",
+    "ln": "https://example.com",
+    "ig": "https://www.linkedin.com/in/praise-ifeoluwa-idowu-back-end-developer-django/",
+    "name": "Liam"
+  }
+},
+{
+  "model": "general.social",
+  "pk": 6,
+  "fields": {
+    "fb": "https://example.com",
+    "tw": "https://example.com",
+    "ln": "https://example.com",
+    "ig": "https://www.linkedin.com/in/praise-ifeoluwa-idowu-back-end-developer-django/",
+    "name": "Olivia"
+  }
+},
+{
+  "model": "general.social",
+  "pk": 7,
+  "fields": {
+    "fb": "https://example.com",
+    "tw": "https://example.com",
+    "ln": "https://example.com",
+    "ig": "https://www.linkedin.com/in/praise-ifeoluwa-idowu-back-end-developer-django/",
+    "name": "Alex"
+  }
+},
+{
+  "model": "general.sitedetail",
+  "pk": "2afb08fc-2600-47c1-b55b-7f6ca3ac6d6f",
+  "fields": {
+    "created": "2024-12-09T21:55:51.037Z",
+    "name": "Clothing Store",
+    "description": "We curate and deliver trendy, high-quality clothing and accessories for men and women, right to your doorstep. From casual wear to statement pieces, our collections are designed to help you look and feel your best. Based in Lagos, we currently offer delivery across the city, with options for standard and express shipping to ensure you get your fashion fix as quickly as possible. At Sixteen Clothing, we’re not just selling clothes—we’re creating a community of fashion lovers who value style, quality, and sustainability.",
+    "phone": "+2348029874990",
+    "address": "23, Lagos, Nigeria",
+    "email": "praizthecoder@gmail.com",
+    "company_socials": 1,
+    "map_url": "https://maps.google.com/maps?q=Av.+L%C3%BAcio+Costa,+Rio+de+Janeiro+-+RJ,+Brazil&t=&z=13&ie=UTF8&iwloc=&output=embed"
+  }
+},
+{
+  "model": "general.teammember",
+  "pk": "2d99fd26-4ceb-41e0-b8f8-e36a2348aa61",
+  "fields": {
+    "created": "2025-01-05T06:00:28.874Z",
+    "name": "Emily Carter",
+    "role": "CO-Founder",
+    "description": "Emily is the visionary behind Sixteen Clothing, combining her passion for fashion with a sharp business acumen to drive the brand's success.",
+    "avatar": "media/team/team_02_ul2wwq",
+    "social_links": 2
+  }
+},
+{
+  "model": "general.teammember",
+  "pk": "31761ac2-3545-4f08-aa64-57cfa577fbce",
+  "fields": {
+    "created": "2025-01-05T06:05:14.423Z",
+    "name": "Olivia Kim",
+    "role": "Product Photographer",
+    "description": "Olivia brings Sixteen Clothing's products to life through stunning visuals that capture the essence of the brand and inspire shoppers.",
+    "avatar": "media/team/team_05_rnmm5u",
+    "social_links": 6
+  }
+},
+{
+  "model": "general.teammember",
+  "pk": "53ff1b80-e252-4d3c-9144-f3a59cd49389",
+  "fields": {
+    "created": "2025-01-05T06:07:26.765Z",
+    "name": "Alex Bennett",
+    "role": "General Manager",
+    "description": "Alex keeps Sixteen Clothing running smoothly, overseeing operations and ensuring every team member has what they need to succeed.",
+    "avatar": "media/team/team_03_akdx8q",
+    "social_links": 7
+  }
+},
+{
+  "model": "general.teammember",
+  "pk": "804044b1-9499-4c84-a31b-4c78937ad9c3",
+  "fields": {
+    "created": "2025-01-05T06:03:59.847Z",
+    "name": "Liam O'Connor",
+    "role": "Product Specialist",
+    "description": "Liam is the go-to expert for curating Sixteen Clothing's collections, ensuring every product aligns with the brand's style and quality.",
+    "avatar": "media/team/team_06_u9macc",
+    "social_links": 5
+  }
+},
+{
+  "model": "general.teammember",
+  "pk": "ac89067c-32a8-462b-b172-3fcb9e197f72",
+  "fields": {
+    "created": "2025-01-05T06:01:39.404Z",
+    "name": "James Thompson",
+    "role": "Product Expert",
+    "description": "James ensures every piece at Sixteen Clothing meets the highest standards, leveraging his deep knowledge of fabrics, trends, and customer preferences.",
+    "avatar": "media/team/team_01_y8p26q",
+    "social_links": 3
+  }
+},
+{
+  "model": "general.teammember",
+  "pk": "b8b28536-15f8-489a-8f2c-bbf3d8690bfe",
+  "fields": {
+    "created": "2025-01-05T06:02:42.581Z",
+    "name": "Sophia Martinez",
+    "role": "Chief Marketing",
+    "description": "Sophia crafts compelling stories and strategies that make Sixteen Clothing a standout name in the e-commerce fashion world.",
+    "avatar": "media/team/team_04_yke79u",
+    "social_links": 4
+  }
+},
+{
+  "model": "general.message",
+  "pk": "299203c0-f71d-417b-867c-aaccf9c18e00",
+  "fields": {
+    "created": "2024-12-20T19:15:46.415Z",
+    "name": "Tomi",
+    "email": "tom@gmail.com",
+    "subject": "Collaboration on design",
+    "text": "Lorem ipsum",
+    "sent_at": "2024-12-20T19:15:46.415Z"
+  }
+},
+{
+  "model": "general.message",
+  "pk": "5fa06fec-aa59-4bdc-95d3-b95daa90a6cb",
+  "fields": {
+    "created": "2024-12-18T22:47:33.343Z",
+    "name": "Praise",
+    "email": "ifeoluwapraise02@gmail.com",
+    "subject": "Inquiry",
+    "text": "Test",
+    "sent_at": "2024-12-18T22:47:33.344Z"
+  }
+},
+
+{
+  "model": "shop.category",
+  "pk": "29885efe-f933-4b7d-a037-112cb168bd7e",
+  "fields": {
+    "created": "2024-12-03T03:28:53.406Z",
+    "name": "Category 1",
+    "slug": "category-1",
+    "last_updated": "2024-12-03T03:28:53.473Z"
+  }
+},
+{
+  "model": "shop.category",
+  "pk": "29d55e3a-6ed5-49de-8f98-a4d927eb0772",
+  "fields": {
+    "created": "2024-12-09T21:34:27.367Z",
+    "name": "Men's wear",
+    "slug": "mens-wear",
+    "last_updated": "2024-12-09T21:34:27.374Z"
+  }
+},
+{
+  "model": "shop.category",
+  "pk": "92ee4173-696a-48e2-b6dc-50daee09512d",
+  "fields": {
+    "created": "2024-12-09T21:33:38.965Z",
+    "name": "Accessories",
+    "slug": "accessories",
+    "last_updated": "2024-12-09T21:35:37.555Z"
+  }
+},
+{
+  "model": "shop.category",
+  "pk": "be57acff-b917-43fa-bae5-1c92139a5b8d",
+  "fields": {
+    "created": "2024-12-09T21:33:29.858Z",
+    "name": "Kids' wear",
+    "slug": "kids-wear",
+    "last_updated": "2024-12-09T21:35:04.787Z"
+  }
+},
+{
+  "model": "shop.category",
+  "pk": "d3742f82-b7c6-497d-a605-750c933b94d9",
+  "fields": {
+    "created": "2024-12-09T21:33:44.397Z",
+    "name": "Women's wear",
+    "slug": "womens-wear",
+    "last_updated": "2024-12-09T21:34:40.475Z"
+  }
+},
+{
+  "model": "shop.product",
+  "pk": "a998167d-794a-40b9-98e2-7c382d825850",
+  "fields": {
+    "created": "2024-12-09T21:44:01.538Z",
+    "name": "Summer dress",
+    "slug": "summer-dress",
+    "description": "Breeze through sunny days in this lightweight and colorful summer dress, designed to keep you cool and chic. Ideal for picnics, beach outings, or casual get-togethers.",
+    "category": "d3742f82-b7c6-497d-a605-750c933b94d9",
+    "price": "49999.99",
+    "in_stock": 40,
+    "is_available": true,
+    "featured": false,
+    "flash_deals": true,
+    "image": "image/upload/media/products/summer-1_nikl6u"
+  }
+},
+{
+  "model": "shop.product",
+  "pk": "b4aa347f-0569-4bf7-8167-465d04ec8e81",
+  "fields": {
+    "created": "2024-12-09T21:42:33.767Z",
+    "name": "Indian party wear",
+    "slug": "indian-party-wear",
+    "description": "Celebrate in style with this stunning Indian party wear, adorned with intricate designs and vibrant colors. Perfect for weddings, festivals, or grand occasions.",
+    "category": "d3742f82-b7c6-497d-a605-750c933b94d9",
+    "price": "39999.99",
+    "in_stock": 30,
+    "is_available": true,
+    "featured": false,
+    "flash_deals": false,
+    "image": "image/upload/media/products/india-party-wear_mwpdgx"
+  }
+},
+{
+  "model": "shop.product",
+  "pk": "cd20bc8a-6789-4620-bb5c-7a6adffa4089",
+  "fields": {
+    "created": "2024-12-09T21:42:00.319Z",
+    "name": "Ankara off shoulder",
+    "slug": "ankara-off-shoulder",
+    "description": "Show off your bold fashion sense with this Ankara off-shoulder dress, featuring vibrant African prints and a flattering neckline. Perfect for cultural events or casual outings.",
+    "category": "d3742f82-b7c6-497d-a605-750c933b94d9",
+    "price": "50000.00",
+    "in_stock": 20,
+    "is_available": true,
+    "featured": false,
+    "flash_deals": false,
+    "image": "image/upload/media/products/ankara-off-shoulder_rugbxe"
+  }
+},
+{
+  "model": "shop.product",
+  "pk": "cea90fb2-33e4-4282-8a2e-f2543830d067",
+  "fields": {
+    "created": "2024-12-03T03:30:30.755Z",
+    "name": "Product 2",
+    "slug": "product-2",
+    "description": "Lorem ipsum",
+    "category": "29885efe-f933-4b7d-a037-112cb168bd7e",
+    "price": "3000.00",
+    "in_stock": 6,
+    "is_available": true,
+    "featured": false,
+    "flash_deals": false,
+    "image": "image/upload/v1733944859/products/vaeaydmdshsbgjmsshfs.jpg"
+  }
+},
+{
+  "model": "shop.product",
+  "pk": "de58b858-7fa2-462d-9b3e-ad9bbd6af938",
+  "fields": {
+    "created": "2024-12-09T21:45:37.495Z",
+    "name": "Stylish Gown",
+    "slug": "stylish-gown",
+    "description": "Turn heads effortlessly with this elegant and trendy gown, featuring a figure-flattering design perfect for any occasion. Made from premium fabric for comfort and style.",
+    "category": "d3742f82-b7c6-497d-a605-750c933b94d9",
+    "price": "9000.00",
+    "in_stock": 0,
+    "is_available": false,
+    "featured": true,
+    "flash_deals": false,
+    "image": "image/upload/v1733942922/svllmldide2wpvtmkc8o.jpg"
+  }
+},
+{
+  "model": "shop.product",
+  "pk": "e38ffebb-f77a-4515-a06f-07856d21d906",
+  "fields": {
+    "created": "2024-12-09T21:43:03.495Z",
+    "name": "Office wear",
+    "slug": "office-wear",
+    "description": "Exude confidence and professionalism with this sleek office wear. Tailored for a smart fit, it's the ultimate choice for meetings, presentations, and everyday work style.",
+    "category": "d3742f82-b7c6-497d-a605-750c933b94d9",
+    "price": "150000.00",
+    "in_stock": 5,
+    "is_available": true,
+    "featured": false,
+    "flash_deals": false,
+    "image": "image/upload/media/products/office-1_pvpjzv"
+  }
+},
+{
+  "model": "shop.product",
+  "pk": "ec4be580-c961-455e-93f8-66fda302d134",
+  "fields": {
+    "created": "2024-12-09T21:43:33.175Z",
+    "name": "Pink dress",
+    "slug": "pink-dress",
+    "description": "Make a statement in this charming pink dress, crafted for elegance and femininity. Perfect for dates, parties, or adding a pop of color to your wardrobe.",
+    "category": "d3742f82-b7c6-497d-a605-750c933b94d9",
+    "price": "80000.00",
+    "in_stock": 10,
+    "is_available": true,
+    "featured": false,
+    "flash_deals": false,
+    "image": "image/upload/media/products/pink-1_xw9lzu"
+  }
+},
+
+{
+  "model": "coupons.coupon",
+  "pk": 1,
+  "fields": {
+    "code": "SUMMER15",
+    "valid_from": "2024-12-03T03:27:53Z",
+    "valid_to": "2024-12-28T03:27:59Z",
+    "discount": 20,
+    "active": true
+  }
+},
+{
+  "model": "coupons.coupon",
+  "pk": 2,
+  "fields": {
+    "code": "FLASH15",
+    "valid_from": "2024-12-04T00:52:01Z",
+    "valid_to": "2024-12-06T00:52:06Z",
+    "discount": 50,
+    "active": true
+  }
+},
+{
+  "model": "coupons.coupon",
+  "pk": 3,
+  "fields": {
+    "code": "BLACKFRIDAY2024",
+    "valid_from": "2024-12-06T00:38:55Z",
+    "valid_to": "2024-12-07T00:39:05Z",
+    "discount": 20,
+    "active": true
+  }
+}
+]

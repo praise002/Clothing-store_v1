@@ -19,3 +19,5 @@ DATABASES = {
         "PORT": config("POSTGRES_PORT"),
     }
 }
+
+CELERY_BROKER_URL = 'redis://redis:6379/1'
